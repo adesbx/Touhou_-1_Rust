@@ -7,15 +7,17 @@ const PLAYER_SPEED: f32 = 200.0;
 const PLAYER_SIZE: f32 = 32.0; // taille du sprite du joueur
 const PROJECTILE_SPEED: f32 = 400.0;
 const PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
-const ANGEL_HP: f32 = 500.0; // taille du sprite ange
+const ANGEL_HP: f32 = 100.0; 
 const ANGEL_SIZE: f32 = 18.0; // taille du sprite ange
+const CROSS_PROJECTILE_SPEED: f32 = 300.0;
+const CROSS_PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
 const ZOOM_FACTOR: f32 = 0.5; // zoom caméra
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_systems(Startup, setup)
-        .add_systems(Startup, spawn_ennemy)
+        .add_systems(Startup, spawn_enemies)
         .add_systems(Update, move_player)
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, shoot_projectile)
@@ -23,6 +25,7 @@ fn main() {
         .add_systems(Update, confine_projectile_movement)
         .add_systems(Update, check_collison_enemies)
         .add_systems(Update, check_health)
+        .add_systems(Update, move_enemies)
         .run();
 }
 
@@ -113,7 +116,7 @@ fn shoot_projectile(
     player_transform: Single<&mut Transform, With<Player>>, 
     keyboard: Res<ButtonInput<KeyCode>>,
 ) {
-    if keyboard.just_pressed(KeyCode::KeyK) {
+    if keyboard.pressed(KeyCode::KeyK) {
         let texture = asset_serv.load("projectiles/projectile.png");
         commands.spawn((
             Sprite::from_image(texture),
@@ -155,25 +158,72 @@ fn confine_projectile_movement(
     }
 }
 
-fn spawn_ennemy(
+fn spawn_enemies(
+    time: Res<Time>,
     mut commands: Commands,
     window: Single<&Window, With<PrimaryWindow>>,
     asset_serv: Res<AssetServer>
 ) {
     let texture = asset_serv.load("enemies/angel.png");
+    let spawn_t: f32 = time.elapsed_secs();
+
     let half_width = (window.width() / 2.0) * ZOOM_FACTOR;
     let half_height = (window.height() / 2.0) * ZOOM_FACTOR;
+    let top_y = half_height - ANGEL_SIZE;
 
-    commands.spawn((
-        Sprite::from_image(texture),
-        Transform::from_xyz(
-            half_width - ANGEL_SIZE,
-            half_height - ANGEL_SIZE,
-            2.0
-        ),
-        Enemy,
-        Health{hp:ANGEL_HP},
-    ));    
+    // --- GROUPE GAUCHE (Vont vers la DROITE : direction = 1.0) ---
+    let left_x = -half_width + ANGEL_SIZE;
+    for i in 0..3 {
+        commands.spawn((
+            Sprite::from_image(texture.clone()),
+            Transform::from_xyz(left_x, top_y - (i as f32 * ANGEL_SIZE * 1.2), 2.0),
+            Enemy,
+            Health { hp: ANGEL_HP },
+            EnemyMovement { spawn_time: spawn_t, direction: 1.0 },
+        ));
+    }
+
+    // --- GROUPE DROITE (Vont vers la GAUCHE : direction = -1.0) ---
+    let right_x = half_width - ANGEL_SIZE;
+    for i in 0..3 {
+        commands.spawn((
+            Sprite::from_image(texture.clone()),
+            Transform::from_xyz(right_x, top_y - (i as f32 * ANGEL_SIZE * 1.2), 2.0),
+            Enemy,
+            Health { hp: ANGEL_HP },
+            EnemyMovement { spawn_time: spawn_t, direction: -1.0 },
+        ));
+    }
+
+    // --- GROUPE MILIEU (Descente "droite" : direction = 0.0) ---
+    let x_offset = ANGEL_SIZE; 
+    for x_side in [-1.0, 1.0] { 
+        commands.spawn((
+            Sprite::from_image(texture.clone()),
+            Transform::from_xyz(x_side * x_offset, top_y, 2.0),
+            Enemy,
+            Health { hp: ANGEL_HP },
+            EnemyMovement { spawn_time: spawn_t, direction: 0.0 },
+        ));
+    }
+
+}
+
+fn move_enemies(
+    time: Res<Time>,
+    mut query: Query<(&mut Transform, &EnemyMovement), With<Enemy>>,
+) {
+    let elapsed = time.elapsed_secs();
+
+    for (mut transform, movement) in &mut query {
+        transform.translation.y -= 50.0 * time.delta_secs();
+
+        let local_time = elapsed - movement.spawn_time;
+        
+        let offset_x = (local_time * 1.5).sin() * 75.0 * movement.direction;
+
+        transform.translation.x += offset_x * time.delta_secs();
+    }
 }
 
 fn check_collison_enemies(
@@ -207,6 +257,8 @@ fn check_health(
         }
     }
 }
+
+
  
 #[derive(Component)]
 struct Player;
@@ -220,4 +272,10 @@ struct Enemy;
 #[derive(Component)]
 struct Health {
     hp: f32
+}
+
+#[derive(Component)]
+struct EnemyMovement {
+    spawn_time: f32,
+    direction: f32, // 1.0 pour la droite vers la gauche, -1.0 pour l'inverse
 }
