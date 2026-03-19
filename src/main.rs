@@ -1,6 +1,7 @@
 use bevy::app::App;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use rand::Rng;
 
 const PLAYER_DAMAGE: f32 = 10.0;
 const PLAYER_SPEED: f32 = 200.0;
@@ -26,6 +27,8 @@ fn main() {
         .add_systems(Update, check_collison_enemies)
         .add_systems(Update, check_health)
         .add_systems(Update, move_enemies)
+        .add_systems(Update, enemies_shoot_projectiles)
+        .add_systems(Update, move_enemy_projectiles)
         .run();
 }
 
@@ -246,6 +249,41 @@ fn check_collison_enemies(
     }
 }
 
+fn enemies_shoot_projectiles(
+    mut commands: Commands,
+    asset_serv: Res<AssetServer>,
+    enemy_transform: Query<&Transform, With<Enemy>>,
+    player_transform: Single<&Transform, With<Player>>,
+) {
+    let player_pos = player_transform.translation.truncate(); 
+
+    for transform in &enemy_transform {
+        let mut rng = rand::thread_rng();
+
+        if rng.gen_range(1..101) == 1 {  
+            let enemy_pos = transform.translation.truncate();
+            let direction = (player_pos - enemy_pos).normalize_or_zero();
+
+            let texture = asset_serv.load("projectiles/projectile_cross.png");
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_translation(transform.translation),
+                EnemyProjectile{velocity: direction*CROSS_PROJECTILE_SPEED},
+            ));
+          }
+    }
+}
+
+fn move_enemy_projectiles(
+    time: Res<Time>,
+    mut query: Query<(&mut Transform, &EnemyProjectile)>,
+) {
+    for (mut transform, projectile) in &mut query {
+        let movement = projectile.velocity.extend(0.0) * time.delta_secs();
+        transform.translation += movement;
+    }
+}
+
 fn check_health(
     mut commands: Commands,
     health_query: Query<(Entity, &Health), With<Health>>,
@@ -265,6 +303,11 @@ struct Player;
 
 #[derive(Component)]
 struct Projectile;
+
+#[derive(Component)]
+struct EnemyProjectile {
+    velocity: Vec2,
+}
 
 #[derive(Component)]
 struct Enemy;
