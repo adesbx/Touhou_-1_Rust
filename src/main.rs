@@ -2,21 +2,27 @@ use bevy::app::App;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
+const PLAYER_DAMAGE: f32 = 10.0;
 const PLAYER_SPEED: f32 = 200.0;
 const PLAYER_SIZE: f32 = 32.0; // taille du sprite du joueur
 const PROJECTILE_SPEED: f32 = 400.0;
 const PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
+const ANGEL_HP: f32 = 500.0; // taille du sprite ange
+const ANGEL_SIZE: f32 = 18.0; // taille du sprite ange
 const ZOOM_FACTOR: f32 = 0.5; // zoom caméra
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_systems(Startup, setup)
+        .add_systems(Startup, spawn_ennemy)
         .add_systems(Update, move_player)
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, shoot_projectile)
         .add_systems(Update, move_projectile)
         .add_systems(Update, confine_projectile_movement)
+        .add_systems(Update, check_collison_enemies)
+        .add_systems(Update, check_health)
         .run();
 }
 
@@ -107,7 +113,7 @@ fn shoot_projectile(
     player_transform: Single<&mut Transform, With<Player>>, 
     keyboard: Res<ButtonInput<KeyCode>>,
 ) {
-    if keyboard.pressed(KeyCode::KeyK) {
+    if keyboard.just_pressed(KeyCode::KeyK) {
         let texture = asset_serv.load("projectiles/projectile.png");
         commands.spawn((
             Sprite::from_image(texture),
@@ -148,9 +154,70 @@ fn confine_projectile_movement(
         }
     }
 }
+
+fn spawn_ennemy(
+    mut commands: Commands,
+    window: Single<&Window, With<PrimaryWindow>>,
+    asset_serv: Res<AssetServer>
+) {
+    let texture = asset_serv.load("enemies/angel.png");
+    let half_width = (window.width() / 2.0) * ZOOM_FACTOR;
+    let half_height = (window.height() / 2.0) * ZOOM_FACTOR;
+
+    commands.spawn((
+        Sprite::from_image(texture),
+        Transform::from_xyz(
+            half_width - ANGEL_SIZE,
+            half_height - ANGEL_SIZE,
+            2.0
+        ),
+        Enemy,
+        Health{hp:ANGEL_HP},
+    ));    
+}
+
+fn check_collison_enemies(
+    mut commands: Commands,
+    projectile_query: Query<(Entity, &Transform), With<Projectile>>,
+    mut enemy_query: Query<(&Transform, &mut Health), With<Enemy>>,
+) {
+
+    for (projectile_entity, projectile_transform) in &projectile_query {
+        for (enemy_transform, mut enemy_health) in &mut enemy_query {
+            let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
+            let p2 = enemy_transform.translation.truncate();
+            let distance = p1.distance(p2);
+            if distance < (PROJECTILE_SIZE + ANGEL_SIZE) / 2.0 {                
+                commands.entity(projectile_entity).despawn();
+                enemy_health.hp -= PLAYER_DAMAGE;
+                break;
+            }
+        }
+    }
+}
+
+fn check_health(
+    mut commands: Commands,
+    health_query: Query<(Entity, &Health), With<Health>>,
+) {
+
+    for (entity, health) in &health_query {
+        if health.hp <= 0.0 {
+            commands.entity(entity).despawn();
+        }
+    }
+}
  
 #[derive(Component)]
 struct Player;
 
 #[derive(Component)]
 struct Projectile;
+
+#[derive(Component)]
+struct Enemy;
+
+#[derive(Component)]
+struct Health {
+    hp: f32
+}
