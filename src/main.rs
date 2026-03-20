@@ -46,21 +46,20 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
         }),
     )); 
 
-    let side_width = 200.0;
     commands.spawn((
         Sprite::from_color(
             Color::srgb(0.1, 0.1, 0.9),
-            Vec2::new(side_width, GAME_HEIGHT * 2.0),
+            Vec2::new(50.0, GAME_HEIGHT * 2.0),
         ),
-        Transform::from_xyz(-GAME_WIDTH / 2.0 - side_width / 2.0, 0.0, -10.0),
+        Transform::from_xyz(-GAME_WIDTH / 2.0 - 50.0 / 2.0, 0.0, -10.0),
     ));
 
     commands.spawn((
         Sprite::from_color(
             Color::srgb(0.1, 0.1, 0.9),
-            Vec2::new(side_width, GAME_HEIGHT * 2.0),
+            Vec2::new(200.0, GAME_HEIGHT * 2.0),
         ),
-        Transform::from_xyz(GAME_WIDTH / 2.0 + side_width / 2.0, 0.0, -10.0),
+        Transform::from_xyz(GAME_WIDTH / 2.0 + 200.0 / 2.0, 0.0, -10.0),
     ));
 
     let texture = asset_serv.load("characters/character.png");
@@ -168,14 +167,27 @@ fn move_projectile(
 fn confine_projectile_movement(    
     mut commands: Commands,
     projectile_query: Query<(Entity, &Transform), With<Projectile>>,
+    enemy_projectile_query: Query<(Entity, &Transform), With<EnemyProjectile>>,
+
 ) {
     let half_projectile_size: f32 = PROJECTILE_SIZE / 2.0;
     let half_height: f32 = GAME_HEIGHT / 2.0;
+    let half_width: f32 = GAME_WIDTH / 2.0;
 
+
+    let x_min = -half_width + half_projectile_size;
+    let x_max = half_width - half_projectile_size;
+    let y_min = -half_height + half_projectile_size;
     let y_max = half_height - half_projectile_size;
 
     for (entity, transform) in &projectile_query {
         if transform.translation.y > y_max {
+            commands.entity(entity).despawn();
+        }
+    }
+
+    for (entity, transform) in &enemy_projectile_query {
+        if transform.translation.y > y_max || transform.translation.y < y_min || transform.translation.x > x_max || transform.translation.x < x_min {
             commands.entity(entity).despawn();
         }
     }
