@@ -12,7 +12,9 @@ const ANGEL_HP: f32 = 100.0;
 const ANGEL_SIZE: f32 = 18.0; // taille du sprite ange
 const CROSS_PROJECTILE_SPEED: f32 = 300.0;
 const CROSS_PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
-const ZOOM_FACTOR: f32 = 0.5; // zoom caméra
+
+const GAME_WIDTH: f32 = 384.0;
+const GAME_HEIGHT: f32 = 448.0;
 
 fn main() {
     App::new()
@@ -36,10 +38,30 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
     commands.spawn((
         Camera2d, 
         Projection::Orthographic(OrthographicProjection { 
-            scale: ZOOM_FACTOR,
+            scaling_mode: bevy::camera::ScalingMode::AutoMin { 
+                min_width: GAME_WIDTH, 
+                min_height: GAME_HEIGHT
+            },
             ..OrthographicProjection::default_2d()
         }),
     )); 
+
+    let side_width = 200.0;
+    commands.spawn((
+        Sprite::from_color(
+            Color::srgb(0.1, 0.1, 0.9),
+            Vec2::new(side_width, GAME_HEIGHT * 2.0),
+        ),
+        Transform::from_xyz(-GAME_WIDTH / 2.0 - side_width / 2.0, 0.0, -10.0),
+    ));
+
+    commands.spawn((
+        Sprite::from_color(
+            Color::srgb(0.1, 0.1, 0.9),
+            Vec2::new(side_width, GAME_HEIGHT * 2.0),
+        ),
+        Transform::from_xyz(GAME_WIDTH / 2.0 + side_width / 2.0, 0.0, -10.0),
+    ));
 
     let texture = asset_serv.load("characters/character.png");
 
@@ -84,12 +106,11 @@ fn move_player(
 
 fn confine_player_movement(
     mut player_transform: Single<&mut Transform, With<Player>>, 
-    window: Single<&Window, With<PrimaryWindow>>
 ) {
 
-    let half_player_size: f32 = (PLAYER_SIZE / 2.0) * ZOOM_FACTOR;
-    let half_width: f32 = (window.width() / 2.0) * ZOOM_FACTOR;
-    let half_height: f32 = (window.height() / 2.0) * ZOOM_FACTOR;
+    let half_player_size: f32 = PLAYER_SIZE / 2.0;
+    let half_width: f32 = GAME_WIDTH / 2.0;
+    let half_height: f32 = GAME_HEIGHT / 2.0;
 
     let x_min = -half_width + half_player_size;
     let x_max = half_width - half_player_size;
@@ -147,10 +168,9 @@ fn move_projectile(
 fn confine_projectile_movement(    
     mut commands: Commands,
     projectile_query: Query<(Entity, &Transform), With<Projectile>>,
-    window: Single<&Window, With<PrimaryWindow>>
 ) {
-    let half_projectile_size: f32 = (PROJECTILE_SIZE / 2.0) * ZOOM_FACTOR;
-    let half_height: f32 = (window.height() / 2.0) * ZOOM_FACTOR;
+    let half_projectile_size: f32 = PROJECTILE_SIZE / 2.0;
+    let half_height: f32 = GAME_HEIGHT / 2.0;
 
     let y_max = half_height - half_projectile_size;
 
@@ -164,14 +184,13 @@ fn confine_projectile_movement(
 fn spawn_enemies(
     time: Res<Time>,
     mut commands: Commands,
-    window: Single<&Window, With<PrimaryWindow>>,
     asset_serv: Res<AssetServer>
 ) {
     let texture = asset_serv.load("enemies/angel.png");
     let spawn_t: f32 = time.elapsed_secs();
 
-    let half_width = (window.width() / 2.0) * ZOOM_FACTOR;
-    let half_height = (window.height() / 2.0) * ZOOM_FACTOR;
+    let half_width = GAME_WIDTH / 2.0;
+    let half_height = GAME_HEIGHT / 2.0;
     let top_y = half_height - ANGEL_SIZE;
 
     // --- GROUPE GAUCHE (Vont vers la DROITE : direction = 1.0) ---
