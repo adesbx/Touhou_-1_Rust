@@ -31,10 +31,12 @@ fn main() {
         .add_systems(Update, move_enemies)
         .add_systems(Update, enemies_shoot_projectiles)
         .add_systems(Update, move_enemy_projectiles)
+        .add_systems(Update, check_collison_projectile_player)
+        .add_systems(Update, update_health_ui)
         .run();
 }
 
-fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
+fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {    
     commands.spawn((
         Camera2d, 
         Projection::Orthographic(OrthographicProjection { 
@@ -68,6 +70,17 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
         Sprite::from_image(texture),
         Transform::from_xyz(0., 0., 0.),
         Player,
+        Health { hp: 3.0 },
+    ));
+
+    commands.spawn((
+        Text::new("HP: 3"), 
+        TextFont {
+            font_size: 40.0,
+            ..default()
+        },
+        TextColor(Color::srgb(1.0, 0.0, 0.0)), 
+        PlayerHealthText, 
     ));
 }
 
@@ -203,7 +216,7 @@ fn spawn_enemies(
 
     let half_width = GAME_WIDTH / 2.0;
     let half_height = GAME_HEIGHT / 2.0;
-    let top_y = half_height - ANGEL_SIZE;
+    let top_y = half_height;
 
     // --- GROUPE GAUCHE (Vont vers la DROITE : direction = 1.0) ---
     let left_x = -half_width + ANGEL_SIZE;
@@ -280,6 +293,26 @@ fn check_collison_enemies(
     }
 }
 
+fn check_collison_projectile_player(
+    mut commands: Commands,
+    enemy_projectile_query: Query<(Entity, &Transform), With<EnemyProjectile>>,
+    mut player_query: Single<(&Transform, &mut Health), With<Player>>,
+) {
+
+    for (projectile_entity, projectile_transform) in &enemy_projectile_query {
+        let (transform, health) = &mut *player_query; // possiblement sale voir pour faire autrement
+        let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
+        let p2 = transform.translation.truncate();
+        let distance = p1.distance(p2);
+        if distance < (PROJECTILE_SIZE + PLAYER_SIZE) / 2.0 {                
+            commands.entity(projectile_entity).despawn();
+            health.hp -= 1.0;
+            break;
+        }
+        
+    }
+}
+
 fn enemies_shoot_projectiles(
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
@@ -327,10 +360,29 @@ fn check_health(
     }
 }
 
+fn update_health_ui(
+    player_query: Single<&Health, With<Player>>, 
+    mut text_query: Single<&mut Text, With<PlayerHealthText>>,
+) {
+    // // On ajoute '*' pour accéder aux méthodes de DetectChanges sur le composant
+    // if player_query.is_changed() {
+        
+    //     // On utilise 'hp' comme indiqué par ton message d'erreur
+    //     let hp_point = player_query.hp; 
+
+    //     // Dans Bevy 0.15+, Text est une tuple struct, on accède à la string via .0
+    //     text_query.0 = format!("HP: {:.0}", hp_point);
+    // }
+
+    text_query.0 = format!("HP: {:.0}", player_query.hp);
+}
 
  
 #[derive(Component)]
 struct Player;
+
+#[derive(Component)]
+struct PlayerHealthText;
 
 #[derive(Component)]
 struct Projectile;
