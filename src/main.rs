@@ -4,14 +4,16 @@ use bevy::window::PrimaryWindow;
 use rand::Rng;
 
 const PLAYER_DAMAGE: f32 = 10.0;
+const PLAYER_HP: f32 = 3.0;
 const PLAYER_SPEED: f32 = 200.0;
 const PLAYER_SIZE: f32 = 32.0; // taille du sprite du joueur
 const PROJECTILE_SPEED: f32 = 400.0;
 const PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
 const ANGEL_HP: f32 = 100.0; 
 const ANGEL_SIZE: f32 = 18.0; // taille du sprite ange
-const CROSS_PROJECTILE_SPEED: f32 = 300.0;
+const CROSS_PROJECTILE_SPEED: f32 = 200.0;
 const CROSS_PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
+const POWER_UP_SIZE: f32 = 14.0;
 
 const GAME_WIDTH: f32 = 384.0;
 const GAME_HEIGHT: f32 = 448.0;
@@ -33,6 +35,9 @@ fn main() {
         .add_systems(Update, move_enemy_projectiles)
         .add_systems(Update, check_collison_projectile_player)
         .add_systems(Update, update_health_ui)
+        .add_systems(Update, update_damage_ui)
+        .add_systems(Update, move_power_up)
+        .add_systems(Update, check_collison_power_up)
         .run();
 }
 
@@ -70,7 +75,8 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
         Sprite::from_image(texture),
         Transform::from_xyz(0., 0., 0.),
         Player,
-        Health { hp: 3.0 },
+        Health { hp: PLAYER_HP},
+        Damage { damage: PLAYER_DAMAGE}
     ));
 
     commands.spawn((
@@ -79,8 +85,30 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
             font_size: 40.0,
             ..default()
         },
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
+            ..default()
+        },
         TextColor(Color::srgb(1.0, 0.0, 0.0)), 
         PlayerHealthText, 
+    ));
+
+    commands.spawn((
+        Text::new("Damage: 10"), 
+        TextFont {
+            font_size: 40.0,
+            ..default()
+        },
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0 + 30.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
+            ..default()
+        },
+        TextColor(Color::srgb(1.0, 0.0, 0.0)), 
+        PlayerDamageText, 
     ));
 }
 
@@ -277,6 +305,7 @@ fn check_collison_enemies(
     mut commands: Commands,
     projectile_query: Query<(Entity, &Transform), With<Projectile>>,
     mut enemy_query: Query<(&Transform, &mut Health), With<Enemy>>,
+    mut player_query: Single<&Damage, With<Player>>,
 ) {
 
     for (projectile_entity, projectile_transform) in &projectile_query {
@@ -286,7 +315,7 @@ fn check_collison_enemies(
             let distance = p1.distance(p2);
             if distance < (PROJECTILE_SIZE + ANGEL_SIZE) / 2.0 {                
                 commands.entity(projectile_entity).despawn();
-                enemy_health.hp -= PLAYER_DAMAGE;
+                enemy_health.hp -= player_query.damage;
                 break;
             }
         }
@@ -328,7 +357,7 @@ fn enemies_shoot_projectiles(
             let enemy_pos = transform.translation.truncate();
             let direction = (player_pos - enemy_pos).normalize_or_zero();
 
-            let texture = asset_serv.load("projectiles/projectile_cross.png");
+            let texture: Handle<Image> = asset_serv.load("projectiles/projectile_cross.png");
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_translation(transform.translation),
@@ -348,14 +377,50 @@ fn move_enemy_projectiles(
     }
 }
 
+fn move_power_up(
+    time: Res<Time>,
+    mut query: Query<&mut Transform, With<PowerUp>>,
+) {
+    for mut transform  in &mut query {
+        transform.translation.y -= 40.0 * time.delta_secs();
+
+    }
+}
+
+fn check_collison_power_up(
+    mut commands: Commands,
+    power_up_query: Query<(Entity, &Transform), With<PowerUp>>,
+    mut player_query: Single<(&Transform, &mut Damage), With<Player>>,
+) {
+    let (transform, damage_player) = &mut *player_query; // possiblement sale voir pour faire autrement
+
+    for (power_entity, power_transform) in &power_up_query {
+            let p1 = power_transform.translation.truncate(); // Vec3 -> Vec2
+            let p2 = transform.translation.truncate();
+            let distance = p1.distance(p2);
+            if distance < (POWER_UP_SIZE + PLAYER_SIZE) / 2.0 {                
+                damage_player.damage += PLAYER_DAMAGE;
+                commands.entity(power_entity).despawn();
+                break;
+            }
+    }
+}
+
 fn check_health(
     mut commands: Commands,
-    health_query: Query<(Entity, &Health), With<Health>>,
+    asset_serv: Res<AssetServer>,
+    health_query: Query<(Entity, &Transform ,&Health), With<Health>>,
 ) {
 
-    for (entity, health) in &health_query {
+    for (entity, transform, health) in &health_query {
         if health.hp <= 0.0 {
             commands.entity(entity).despawn();
+            let texture: Handle<Image> = asset_serv.load("items/power_up.png");
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_translation(transform.translation),
+                PowerUp
+            ));
         }
     }
 }
@@ -364,19 +429,15 @@ fn update_health_ui(
     player_query: Single<&Health, With<Player>>, 
     mut text_query: Single<&mut Text, With<PlayerHealthText>>,
 ) {
-    // // On ajoute '*' pour accéder aux méthodes de DetectChanges sur le composant
-    // if player_query.is_changed() {
-        
-    //     // On utilise 'hp' comme indiqué par ton message d'erreur
-    //     let hp_point = player_query.hp; 
-
-    //     // Dans Bevy 0.15+, Text est une tuple struct, on accède à la string via .0
-    //     text_query.0 = format!("HP: {:.0}", hp_point);
-    // }
-
     text_query.0 = format!("HP: {:.0}", player_query.hp);
 }
 
+fn update_damage_ui(
+    player_query: Single<&Damage, With<Player>>, 
+    mut text_query: Single<&mut Text, With<PlayerDamageText>>,
+) {
+    text_query.0 = format!("Damage: {:.0}", player_query.damage);
+}
  
 #[derive(Component)]
 struct Player;
@@ -385,7 +446,13 @@ struct Player;
 struct PlayerHealthText;
 
 #[derive(Component)]
+struct PlayerDamageText;
+
+#[derive(Component)]
 struct Projectile;
+
+#[derive(Component)]
+struct PowerUp;
 
 #[derive(Component)]
 struct EnemyProjectile {
@@ -398,6 +465,11 @@ struct Enemy;
 #[derive(Component)]
 struct Health {
     hp: f32
+}
+
+#[derive(Component)]
+struct Damage {
+    damage: f32
 }
 
 #[derive(Component)]
