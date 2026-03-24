@@ -177,31 +177,57 @@ fn confine_player_movement(
 fn shoot_projectile(
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
-    player_transform: Single<&mut Transform, With<Player>>, 
+    mut player_query: Single<(&Transform, &mut Damage), With<Player>>,
     keyboard: Res<ButtonInput<KeyCode>>,
 ) {
     if keyboard.pressed(KeyCode::KeyK) {
         let texture = asset_serv.load("projectiles/projectile.png");
-        commands.spawn((
-            Sprite::from_image(texture),
-            Transform::from_xyz(
-                player_transform.translation.x,
-                player_transform.translation.y+10.0,
-                player_transform.translation.z
-            ),
-            Projectile,
-        ));
+        let (transform, damage_player) = &mut *player_query; // possiblement sale voir pour faire autrement
+
+        let base_x = transform.translation.x;
+        let base_y = transform.translation.y + 10.0;
+        let z = transform.translation.z;
+
+        if damage_player.damage < 50.0 {
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_xyz(
+                    base_x,
+                    base_y,
+                    z
+                ),
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED},
+            ));
+        } else if damage_player.damage < 100.0 {
+            commands.spawn((
+                Sprite::from_image(texture.clone()),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED},
+            ));
+
+            commands.spawn((
+                Sprite::from_image(texture.clone()),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED},
+            ));
+
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED},
+            ));
+        }
+
     }
 }
 
 fn move_projectile(
     time:  Res<Time>,
-    mut projectile_query: Query<&mut Transform, With<Projectile>>, 
+    mut projectile_query: Query<(&mut Transform, &Projectile)>,
 ) {
-    for mut transform in &mut projectile_query {
-        let mut direction: Vec2 = Vec2::ZERO;
-        direction.y += 1.;
-        transform.translation.y += direction.y * time.delta_secs() * PROJECTILE_SPEED;
+    for (mut transform, projectile) in &mut projectile_query {
+        let movement = projectile.direction.normalize() * projectile.speed * time.delta_secs();
+        transform.translation += movement.extend(0.0);
     }
 }
 
@@ -222,7 +248,7 @@ fn confine_projectile_movement(
     let y_max = half_height - half_projectile_size;
 
     for (entity, transform) in &projectile_query {
-        if transform.translation.y > y_max {
+        if transform.translation.y > y_max || transform.translation.y < y_min || transform.translation.x > x_max || transform.translation.x < x_min {
             commands.entity(entity).despawn();
         }
     }
@@ -449,7 +475,10 @@ struct PlayerHealthText;
 struct PlayerDamageText;
 
 #[derive(Component)]
-struct Projectile;
+struct Projectile {
+    direction: Vec2,
+    speed: f32,
+}
 
 #[derive(Component)]
 struct PowerUp;
