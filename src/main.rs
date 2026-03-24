@@ -1,8 +1,8 @@
 use bevy::app::App;
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
 use rand::Rng;
 
+const INVINCIBILITY_TIME: f32 = 2.0;
 const PLAYER_DAMAGE: f32 = 10.0;
 const PLAYER_HP: f32 = 3.0;
 const PLAYER_SPEED: f32 = 200.0;
@@ -74,7 +74,7 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
     commands.spawn((
         Sprite::from_image(texture),
         Transform::from_xyz(0., 0., 0.),
-        Player,
+        Player { last_hit: 0.0},
         Health { hp: PLAYER_HP},
         Damage { damage: PLAYER_DAMAGE}
     ));
@@ -331,7 +331,7 @@ fn check_collison_enemies(
     mut commands: Commands,
     projectile_query: Query<(Entity, &Transform), With<Projectile>>,
     mut enemy_query: Query<(&Transform, &mut Health), With<Enemy>>,
-    mut player_query: Single<&Damage, With<Player>>,
+    player_query: Single<&Damage, With<Player>>,
 ) {
 
     for (projectile_entity, projectile_transform) in &projectile_query {
@@ -349,22 +349,25 @@ fn check_collison_enemies(
 }
 
 fn check_collison_projectile_player(
+    time: Res<Time>,
     mut commands: Commands,
     enemy_projectile_query: Query<(Entity, &Transform), With<EnemyProjectile>>,
-    mut player_query: Single<(&Transform, &mut Health), With<Player>>,
+    mut player_query: Single<(&Transform, &mut Health, &mut Player), With<Player>>,
 ) {
-
-    for (projectile_entity, projectile_transform) in &enemy_projectile_query {
-        let (transform, health) = &mut *player_query; // possiblement sale voir pour faire autrement
-        let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
-        let p2 = transform.translation.truncate();
-        let distance = p1.distance(p2);
-        if distance < (PROJECTILE_SIZE + PLAYER_SIZE) / 2.0 {                
-            commands.entity(projectile_entity).despawn();
-            health.hp -= 1.0;
-            break;
+    let (transform, health, player) = &mut *player_query; // possiblement sale voir pour faire autrement
+    if time.elapsed_secs() - player.last_hit > INVINCIBILITY_TIME  {
+        for (projectile_entity, projectile_transform) in &enemy_projectile_query {
+            let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
+            let p2 = transform.translation.truncate();
+            let distance = p1.distance(p2);
+            if distance < (PROJECTILE_SIZE + PLAYER_SIZE) / 2.0 {                
+                commands.entity(projectile_entity).despawn();
+                health.hp -= 1.0;
+                player.last_hit = time.elapsed_secs();
+                break;
+            }
+            
         }
-        
     }
 }
 
@@ -466,7 +469,9 @@ fn update_damage_ui(
 }
  
 #[derive(Component)]
-struct Player;
+struct Player {
+    last_hit: f32,
+}
 
 #[derive(Component)]
 struct PlayerHealthText;
