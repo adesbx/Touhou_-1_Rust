@@ -1,6 +1,9 @@
 use bevy::app::App;
 use bevy::prelude::*;
 use rand::Rng;
+use serde::Deserialize;
+use bevy::asset::{io::Reader, AssetLoader, LoadContext};
+use futures_lite::AsyncReadExt;
 
 const INVINCIBILITY_TIME: f32 = 2.0;
 const PLAYER_DAMAGE: f32 = 10.0;
@@ -21,8 +24,9 @@ const GAME_HEIGHT: f32 = 448.0;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .init_asset::<LevelData>()
+        .register_asset_loader(LevelDataLoader)
         .add_systems(Startup, setup)
-        .add_systems(Startup, spawn_enemies)
         .add_systems(Update, move_player)
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, shoot_projectile)
@@ -38,10 +42,14 @@ fn main() {
         .add_systems(Update, update_damage_ui)
         .add_systems(Update, move_power_up)
         .add_systems(Update, check_collison_power_up)
+        .add_systems(Update, spawn_from_level_data)
         .run();
 }
 
-fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {    
+fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {   
+    let handle = asset_serv.load("enemies.ron");
+    commands.insert_resource(LevelHandle(handle));
+
     commands.spawn((
         Camera2d, 
         Projection::Orthographic(OrthographicProjection { 
@@ -310,6 +318,33 @@ fn spawn_enemies(
 
 }
 
+fn spawn_from_level_data(
+    time: Res<Time>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    level_assets: Res<Assets<LevelData>>,
+    level_handle: Res<LevelHandle>, 
+    mut next_index: Local<usize>,
+) {    
+    if let Some(level) = level_assets.get(&level_handle.0) {
+        let current_time = time.elapsed_secs();
+
+        while *next_index < level.waves.len() && current_time >= level.waves[*next_index].spawn_time {
+            let wave = &level.waves[*next_index];
+            
+            commands.spawn((
+                Sprite::from_image(asset_server.load("enemies/angel.png")),
+                Transform::from_translation(wave.pos.extend(2.0)),
+                Enemy,
+                Health { hp: wave.hp.hp },
+                EnemyMovement { spawn_time: current_time, direction: wave.direction },
+            ));
+
+            *next_index += 1;
+        }
+    }
+}
+
 fn move_enemies(
     time: Res<Time>,
     mut query: Query<(&mut Transform, &EnemyMovement), With<Enemy>>,
@@ -494,9 +529,15 @@ struct EnemyProjectile {
 }
 
 #[derive(Component)]
-struct Enemy;
+struct EnemyMovement {
+    spawn_time: f32,
+    direction: f32, // 1.0 pour la droite vers la gauche, -1.0 pour l'inverse
+}
 
 #[derive(Component)]
+struct Enemy;
+
+#[derive(Component, Debug, Deserialize)]
 struct Health {
     hp: f32
 }
@@ -506,8 +547,44 @@ struct Damage {
     damage: f32
 }
 
-#[derive(Component)]
-struct EnemyMovement {
+#[derive(Deserialize, Debug)]
+struct  EnemyWave {
     spawn_time: f32,
-    direction: f32, // 1.0 pour la droite vers la gauche, -1.0 pour l'inverse
+    pos: Vec2,
+    direction: f32,
+    hp: Health
+}
+
+
+#[derive(Deserialize, Asset, TypePath, Debug)]
+pub struct LevelData {
+    waves: Vec<EnemyWave>
+}
+
+#[derive(Resource)]
+struct LevelHandle(Handle<LevelData>);
+
+#[derive(Default)]
+pub struct LevelDataLoader;
+
+impl AssetLoader for LevelDataLoader {
+    type Asset = LevelData;
+    type Settings = ();
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+
+    async fn load(
+        &self,
+        reader: &mut dyn Reader,
+        _settings: &(),
+        _load_context: &mut LoadContext<'_>,
+    ) -> Result<Self::Asset, Self::Error> {
+        let mut bytes = Vec::new();
+        reader.read_to_end(&mut bytes).await?;
+        let level = ron::de::from_bytes::<LevelData>(&bytes)?;
+        Ok(level)
+    }
+
+    fn extensions(&self) -> &[&str] {
+        &["ron"]
+    }
 }
