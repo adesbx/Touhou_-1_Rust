@@ -14,6 +14,7 @@ const PROJECTILE_SPEED: f32 = 400.0;
 const PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
 const ANGEL_HP: f32 = 100.0; 
 const ANGEL_SIZE: f32 = 18.0; // taille du sprite ange
+const CHERUB_SIZE: f32 = 18.0;
 const CROSS_PROJECTILE_SPEED: f32 = 200.0;
 const CROSS_PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
 const POWER_UP_SIZE: f32 = 14.0;
@@ -268,55 +269,55 @@ fn confine_projectile_movement(
     }
 }
 
-fn spawn_enemies(
-    time: Res<Time>,
-    mut commands: Commands,
-    asset_serv: Res<AssetServer>
-) {
-    let texture = asset_serv.load("enemies/angel.png");
-    let spawn_t: f32 = time.elapsed_secs();
+// fn spawn_enemies(
+//     time: Res<Time>,
+//     mut commands: Commands,
+//     asset_serv: Res<AssetServer>
+// ) {
+//     let texture = asset_serv.load("enemies/angel.png");
+//     let spawn_t: f32 = time.elapsed_secs();
 
-    let half_width = GAME_WIDTH / 2.0;
-    let half_height = GAME_HEIGHT / 2.0;
-    let top_y = half_height;
+//     let half_width = GAME_WIDTH / 2.0;
+//     let half_height = GAME_HEIGHT / 2.0;
+//     let top_y = half_height;
 
-    // --- GROUPE GAUCHE (Vont vers la DROITE : direction = 1.0) ---
-    let left_x = -half_width + ANGEL_SIZE;
-    for i in 0..3 {
-        commands.spawn((
-            Sprite::from_image(texture.clone()),
-            Transform::from_xyz(left_x, top_y - (i as f32 * ANGEL_SIZE * 1.2), 2.0),
-            Enemy,
-            Health { hp: ANGEL_HP },
-            EnemyMovement { spawn_time: spawn_t, direction: 1.0 },
-        ));
-    }
+//     // --- GROUPE GAUCHE (Vont vers la DROITE : direction = 1.0) ---
+//     let left_x = -half_width + ANGEL_SIZE;
+//     for i in 0..3 {
+//         commands.spawn((
+//             Sprite::from_image(texture.clone()),
+//             Transform::from_xyz(left_x, top_y - (i as f32 * ANGEL_SIZE * 1.2), 2.0),
+//             Enemy,
+//             Health { hp: ANGEL_HP },
+//             EnemyMovement { spawn_time: spawn_t, direction: 1.0 },
+//         ));
+//     }
 
-    // --- GROUPE DROITE (Vont vers la GAUCHE : direction = -1.0) ---
-    let right_x = half_width - ANGEL_SIZE;
-    for i in 0..3 {
-        commands.spawn((
-            Sprite::from_image(texture.clone()),
-            Transform::from_xyz(right_x, top_y - (i as f32 * ANGEL_SIZE * 1.2), 2.0),
-            Enemy,
-            Health { hp: ANGEL_HP },
-            EnemyMovement { spawn_time: spawn_t, direction: -1.0 },
-        ));
-    }
+//     // --- GROUPE DROITE (Vont vers la GAUCHE : direction = -1.0) ---
+//     let right_x = half_width - ANGEL_SIZE;
+//     for i in 0..3 {
+//         commands.spawn((
+//             Sprite::from_image(texture.clone()),
+//             Transform::from_xyz(right_x, top_y - (i as f32 * ANGEL_SIZE * 1.2), 2.0),
+//             Enemy,
+//             Health { hp: ANGEL_HP },
+//             EnemyMovement { spawn_time: spawn_t, direction: -1.0 },
+//         ));
+//     }
 
-    // --- GROUPE MILIEU (Descente "droite" : direction = 0.0) ---
-    let x_offset = ANGEL_SIZE; 
-    for x_side in [-1.0, 1.0] { 
-        commands.spawn((
-            Sprite::from_image(texture.clone()),
-            Transform::from_xyz(x_side * x_offset, top_y, 2.0),
-            Enemy,
-            Health { hp: ANGEL_HP },
-            EnemyMovement { spawn_time: spawn_t, direction: 0.0 },
-        ));
-    }
+//     // --- GROUPE MILIEU (Descente "droite" : direction = 0.0) ---
+//     let x_offset = ANGEL_SIZE; 
+//     for x_side in [-1.0, 1.0] { 
+//         commands.spawn((
+//             Sprite::from_image(texture.clone()),
+//             Transform::from_xyz(x_side * x_offset, top_y, 2.0),
+//             Enemy,
+//             Health { hp: ANGEL_HP },
+//             EnemyMovement { spawn_time: spawn_t, direction: 0.0 },
+//         ));
+//     }
 
-}
+// }
 
 fn spawn_from_level_data(
     time: Res<Time>,
@@ -332,10 +333,18 @@ fn spawn_from_level_data(
         while *next_index < level.waves.len() && current_time >= level.waves[*next_index].spawn_time {
             let wave = &level.waves[*next_index];
             
+            let mut text = "";
+            if wave.variety == 'a'{
+                text = "enemies/angel.png";
+            }
+            else if wave.variety == 'c'{
+                text = "enemies/cherubien.png";
+            }
+            
             commands.spawn((
-                Sprite::from_image(asset_server.load("enemies/angel.png")),
+                Sprite::from_image(asset_server.load(text)),
                 Transform::from_translation(wave.pos.extend(2.0)),
-                Enemy,
+                Enemy { variety: wave.variety},
                 Health { hp: wave.hp.hp },
                 EnemyMovement { spawn_time: current_time, direction: wave.direction },
             ));
@@ -409,15 +418,15 @@ fn check_collison_projectile_player(
 fn enemies_shoot_projectiles(
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
-    enemy_transform: Query<&Transform, With<Enemy>>,
+    enemy_transform: Query<(&Transform, &Enemy), With<Enemy>>,
     player_transform: Single<&Transform, With<Player>>,
 ) {
     let player_pos = player_transform.translation.truncate(); 
 
-    for transform in &enemy_transform {
+    for (transform, enemy) in &enemy_transform {
         let mut rng = rand::thread_rng();
 
-        if rng.gen_range(1..101) == 1 {  
+        if rng.gen_range(1..101) == 1 && enemy.variety == 'a' {  
             let enemy_pos = transform.translation.truncate();
             let direction = (player_pos - enemy_pos).normalize_or_zero();
 
@@ -535,7 +544,9 @@ struct EnemyMovement {
 }
 
 #[derive(Component)]
-struct Enemy;
+struct Enemy {
+    variety: char,
+}
 
 #[derive(Component, Debug, Deserialize)]
 struct Health {
@@ -552,7 +563,8 @@ struct  EnemyWave {
     spawn_time: f32,
     pos: Vec2,
     direction: f32,
-    hp: Health
+    hp: Health,
+    variety: char
 }
 
 
