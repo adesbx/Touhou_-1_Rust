@@ -361,18 +361,20 @@ fn move_enemies(
 ) {
     let elapsed = time.elapsed_secs();
     let attraction_speed = 150.0;
+    let attraction_range = 50.0;
+
+    let p1 = player_query.translation.truncate();
 
     for (mut transform, movement, enemy) in &mut query {
 
         if enemy.variety == 'c' {
-            let p1 = player_query.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
-            let distance = p1.distance(p2) + 10.0;
-            if distance < (CHERUB_SIZE + PLAYER_SIZE) / 2.0 {     
+            let distance = p1.distance(p2);
+            if distance < attraction_range {     
                            
                     let direction = (p1 - p2).normalize_or_zero();
                     
-                    let strength = (1.0 - (distance / CHERUB_SIZE)).max(0.0);
+                    let strength = (1.0 - (distance / attraction_range));
                     let velocity = direction.extend(0.0) * (attraction_speed * strength) * time.delta_secs();
                     
                     transform.translation += velocity;
@@ -415,6 +417,7 @@ fn check_collison_projectile_player(
     time: Res<Time>,
     mut commands: Commands,
     enemy_projectile_query: Query<(Entity, &Transform), With<EnemyProjectile>>,
+    enemy_query: Query<(Entity, &Transform), With<Enemy>>,
     mut player_query: Single<(&Transform, &mut Health, &mut Player), With<Player>>,
 ) {
     let (transform, health, player) = &mut *player_query; // possiblement sale voir pour faire autrement
@@ -429,7 +432,18 @@ fn check_collison_projectile_player(
                 player.last_hit = time.elapsed_secs();
                 break;
             }
-            
+        }
+
+        for (enemy_entity, enemy_transform) in &enemy_query {
+            let p1 = enemy_transform.translation.truncate(); // Vec3 -> Vec2
+            let p2 = transform.translation.truncate();
+            let distance = p1.distance(p2);
+            if distance < (ANGEL_SIZE + PLAYER_SIZE) / 2.0 {                
+                commands.entity(enemy_entity).despawn();
+                health.hp -= 1.0;
+                player.last_hit = time.elapsed_secs();
+                break;
+            }
         }
     }
 }
