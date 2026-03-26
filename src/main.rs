@@ -356,11 +356,30 @@ fn spawn_from_level_data(
 
 fn move_enemies(
     time: Res<Time>,
-    mut query: Query<(&mut Transform, &EnemyMovement), With<Enemy>>,
+    mut query: Query<(&mut Transform, &EnemyMovement, &Enemy), (With<Enemy>, Without<Player>)>,
+    player_query: Single<&Transform, (With<Player>, Without<Enemy>)>,
 ) {
     let elapsed = time.elapsed_secs();
+    let attraction_speed = 150.0;
 
-    for (mut transform, movement) in &mut query {
+    for (mut transform, movement, enemy) in &mut query {
+
+        if enemy.variety == 'c' {
+            let p1 = player_query.translation.truncate(); // Vec3 -> Vec2
+            let p2 = transform.translation.truncate();
+            let distance = p1.distance(p2) + 10.0;
+            if distance < (CHERUB_SIZE + PLAYER_SIZE) / 2.0 {     
+                           
+                    let direction = (p1 - p2).normalize_or_zero();
+                    
+                    let strength = (1.0 - (distance / CHERUB_SIZE)).max(0.0);
+                    let velocity = direction.extend(0.0) * (attraction_speed * strength) * time.delta_secs();
+                    
+                    transform.translation += velocity;
+                    continue;
+            }
+        }
+
         transform.translation.y -= 50.0 * time.delta_secs();
 
         let local_time = elapsed - movement.spawn_time;
