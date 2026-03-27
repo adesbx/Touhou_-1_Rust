@@ -40,19 +40,15 @@
     	// --- VAGUE 7 : LA PINCE DE CHERUBINS (T=22s) ---
         // Groupe de GAUCHE (Arc positif pour aller vers le centre)
         (spawn_time: 22.0, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.3, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.6, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.9, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 23.2, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 23.5, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.3, pos: (-175.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.6, pos: (-170.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.9, pos: (-165.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
 
-        // Groupe de DROITE (Arc négatif pour aller vers le centre)
+        // Droite : On fait de même pour éviter la superposition totale
         (spawn_time: 22.0, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.3, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.6, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.9, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 23.2, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 23.5, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.3, pos: (175.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.6, pos: (170.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.9, pos: (165.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
 
         // --- VAGUE 8 : LES ANGES CENTRAUX (T=23.5s) ---
         // 3 paires d'anges en ZigZag descendant au milieu
@@ -68,19 +64,19 @@
         // --- VAGUE 9 : L'ÉCLAIREUR RAPIDE (T=30s) ---
         // 5 Chérubins qui arrivent très vite du coin haut-gauche
         // Ils utilisent Arc(100.0) pour traverser l'écran vers le bas-droite
-        (spawn_time: 30.0, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
-        (spawn_time: 30.2, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
-        (spawn_time: 30.4, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
-        (spawn_time: 30.6, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
-        (spawn_time: 30.8, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.0, pos: (-180.0, 240.0), direction: 1.0, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.2, pos: (-180.0, 240.0), direction: 1.0, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.4, pos: (-180.0, 240.0), direction: 1.0, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.6, pos: (-180.0, 240.0), direction: 1.0, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.8, pos: (-180.0, 240.0), direction: 1.0, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
 
         // --- VAGUE 10 : LE MUR SPIRALÉ (T=31s) ---
         // 4 Anges qui descendent en plein milieu (X=0)
         // Le pattern Spiral(10.0) les fait tourner sur eux-mêmes en descendant
-        (spawn_time: 31.0, pos: (0.0, 240.0), direction: 1.0,  hp: (hp: 250.0), variety: 'a', pattern: Spiral(10.0)),
-        (spawn_time: 32.5, pos: (0.0, 240.0), direction: -1.0, hp: (hp: 250.0), variety: 'a', pattern: Spiral(15.0)),
-        (spawn_time: 34.0, pos: (0.0, 240.0), direction: 1.0,  hp: (hp: 250.0), variety: 'a', pattern: Spiral(10.0)),
-        (spawn_time: 35.5, pos: (0.0, 240.0), direction: -1.0, hp: (hp: 250.0), variety: 'a', pattern: Spiral(15.0)),
+        (spawn_time: 31.0, pos: (0.0, 240.0), direction: 1.0,  hp: (hp: 250.0), variety: 'a', pattern: Spiral(2.0)),
+        (spawn_time: 32.5, pos: (0.0, 240.0), direction: -1.0, hp: (hp: 250.0), variety: 'a', pattern: Spiral(4.0)),
+        (spawn_time: 34.0, pos: (0.0, 240.0), direction: 1.0,  hp: (hp: 250.0), variety: 'a', pattern: Spiral(2.0)),
+        (spawn_time: 35.5, pos: (0.0, 240.0), direction: -1.0, hp: (hp: 250.0), variety: 'a', pattern: Spiral(4.0)),
 
         // --- VAGUE 11 : LA CROIX CHRÉTIENNE ('c') (T=40s) ---
         // Tous utilisent Pattern: Straight. Ils descendent à l'unisson.
@@ -90,20 +86,17 @@
         (spawn_time: 40.0, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.15, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.30, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        // Ce chérubin est le centre d'intersection :
         (spawn_time: 40.45, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight), 
-        (spawn_time: 40.60, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.75, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.90, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 41.05, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
 
-        // --- PARTIE 2 : LA BARRE TRANSVERSALE (S'imbrique au centre) ---
-        // Spawn simultané à T = 40.45s (quand le chérubin central apparaît).
-        // Ils sont espacés en X pour créer la barre horizontale.
+        // 2. La barre horizontale (Spawn simultané à 40.45s)
         (spawn_time: 40.45, pos: (-60.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.45, pos: (-30.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        // (spawn_time: 40.45, pos: (0.0, 240.0)) <-- Ce chérubin est déjà dans le poteau vertical
         (spawn_time: 40.45, pos: (30.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.45, pos: (60.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+
+        // 3. Haut du poteau (On rajoute 3 chérubins APRÈS la barre pour fermer la croix en haut)
+        (spawn_time: 40.60, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.75, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 41.90, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
     ]
 )
