@@ -83,7 +83,7 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
     commands.spawn((
         Sprite::from_image(texture),
         Transform::from_xyz(0., 0., 0.),
-        Player { last_hit: 0.0},
+        Player { last_hit: 0.0, shoot_timer: Timer::from_seconds(0.1, TimerMode::Repeating)},
         Health { hp: PLAYER_HP},
         Damage { damage: PLAYER_DAMAGE}
     ));
@@ -184,14 +184,17 @@ fn confine_player_movement(
 }
 
 fn shoot_projectile(
+    time:  Res<Time>,
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
-    mut player_query: Single<(&Transform, &mut Damage), With<Player>>,
+    mut player_query: Single<(&Transform, &mut Damage, &mut Player), With<Player>>,
     keyboard: Res<ButtonInput<KeyCode>>,
 ) {
-    if keyboard.pressed(KeyCode::KeyK) {
+    let (transform, damage_player, player) = &mut *player_query;
+
+    player.shoot_timer.tick(time.delta());
+    if keyboard.pressed(KeyCode::KeyK) && player.shoot_timer.is_finished(){
         let texture = asset_serv.load("projectiles/projectile.png");
-        let (transform, damage_player) = &mut *player_query; // possiblement sale voir pour faire autrement
 
         let base_x = transform.translation.x;
         let base_y = transform.translation.y + 10.0;
@@ -521,12 +524,15 @@ fn check_health(
     for (entity, transform, health) in &health_query {
         if health.hp <= 0.0 {
             commands.entity(entity).despawn();
-            let texture: Handle<Image> = asset_serv.load("items/power_up.png");
-            commands.spawn((
-                Sprite::from_image(texture),
-                Transform::from_translation(transform.translation),
-                PowerUp
-            ));
+            let mut rng = rand::thread_rng();
+            if rng.gen_range(1..4) == 1 { // 1/3 de faire spawbn un power up  
+                let texture: Handle<Image> = asset_serv.load("items/power_up.png");
+                commands.spawn((
+                    Sprite::from_image(texture),
+                    Transform::from_translation(transform.translation),
+                    PowerUp
+                ));
+            }
         }
     }
 }
@@ -548,6 +554,7 @@ fn update_damage_ui(
 #[derive(Component)]
 struct Player {
     last_hit: f32,
+    shoot_timer: Timer,
 }
 
 #[derive(Component)]
