@@ -1,37 +1,109 @@
 (
     waves: [
-        // --- VAGUE 1 : CHERUBS GAUCHE (T = 1.0s) ---
-        // Ils utilisent SineWave pour une approche fluide avant de "chasser" le joueur
-        (spawn_time: 1.0, pos: (-140.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: SineWave),
-        (spawn_time: 1.3, pos: (-140.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: SineWave),
-        (spawn_time: 1.6, pos: (-140.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: SineWave),
+        // --- GROUPE GAUCHE ('c') ---
+        // Spawn à X = -130, toutes les 0.5 secondes.
+        // Direction = 1.0 (oscillation douce)
+        (spawn_time: 1.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 1.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 2.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 2.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 3.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 3.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
 
-        // --- VAGUE 2 : CHERUBS DROITE (T = 3.5s) ---
-        // Ceux-là descendent en spirale, très difficile à viser !
-        (spawn_time: 3.5, pos: (140.0, 240.0), direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Spiral(5.0)),
-        (spawn_time: 3.8, pos: (140.0, 240.0), direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Spiral(5.0)),
-        (spawn_time: 4.1, pos: (140.0, 240.0), direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Spiral(5.0)),
+        // --- GROUPE DROITE ('c') ---
+        // Spawn décalé de 4.5s par rapport au début de gauche (quand le dernier est à mi-chemin).
+        // Spawn à X = 130, toutes les 0.5 secondes.
+        // Direction = -1.0 pour une oscillation en miroir.
+        (spawn_time: 5.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 6.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 6.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 7.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 7.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 8.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
 
-        // --- VAGUE 3 : MILIEU (T = 6.0s) ---
-        // Un mouvement en ZigZag agressif (intensité 150.0)
-        (spawn_time: 6.0, pos: (-40.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: ZigZag(150.0)),
-        (spawn_time: 6.0, pos: (40.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: ZigZag(150.0)),
+    	// --- VAGUE 5 : LES ANGES BALAYEURS (GAUCHE) ---
+        // Ils partent de la gauche et glissent vers la droite (direction: 1.0)
+        // Spawn à T=12.0 (on laisse un peu de temps après la vague des chérubins)
+        (spawn_time: 12.0, pos: (-100.0, 240.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
+        (spawn_time: 12.4, pos: (-100.0, 240.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
+        (spawn_time: 12.8, pos: (-100.0, 240.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
+        (spawn_time: 13.2, pos: (-100.0, 240.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
 
-        // --- VAGUE 4 : LES ANGES DU CENTRE (T = 9.0s) ---
-        // Paire 1 : Descente classique (Straight)
-        (spawn_time: 9.0, pos: (-60.0, 240.0), direction: 0.3,  hp: (hp: 150.0), variety: 'a', pattern: Straight),
-        (spawn_time: 9.0, pos: (60.0, 240.0),  direction: -0.3, hp: (hp: 150.0), variety: 'a', pattern: Straight),
-        
-        // Paire 2 : Mouvement en Arc (s'écartent vers les bords de l'écran)
-        (spawn_time: 9.5, pos: (-60.0, 240.0), direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: Arc(40.0)),
-        (spawn_time: 9.5, pos: (60.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: Arc(40.0)),
-        
-        // Paire 3 : SineWave large pour couvrir le centre
-        (spawn_time: 10.0, pos: (-60.0, 240.0), direction: 0.5,  hp: (hp: 150.0), variety: 'a', pattern: SineWave),
-        (spawn_time: 10.0, pos: (60.0, 240.0),  direction: -0.5, hp: (hp: 150.0), variety: 'a', pattern: SineWave),
-        
-        // --- BONUS : L'ANGE FINAL (T = 13.0s) ---
-        // Un gros ange qui descend très lentement en zigzaguant au milieu
-        (spawn_time: 13.0, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 500.0), variety: 'a', pattern: ZigZag(50.0)),
+        // --- VAGUE 6 : LES ANGES BALAYEURS (DROITE) ---
+        // Ils partent de la droite et glissent vers la gauche (direction: -1.0)
+        // Spawn à T=17.5 (4.3s après le dernier spawn de gauche pour qu'il ait quitté l'écran)
+        (spawn_time: 17.5, pos: (100.0, 240.0), direction: -1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
+        (spawn_time: 17.9, pos: (100.0, 240.0), direction: -1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
+        (spawn_time: 18.3, pos: (100.0, 240.0), direction: -1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
+        (spawn_time: 18.7, pos: (100.0, 240.0), direction: -1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
+
+    	// --- VAGUE 7 : LA PINCE DE CHERUBINS (T=22s) ---
+        // Groupe de GAUCHE (Arc positif pour aller vers le centre)
+        (spawn_time: 22.0, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.3, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.6, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.9, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 23.2, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 23.5, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+
+        // Groupe de DROITE (Arc négatif pour aller vers le centre)
+        (spawn_time: 22.0, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.3, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.6, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 22.9, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 23.2, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 23.5, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+
+        // --- VAGUE 8 : LES ANGES CENTRAUX (T=23.5s) ---
+        // 3 paires d'anges en ZigZag descendant au milieu
+        (spawn_time: 23.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+        (spawn_time: 23.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+
+        (spawn_time: 24.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+        (spawn_time: 24.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+
+        (spawn_time: 25.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+        (spawn_time: 25.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+
+        // --- VAGUE 9 : L'ÉCLAIREUR RAPIDE (T=30s) ---
+        // 5 Chérubins qui arrivent très vite du coin haut-gauche
+        // Ils utilisent Arc(100.0) pour traverser l'écran vers le bas-droite
+        (spawn_time: 30.0, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.2, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.4, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.6, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+        (spawn_time: 30.8, pos: (-180.0, 240.0), direction: 1.5, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),
+
+        // --- VAGUE 10 : LE MUR SPIRALÉ (T=31s) ---
+        // 4 Anges qui descendent en plein milieu (X=0)
+        // Le pattern Spiral(10.0) les fait tourner sur eux-mêmes en descendant
+        (spawn_time: 31.0, pos: (0.0, 240.0), direction: 1.0,  hp: (hp: 250.0), variety: 'a', pattern: Spiral(10.0)),
+        (spawn_time: 32.5, pos: (0.0, 240.0), direction: -1.0, hp: (hp: 250.0), variety: 'a', pattern: Spiral(15.0)),
+        (spawn_time: 34.0, pos: (0.0, 240.0), direction: 1.0,  hp: (hp: 250.0), variety: 'a', pattern: Spiral(10.0)),
+        (spawn_time: 35.5, pos: (0.0, 240.0), direction: -1.0, hp: (hp: 250.0), variety: 'a', pattern: Spiral(15.0)),
+
+        // --- VAGUE 11 : LA CROIX CHRÉTIENNE ('c') (T=40s) ---
+        // Tous utilisent Pattern: Straight. Ils descendent à l'unisson.
+
+        // --- PARTIE 1 : LE POTEAU VERTICAL (Ligne centrale) ---
+        // Spawn à X = 0.0, toutes les 0.15s pour créer la colonne.
+        (spawn_time: 40.0, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.15, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.30, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        // Ce chérubin est le centre d'intersection :
+        (spawn_time: 40.45, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight), 
+        (spawn_time: 40.60, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.75, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.90, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 41.05, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+
+        // --- PARTIE 2 : LA BARRE TRANSVERSALE (S'imbrique au centre) ---
+        // Spawn simultané à T = 40.45s (quand le chérubin central apparaît).
+        // Ils sont espacés en X pour créer la barre horizontale.
+        (spawn_time: 40.45, pos: (-60.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (-30.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        // (spawn_time: 40.45, pos: (0.0, 240.0)) <-- Ce chérubin est déjà dans le poteau vertical
+        (spawn_time: 40.45, pos: (30.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (60.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
     ]
 )
