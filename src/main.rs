@@ -36,6 +36,7 @@ fn main() {
         .add_systems(Update, check_collison_enemies)
         .add_systems(Update, check_health)
         .add_systems(Update, move_enemies)
+        .add_systems(Update, confine_enemies_movement)
         .add_systems(Update, enemies_shoot_projectiles)
         .add_systems(Update, move_enemy_projectiles)
         .add_systems(Update, check_collison_projectile_player)
@@ -349,7 +350,7 @@ fn spawn_from_level_data(
                 Transform::from_translation(wave.pos.extend(2.0)),
                 Enemy { variety: wave.variety},
                 Health { hp: wave.hp.hp },
-                EnemyMovement { spawn_time: current_time, direction: wave.direction },
+                EnemyMovement { spawn_time: current_time, direction: wave.direction, pattern: wave.pattern },
             ));
 
             *next_index += 1;
@@ -362,36 +363,77 @@ fn move_enemies(
     mut query: Query<(&mut Transform, &EnemyMovement, &Enemy), (With<Enemy>, Without<Player>)>,
     player_query: Single<&Transform, (With<Player>, Without<Enemy>)>,
 ) {
+    let dt = time.delta_secs();
     let elapsed = time.elapsed_secs();
-    let attraction_speed = 150.0;
-    let attraction_range = 50.0;
-
     let p1 = player_query.translation.truncate();
+    
+    let attraction_speed = 150.0;
+    let attraction_range = 100.0; 
 
     for (mut transform, movement, enemy) in &mut query {
+        let local_time = elapsed - movement.spawn_time;
 
         if enemy.variety == 'c' {
             let p2 = transform.translation.truncate();
             let distance = p1.distance(p2);
             if distance < attraction_range {     
-                           
-                    let direction = (p1 - p2).normalize_or_zero();
-                    
-                    let strength = (1.0 - (distance / attraction_range));
-                    let velocity = direction.extend(0.0) * (attraction_speed * strength) * time.delta_secs();
-                    
-                    transform.translation += velocity;
-                    continue;
+                let direction = (p1 - p2).normalize_or_zero();
+                let strength = (1.0 - (distance / attraction_range)).max(0.0);
+                transform.translation += direction.extend(0.0) * attraction_speed * strength * dt;
+                continue; // Le Cherub ignore son pattern s'il chasse le joueur
             }
         }
 
-        transform.translation.y -= 50.0 * time.delta_secs();
+        match movement.pattern {
+            MovePattern::Straight => {
+                transform.translation.y -= 80.0 * dt;
+            }
+            
+            MovePattern::ZigZag(intensity) => {
+                transform.translation.y -= 60.0 * dt;
+                let x_move = (local_time * 10.0).sin() * intensity;
+                transform.translation.x += x_move * movement.direction * dt;
+            }
 
-        let local_time = elapsed - movement.spawn_time;
-        
-        let offset_x = (local_time * 1.5).sin() * 75.0 * movement.direction;
+            MovePattern::SineWave => {
+                transform.translation.y -= 50.0 * dt;
+                let offset_x = (local_time * 1.5).sin() * 75.0;
+                transform.translation.x += offset_x * movement.direction * dt;
+            }
 
-        transform.translation.x += offset_x * time.delta_secs();
+            MovePattern::Spiral(curve) => {
+                transform.translation.y -= 40.0 * dt;
+                transform.translation.x += (local_time * 5.0).cos() * curve;
+                transform.translation.y += (local_time * 5.0).sin() * curve;
+            }
+
+            MovePattern::Arc(curve_strength) => {
+                transform.translation.y -= 70.0 * dt;
+                let x_force = local_time * local_time * curve_strength;
+                transform.translation.x += x_force * movement.direction * dt;
+            }
+        }
+    }
+}
+
+fn confine_enemies_movement(    
+    mut commands: Commands,
+    enemy_query: Query<(Entity, &Transform), With<Enemy>>,
+
+) {
+    let half_enemy_size: f32 = ANGEL_SIZE / 2.0;
+    let half_height: f32 = GAME_HEIGHT / 2.0;
+    let half_width: f32 = GAME_WIDTH / 2.0;
+
+
+    let x_min = -half_width + half_enemy_size;
+    let x_max = half_width - half_enemy_size;
+    let y_min = -half_height + half_enemy_size;
+
+    for (entity, transform) in &enemy_query {
+        if transform.translation.y < y_min || transform.translation.x > x_max || transform.translation.x < x_min {
+            commands.entity(entity).despawn();
+        }
     }
 }
 
@@ -577,10 +619,20 @@ struct EnemyProjectile {
     velocity: Vec2,
 }
 
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+enum MovePattern {
+    Straight,
+    ZigZag(f32),
+    Spiral(f32),
+    Arc(f32),
+    SineWave,
+}
+
 #[derive(Component)]
 struct EnemyMovement {
     spawn_time: f32,
     direction: f32, // 1.0 pour la droite vers la gauche, -1.0 pour l'inverse
+    pattern: MovePattern,
 }
 
 #[derive(Component)]
@@ -604,7 +656,8 @@ struct  EnemyWave {
     pos: Vec2,
     direction: f32,
     hp: Health,
-    variety: char
+    variety: char,
+    pattern: MovePattern
 }
 
 

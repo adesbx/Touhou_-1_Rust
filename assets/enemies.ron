@@ -1,40 +1,37 @@
 (
     waves: [
-        // --- VAGUE 1 : GROUPE GAUCHE (T = 1.0s) ---
-        // Spawn juste au-dessus du bord haut (Y = 240)
-        (spawn_time: 1.0, pos: (-140.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c'),
-        (spawn_time: 1.3, pos: (-140.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c'),
-        (spawn_time: 1.6, pos: (-140.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c'),
+        // --- VAGUE 1 : CHERUBS GAUCHE (T = 1.0s) ---
+        // Ils utilisent SineWave pour une approche fluide avant de "chasser" le joueur
+        (spawn_time: 1.0, pos: (-140.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: SineWave),
+        (spawn_time: 1.3, pos: (-140.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: SineWave),
+        (spawn_time: 1.6, pos: (-140.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: SineWave),
 
-        // --- VAGUE 2 : GROUPE DROITE (T = 3.5s) ---
-        (spawn_time: 3.5, pos: (140.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c'),
-        (spawn_time: 3.8, pos: (140.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c'),
-        (spawn_time: 4.1, pos: (140.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c'),
+        // --- VAGUE 2 : CHERUBS DROITE (T = 3.5s) ---
+        // Ceux-là descendent en spirale, très difficile à viser !
+        (spawn_time: 3.5, pos: (140.0, 240.0), direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Spiral(5.0)),
+        (spawn_time: 3.8, pos: (140.0, 240.0), direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Spiral(5.0)),
+        (spawn_time: 4.1, pos: (140.0, 240.0), direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Spiral(5.0)),
 
         // --- VAGUE 3 : MILIEU (T = 6.0s) ---
-        (spawn_time: 6.0, pos: (-40.0, 240.0), direction: 0.0, hp: ( hp: 100.0 ), variety: 'c'),
-        (spawn_time: 6.0, pos: (40.0, 240.0), direction: 0.0, hp: ( hp: 100.0 ), variety: 'c'),
+        // Un mouvement en ZigZag agressif (intensité 150.0)
+        (spawn_time: 6.0, pos: (-40.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: ZigZag(150.0)),
+        (spawn_time: 6.0, pos: (40.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: ZigZag(150.0)),
 
         // --- VAGUE 4 : LES ANGES DU CENTRE (T = 9.0s) ---
-        // Ils arrivent deux par deux, échelonnés dans le temps
-        // Paire 1
-        (spawn_time: 9.0, pos: (-60.0, 240.0), direction: 0.3, hp: ( hp: 150.0 ), variety: 'a'),
-        (spawn_time: 9.0, pos: (60.0, 240.0),  direction: -0.3, hp: ( hp: 150.0 ), variety: 'a'),
-        // Paire 2 (0.5s plus tard)
-        (spawn_time: 9.5, pos: (-60.0, 240.0), direction: 0.3, hp: ( hp: 150.0 ), variety: 'a'),
-        (spawn_time: 9.5, pos: (60.0, 240.0),  direction: -0.3, hp: ( hp: 150.0 ), variety: 'a'),
-        // Paire 3 (1.0s plus tard)
-        (spawn_time: 10.0, pos: (-60.0, 240.0), direction: 0.3, hp: ( hp: 150.0 ), variety: 'a'),
-        (spawn_time: 10.0, pos: (60.0, 240.0),  direction: -0.3, hp: ( hp: 150.0 ), variety: 'a'),
-
-
-        (spawn_time: 10.0, pos: (-60.0, 240.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a'),
-        (spawn_time: 10.0, pos: (60.0, 240.0),  direction: -1.0, hp: ( hp: 150.0 ), variety: 'a'),
-        // Paire 2 (0.5s plus tard)
-        (spawn_time: 10.5, pos: (-60.0, 240.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a'),
-        (spawn_time: 10.5, pos: (60.0, 240.0),  direction: -1.0, hp: ( hp: 150.0 ), variety: 'a'),
-        // Paire 3 (1.0s plus tard)
-        (spawn_time: 11.0, pos: (-60.0, 240.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a'),
-        (spawn_time: 11.0, pos: (60.0, 240.0),  direction: -1.0, hp: ( hp: 150.0 ), variety: 'a'),
+        // Paire 1 : Descente classique (Straight)
+        (spawn_time: 9.0, pos: (-60.0, 240.0), direction: 0.3,  hp: (hp: 150.0), variety: 'a', pattern: Straight),
+        (spawn_time: 9.0, pos: (60.0, 240.0),  direction: -0.3, hp: (hp: 150.0), variety: 'a', pattern: Straight),
+        
+        // Paire 2 : Mouvement en Arc (s'écartent vers les bords de l'écran)
+        (spawn_time: 9.5, pos: (-60.0, 240.0), direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: Arc(40.0)),
+        (spawn_time: 9.5, pos: (60.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: Arc(40.0)),
+        
+        // Paire 3 : SineWave large pour couvrir le centre
+        (spawn_time: 10.0, pos: (-60.0, 240.0), direction: 0.5,  hp: (hp: 150.0), variety: 'a', pattern: SineWave),
+        (spawn_time: 10.0, pos: (60.0, 240.0),  direction: -0.5, hp: (hp: 150.0), variety: 'a', pattern: SineWave),
+        
+        // --- BONUS : L'ANGE FINAL (T = 13.0s) ---
+        // Un gros ange qui descend très lentement en zigzaguant au milieu
+        (spawn_time: 13.0, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 500.0), variety: 'a', pattern: ZigZag(50.0)),
     ]
 )
