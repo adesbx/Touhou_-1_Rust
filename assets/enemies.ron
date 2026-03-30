@@ -87,16 +87,23 @@
         (spawn_time: 40.15, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.30, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.45, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight), 
+        
 
         // 2. La barre horizontale (Spawn simultané à 40.45s)
-        (spawn_time: 40.45, pos: (-60.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.45, pos: (-30.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (-20.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (-10.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (10.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (20.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.45, pos: (30.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.45, pos: (60.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
 
         // 3. Haut du poteau (On rajoute 3 chérubins APRÈS la barre pour fermer la croix en haut)
         (spawn_time: 40.60, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 40.75, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 41.90, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.90, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 41.05, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 41.20, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 41.35, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+
     ]
 )
