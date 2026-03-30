@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::app::App;
 use bevy::prelude::*;
 use rand::Rng;
@@ -541,17 +543,21 @@ fn move_power_up(
 fn check_collison_power_up(
     mut commands: Commands,
     power_up_query: Query<(Entity, &Transform), With<PowerUp>>,
-    mut player_query: Single<(&Transform, &mut Damage), With<Player>>,
+    mut player_query: Single<(&Transform, &mut Damage, &mut Player), With<Player>>,
 ) {
-    let (transform, damage_player) = &mut *player_query; // possiblement sale voir pour faire autrement
+    let (transform, damage_player, player) = &mut *player_query; // possiblement sale voir pour faire autrement
 
     for (power_entity, power_transform) in &power_up_query {
             let p1 = power_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
-            let distance = p1.distance(p2);
+            let distance: f32 = p1.distance(p2);
             if distance < (POWER_UP_SIZE + PLAYER_SIZE) / 2.0 {                
                 damage_player.damage += PLAYER_DAMAGE;
                 commands.entity(power_entity).despawn();
+
+                let new_delay = (0.1 - (damage_player.damage - 10.0) * 0.0005).max(0.02);
+                player.shoot_timer.set_duration(Duration::from_secs_f32(new_delay));
+
                 break;
             }
     }
