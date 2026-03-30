@@ -14,6 +14,7 @@ const PLAYER_SPEED: f32 = 200.0;
 const PLAYER_SIZE: f32 = 32.0; // taille du sprite du joueur
 const PROJECTILE_SPEED: f32 = 400.0;
 const PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
+const FIRE_PROJECTILE_SIZE: f32 = 20.0; // taille du sprite projectile
 const ANGEL_HP: f32 = 100.0; 
 const ANGEL_SIZE: f32 = 18.0; // taille du sprite ange
 const CHERUB_SIZE: f32 = 18.0;
@@ -86,7 +87,12 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
     commands.spawn((
         Sprite::from_image(texture),
         Transform::from_xyz(0., 0., 0.),
-        Player { last_hit: 0.0, shoot_timer: Timer::from_seconds(0.1, TimerMode::Repeating)},
+        Player { 
+            last_hit: 0.0, 
+            shoot_timer: Timer::from_seconds(0.1, TimerMode::Repeating), 
+            shoot_from_left: false,
+            shoot_timer_fire: Timer::from_seconds(0.5, TimerMode::Repeating), 
+        },
         Health { hp: PLAYER_HP},
         Damage { damage: PLAYER_DAMAGE}
     ));
@@ -196,8 +202,12 @@ fn shoot_projectile(
     let (transform, damage_player, player) = &mut *player_query;
 
     player.shoot_timer.tick(time.delta());
+    player.shoot_timer_fire.tick(time.delta());
+
     if keyboard.pressed(KeyCode::KeyK) && player.shoot_timer.is_finished(){
         let texture = asset_serv.load("projectiles/projectile.png");
+        let fire_texture = asset_serv.load("projectiles/fire_ball.png");
+
 
         let base_x = transform.translation.x;
         let base_y = transform.translation.y + 10.0;
@@ -211,26 +221,61 @@ fn shoot_projectile(
                     base_y,
                     z
                 ),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED},
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
             ));
         } else if damage_player.damage < 100.0 {
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED},
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs(),},
             ));
 
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED},
+                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
             ));
 
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED},
+                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
             ));
+        } else if damage_player.damage < 150.0 {
+                        commands.spawn((
+                Sprite::from_image(texture.clone()),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+            ));
+
+            commands.spawn((
+                Sprite::from_image(texture.clone()),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+            ));
+
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+            ));
+            
+            if  player.shoot_timer_fire.is_finished() {
+                if player.shoot_from_left {
+                commands.spawn((
+                        Sprite::from_image(fire_texture),
+                        Transform::from_xyz(base_x-10.0, base_y, z),
+                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
+                    ));
+                } else {
+                    commands.spawn((
+                        Sprite::from_image(fire_texture),
+                        Transform::from_xyz(base_x+10.0, base_y, z),
+                        Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
+                    ));
+                }
+                player.shoot_from_left = !player.shoot_from_left
+            }
         }
 
     }
@@ -240,9 +285,20 @@ fn move_projectile(
     time:  Res<Time>,
     mut projectile_query: Query<(&mut Transform, &Projectile)>,
 ) {
+    let elapsed = time.elapsed_secs();
+    let dt = time.delta_secs();
+
     for (mut transform, projectile) in &mut projectile_query {
-        let movement = projectile.direction.normalize() * projectile.speed * time.delta_secs();
-        transform.translation += movement.extend(0.0);
+
+        if projectile.variety == 'b' {// projectile basique fonce dans sa direction
+            let movement = projectile.direction.normalize() * projectile.speed * time.delta_secs();
+            transform.translation += movement.extend(0.0);
+        } else if projectile.variety == 'f' {
+            let local_time: f32 = elapsed - projectile.spawn_time;
+            transform.translation.y += projectile.speed * dt;
+            let x_force = local_time * local_time * 300.0;
+            transform.translation.x += x_force * projectile.direction.x * dt;
+        }
     }
 }
 
@@ -603,6 +659,8 @@ fn update_damage_ui(
 struct Player {
     last_hit: f32,
     shoot_timer: Timer,
+    shoot_timer_fire: Timer,
+    shoot_from_left: bool,
 }
 
 #[derive(Component)]
@@ -615,6 +673,8 @@ struct PlayerDamageText;
 struct Projectile {
     direction: Vec2,
     speed: f32,
+    variety: char,
+    spawn_time: f32,
 }
 
 #[derive(Component)]
