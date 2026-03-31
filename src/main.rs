@@ -29,6 +29,9 @@ fn main() {
 fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {   
     let handle = asset_serv.load("enemies.ron");
     commands.insert_resource(LevelHandle(handle));
+    commands.insert_resource(BombSpawner {
+        spawn_timer: Timer::from_seconds(5.0, TimerMode::Once),
+    });
 
     commands.spawn((
         Camera2d, 
@@ -67,6 +70,7 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
             shoot_timer: Timer::from_seconds(0.1, TimerMode::Repeating), 
             shoot_from_left: false,
             shoot_timer_fire: Timer::from_seconds(0.5, TimerMode::Repeating), 
+            nbr_bombs: 0
         },
         Health { hp: PLAYER_HP},
         Damage { damage: PLAYER_DAMAGE}
@@ -89,7 +93,7 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
     ));
 
     commands.spawn((
-        Text::new("Damage: 10"), 
+        Text::new("Power: 10"), 
         TextFont {
             font_size: 40.0,
             ..default()
@@ -102,5 +106,21 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
         },
         TextColor(Color::srgb(1.0, 0.0, 0.0)), 
         PlayerDamageText, 
+    ));
+
+    commands.spawn((
+        Text::new("Bombs: 0"), 
+        TextFont {
+            font_size: 40.0,
+            ..default()
+        },
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0 + 60.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
+            ..default()
+        },
+        TextColor(Color::srgb(1.0, 0.0, 0.0)), 
+        PlayerBombsText, 
     ));
 }

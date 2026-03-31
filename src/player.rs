@@ -7,7 +7,7 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (move_player, confine_player_movement, move_power_up, check_collison_power_up));
+        app.add_systems(Update, (move_player, confine_player_movement, move_power_up, check_collison_power_up, use_bombs));
     }
 }
 
@@ -104,4 +104,43 @@ fn check_collison_power_up(
                 break;
             }
     }
+}
+
+fn use_bombs(
+    mut commands: Commands,
+    asset_serv: Res<AssetServer>,
+    mut player_query: Single<(&Transform, &mut Player), With<Player>>,
+    mut enemy_query: Query<(&Transform, &mut Health), With<Enemy>>, 
+    keyboard: Res<ButtonInput<KeyCode>>
+) {
+
+    let (transform, player) = &mut *player_query; // possiblement sale voir pour faire autrement
+
+    if keyboard.pressed(KeyCode::KeyL) && player.nbr_bombs > 0 {
+        let player_pos = transform.translation.truncate();
+        let bomb_radius = 180.0;
+        let bomb_damage = 200.0;
+        for (enemy_transform, mut enemy_health) in &mut enemy_query {
+            let enemy_pos = enemy_transform.translation.truncate();
+            if player_pos.distance(enemy_pos) < bomb_radius {
+                enemy_health.hp -= bomb_damage;
+            
+            }
+        }
+        
+        commands.spawn((
+            Sprite {
+                image: asset_serv.load("projectiles/explosion_ring.png"),
+                custom_size: Some(Vec2::new(128.0, 128.0)), 
+                ..default()
+            },
+            Transform::from_translation(transform.translation),
+            DespawnTimer {
+                timer: Timer::from_seconds(0.5, TimerMode::Once),
+            },
+        ));
+
+        player.nbr_bombs -= 1;
+    }
+
 }

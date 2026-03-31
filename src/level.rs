@@ -1,12 +1,14 @@
 use bevy::prelude::*;
+use rand::Rng;
 use crate::components::*;
+use crate::constants::*;
 use bevy::asset::{io::Reader, AssetLoader, LoadContext};
 
 pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, spawn_from_level_data);
+        app.add_systems(Update, (spawn_from_level_data, spawn_bombs, move_bombs, check_collison_bombs, handle_despawn_timers));
     }
 }
 
@@ -44,6 +46,77 @@ pub fn spawn_from_level_data(
         }
     }
 }
+
+pub fn spawn_bombs(
+    time: Res<Time>,
+    mut commands: Commands,
+    asset_serv: Res<AssetServer>,
+    mut spawner: ResMut<BombSpawner>,
+){
+    spawner.spawn_timer.tick(time.delta());
+
+    if spawner.spawn_timer.is_finished() {
+        let mut rng = rand::thread_rng();
+
+        let texture: Handle<Image> = asset_serv.load("items/bomb_angel.png");
+        let random_x = rng.gen_range(-GAME_WIDTH / 2.0 .. GAME_WIDTH / 2.0);
+        let spawn_pos = Vec3::new(random_x, GAME_HEIGHT / 2.0 + 50.0, 5.0);
+
+        commands.spawn((
+            Sprite::from_image(texture),
+            Transform::from_translation(spawn_pos),
+            Bomb
+        ));
+
+        let next_wait = rng.gen_range(25.0..50.0);
+        spawner.spawn_timer.set_duration(std::time::Duration::from_secs_f32(next_wait));
+        spawner.spawn_timer.reset();
+    }
+}
+
+fn move_bombs(
+    time: Res<Time>,
+    mut query: Query<&mut Transform, With<Bomb>>,
+) {
+    for mut transform  in &mut query {
+        transform.translation.y -= 40.0 * time.delta_secs();
+    }
+}
+
+fn check_collison_bombs(
+    mut commands: Commands,
+    bomb_query: Query<(Entity, &Transform), With<Bomb>>,
+    mut player_query: Single<(&Transform, &mut Player), With<Player>>,
+) {
+    let (transform, player) = &mut *player_query; // possiblement sale voir pour faire autrement
+
+    for (power_entity, power_transform) in &bomb_query {
+            let p1 = power_transform.translation.truncate(); // Vec3 -> Vec2
+            let p2 = transform.translation.truncate();
+            let distance: f32 = p1.distance(p2);
+            if distance < (POWER_UP_SIZE + PLAYER_SIZE) / 2.0 {                
+                player.nbr_bombs += 1;
+                commands.entity(power_entity).despawn();
+
+                break;
+            }
+    }
+}
+
+fn handle_despawn_timers(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut DespawnTimer)>,
+) {
+    for (entity, mut despawn_timer) in &mut query {
+        despawn_timer.timer.tick(time.delta());
+        
+        if despawn_timer.timer.is_finished() {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
 
 impl AssetLoader for LevelDataLoader {
     type Asset = LevelData;

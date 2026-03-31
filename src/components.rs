@@ -7,6 +7,7 @@ pub struct Player {
     pub shoot_timer: Timer,
     pub shoot_timer_fire: Timer,
     pub shoot_from_left: bool,
+    pub nbr_bombs: i32
 }
 
 #[derive(Component)]
@@ -14,6 +15,9 @@ pub struct PlayerHealthText;
 
 #[derive(Component)]
 pub struct PlayerDamageText;
+
+#[derive(Component)]
+pub struct PlayerBombsText;
 
 #[derive(Component)]
 pub struct Projectile {
@@ -25,6 +29,19 @@ pub struct Projectile {
 
 #[derive(Component)]
 pub struct PowerUp;
+
+#[derive(Component)]
+pub struct Bomb;
+
+#[derive(Resource)]
+pub struct BombSpawner{
+    pub spawn_timer: Timer,
+}
+
+#[derive(Component)]
+pub struct DespawnTimer {
+    pub timer: Timer,
+}
 
 #[derive(Component)]
 pub struct EnemyProjectile {
