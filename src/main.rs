@@ -509,7 +509,7 @@ fn check_collison_enemies(
             let distance = p1.distance(p2);
             if distance < (PROJECTILE_SIZE + ANGEL_SIZE) / 2.0 {                
                 commands.entity(projectile_entity).despawn();
-                enemy_health.hp -= player_query.damage;
+                enemy_health.hp -= PLAYER_DAMAGE; //anciennement player_query.damage; mtn les ennemient perdent un montant fixe par projectile
                 break;
             }
         }
