@@ -1,0 +1,107 @@
+use bevy::prelude::*;
+use std::time::Duration;
+use crate::components::*;
+use crate::constants::*;
+
+pub struct PlayerPlugin;
+
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, (move_player, confine_player_movement, move_power_up, check_collison_power_up));
+    }
+}
+
+fn confine_player_movement(
+    mut player_transform: Single<&mut Transform, With<Player>>, 
+) {
+
+    let half_player_size: f32 = PLAYER_SIZE / 2.0;
+    let half_width: f32 = GAME_WIDTH / 2.0;
+    let half_height: f32 = GAME_HEIGHT / 2.0;
+
+    let x_min = -half_width + half_player_size;
+    let x_max = half_width - half_player_size;
+    let y_min = -half_height + half_player_size;
+    let y_max = half_height - half_player_size;
+
+    let mut translation: Vec3 = player_transform.translation;
+
+    if translation.x < x_min {
+        translation.x = x_min
+    } else if translation.x > x_max {
+        translation.x = x_max
+    }
+
+    if translation.y < y_min {
+        translation.y = y_min
+    } else if translation.y > y_max {
+        translation.y = y_max
+    }
+
+    player_transform.translation = translation;
+}
+
+fn move_player(
+    time:  Res<Time>,
+    mut player_transform: Single<&mut Transform, With<Player>>, 
+    keyboard: Res<ButtonInput<KeyCode>>
+) {
+    let mut direction = Vec2::ZERO;
+
+    if keyboard.pressed(KeyCode::KeyW) {
+        direction.y += 1.;
+    }
+
+    if keyboard.pressed(KeyCode::KeyS) {
+        direction.y -= 1.;
+    }
+
+    if keyboard.pressed(KeyCode::KeyD) {
+        direction.x += 1.;
+    }
+
+    if keyboard.pressed(KeyCode::KeyA) {
+        direction.x -= 1.;
+    }
+
+    //no more speed bonus in diagonal
+    if direction != Vec2::ZERO {
+        direction = direction.normalize_or_zero();
+    }
+
+    player_transform.translation.x += direction.x * time.delta_secs() * PLAYER_SPEED;
+    player_transform.translation.y += direction.y * time.delta_secs() * PLAYER_SPEED;
+}
+
+fn move_power_up(
+    time: Res<Time>,
+    mut query: Query<&mut Transform, With<PowerUp>>,
+) {
+    for mut transform  in &mut query {
+        transform.translation.y -= 40.0 * time.delta_secs();
+
+    }
+}
+
+fn check_collison_power_up(
+    mut commands: Commands,
+    power_up_query: Query<(Entity, &Transform), With<PowerUp>>,
+    mut player_query: Single<(&Transform, &mut Damage, &mut Player), With<Player>>,
+) {
+    let (transform, damage_player, player) = &mut *player_query; // possiblement sale voir pour faire autrement
+
+    for (power_entity, power_transform) in &power_up_query {
+            let p1 = power_transform.translation.truncate(); // Vec3 -> Vec2
+            let p2 = transform.translation.truncate();
+            let distance: f32 = p1.distance(p2);
+            if distance < (POWER_UP_SIZE + PLAYER_SIZE) / 2.0 {                
+                damage_player.damage += PLAYER_DAMAGE;
+                commands.entity(power_entity).despawn();
+
+                let new_delay = (0.1 - (damage_player.damage - 10.0) * 0.0005).max(0.02);
+                player.shoot_timer.set_duration(Duration::from_secs_f32(new_delay));
+
+                break;
+            }
+    }
+}
