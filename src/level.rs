@@ -94,7 +94,7 @@ fn check_collison_bombs(
             let p1 = power_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
             let distance: f32 = p1.distance(p2);
-            if distance < (POWER_UP_SIZE + PLAYER_SIZE) / 2.0 {                
+            if distance < (BOMB_SIZE + PLAYER_SIZE) / 2.0 {                
                 player.nbr_bombs += 1;
                 commands.entity(power_entity).despawn();
 

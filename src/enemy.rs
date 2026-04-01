@@ -93,16 +93,23 @@ fn confine_enemies_movement(
 fn check_collison_enemies(
     mut commands: Commands,
     projectile_query: Query<(Entity, &Transform), With<Projectile>>,
-    mut enemy_query: Query<(&Transform, &mut Health), With<Enemy>>,
+    mut enemy_query: Query<(&Transform, &mut Health, &Enemy), With<Enemy>>,
     player_query: Single<&Damage, With<Player>>,
 ) {
 
     for (projectile_entity, projectile_transform) in &projectile_query {
-        for (enemy_transform, mut enemy_health) in &mut enemy_query {
+        for (enemy_transform, mut enemy_health, enemy) in &mut enemy_query {
             let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = enemy_transform.translation.truncate();
             let distance = p1.distance(p2);
-            if distance < (PROJECTILE_SIZE + ANGEL_SIZE) / 2.0 {                
+            let mut size = 0.0;
+            if enemy.variety == 'c' {
+                size = CHERUB_SIZE
+            } else if enemy.variety == 'a' {
+                size = ANGEL_SIZE
+            }
+            
+            if distance < (PROJECTILE_SIZE + size) / 2.0 {                
                 commands.entity(projectile_entity).despawn();
                 enemy_health.hp -= PLAYER_DAMAGE; //anciennement player_query.damage; mtn les ennemient perdent un montant fixe par projectile
                 break;

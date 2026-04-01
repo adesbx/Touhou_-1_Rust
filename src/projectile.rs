@@ -163,7 +163,7 @@ fn check_collison_projectile_player(
     time: Res<Time>,
     mut commands: Commands,
     enemy_projectile_query: Query<(Entity, &Transform), With<EnemyProjectile>>,
-    enemy_query: Query<(Entity, &Transform), With<Enemy>>,
+    enemy_query: Query<(Entity, &Transform, &Enemy), With<Enemy>>,
     mut player_query: Single<(&Transform, &mut Health, &mut Player), With<Player>>,
 ) {
     let (transform, health, player) = &mut *player_query; // possiblement sale voir pour faire autrement
@@ -180,11 +180,19 @@ fn check_collison_projectile_player(
             }
         }
 
-        for (enemy_entity, enemy_transform) in &enemy_query {
+        for (enemy_entity, enemy_transform, enemy) in &enemy_query {
             let p1 = enemy_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
             let distance = p1.distance(p2);
-            if distance < (ANGEL_SIZE + PLAYER_SIZE) / 2.0 {                
+
+            let mut size = 0.0;
+            if enemy.variety == 'c' {
+                size = CHERUB_SIZE
+            } else if enemy.variety == 'a' {
+                size = ANGEL_SIZE
+            }
+
+            if distance < (size + PLAYER_SIZE) / 2.0 {                
                 commands.entity(enemy_entity).despawn();
                 health.hp -= 1.0;
                 player.last_hit = time.elapsed_secs();
