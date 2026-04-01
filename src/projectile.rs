@@ -136,6 +136,7 @@ fn confine_projectile_movement(
 
 ) {
     let half_projectile_size: f32 = PROJECTILE_SIZE / 2.0;
+    let half_cross_projectile_size: f32 = CROSS_PROJECTILE_SIZE / 2.0;
     let half_height: f32 = GAME_HEIGHT / 2.0;
     let half_width: f32 = GAME_WIDTH / 2.0;
 
@@ -150,6 +151,11 @@ fn confine_projectile_movement(
             commands.entity(entity).despawn();
         }
     }
+
+    let x_min = -half_width + half_cross_projectile_size;
+    let x_max = half_width - half_cross_projectile_size;
+    let y_min = -half_height + half_cross_projectile_size;
+    let y_max = half_height - half_cross_projectile_size;
 
     for (entity, transform) in &enemy_projectile_query {
         if transform.translation.y > y_max || transform.translation.y < y_min || transform.translation.x > x_max || transform.translation.x < x_min {
@@ -172,7 +178,7 @@ fn check_collison_projectile_player(
             let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
             let distance = p1.distance(p2);
-            if distance < (PROJECTILE_SIZE + PLAYER_SIZE) / 2.0 {                
+            if distance < (CROSS_PROJECTILE_SIZE + PLAYER_SIZE) / 2.0 {                
                 commands.entity(projectile_entity).despawn();
                 health.hp -= 1.0;
                 player.last_hit = time.elapsed_secs();
