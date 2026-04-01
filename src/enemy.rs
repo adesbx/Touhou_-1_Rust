@@ -31,7 +31,7 @@ fn move_enemies(
             let distance = p1.distance(p2);
             if distance < attraction_range {     
                 let direction = (p1 - p2).normalize_or_zero();
-                let strength = (1.0 - (distance / attraction_range)).max(0.0);
+                let strength = (1.0 - (distance / attraction_range)).max(0.6); //0.6 force minimum d'attraction (rapide ou pas)
                 transform.translation += direction.extend(0.0) * attraction_speed * strength * dt;
                 continue; // Le Cherub ignore son pattern s'il chasse le joueur
             }
@@ -94,7 +94,6 @@ fn check_collison_enemies(
     mut commands: Commands,
     projectile_query: Query<(Entity, &Transform), With<Projectile>>,
     mut enemy_query: Query<(&Transform, &mut Health, &Enemy), With<Enemy>>,
-    player_query: Single<&Damage, With<Player>>,
 ) {
 
     for (projectile_entity, projectile_transform) in &projectile_query {
