@@ -31,7 +31,7 @@ pub fn spawn_from_level_data(
                 text = "enemies/angel.png";
             }
             else if wave.variety == 'c'{
-                text = "enemies/cherubien.png";
+                text = "enemies/cherubin.png";
             }
             
             commands.spawn((
