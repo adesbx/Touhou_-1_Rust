@@ -8,6 +8,7 @@ mod enemy;
 mod projectile;
 mod level;
 mod ui;
+mod background;
 
 use crate::components::*;
 use crate::constants::*;
@@ -22,6 +23,7 @@ fn main() {
         .add_plugins(projectile::ProjectilePlugin)
         .add_plugins(level::LevelPlugin)
         .add_plugins(ui::UiPlugin)
+        .add_plugins(background::BackgroundPlugin)
         .add_systems(Startup, setup)
         .run();
 }
@@ -40,9 +42,10 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
                 min_width: GAME_WIDTH, 
                 min_height: GAME_HEIGHT
             },
+            
             ..OrthographicProjection::default_2d()
         }),
-    )); 
+    ));
 
     commands.spawn((
         Sprite::from_color(

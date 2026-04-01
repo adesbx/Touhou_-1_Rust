@@ -102,3 +102,6 @@ pub struct LevelHandle(
 
 #[derive(Default)]
 pub struct LevelDataLoader;
+
+#[derive(Component)]
+pub struct Background;
