@@ -5,6 +5,7 @@ mod components;
 mod constants;
 mod player;
 mod enemy;
+mod boss;
 mod projectile;
 mod level;
 mod ui;
@@ -20,6 +21,7 @@ fn main() {
         .register_asset_loader(LevelDataLoader)
         .add_plugins(player::PlayerPlugin)
         .add_plugins(enemy::EnemyPlugin)
+        .add_plugins(boss::BossPlugin)
         .add_plugins(projectile::ProjectilePlugin)
         .add_plugins(level::LevelPlugin)
         .add_plugins(ui::UiPlugin)

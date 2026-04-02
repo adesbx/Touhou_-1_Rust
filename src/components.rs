@@ -79,6 +79,12 @@ pub struct Damage {
     pub damage: f32
 }
 
+#[derive(Component)]
+pub struct Boss;
+
+#[derive(Component)]
+pub struct BossHealthBar;
+
 #[derive(Deserialize, Debug)]
 pub struct  EnemyWave {
     pub spawn_time: f32,

@@ -105,5 +105,9 @@
         (spawn_time: 41.20, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
         (spawn_time: 41.35, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
 
+        //premier boss spawn
+        (spawn_time: 55.00, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 1000.0), variety: 'b', pattern: Straight),
+
+
     ]
 )

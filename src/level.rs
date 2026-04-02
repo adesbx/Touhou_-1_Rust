@@ -26,21 +26,31 @@ pub fn spawn_from_level_data(
         while *next_index < level.waves.len() && current_time >= level.waves[*next_index].spawn_time {
             let wave = &level.waves[*next_index];
             
-            let mut text = "";
-            if wave.variety == 'a'{
-                text = "enemies/angel.png";
+            if wave.variety != 'b' {
+                let mut text = "";
+                if wave.variety == 'a'{
+                    text = "enemies/angel.png";
+                }
+                else if wave.variety == 'c'{
+                    text = "enemies/cherubin.png";
+                }
+                
+                commands.spawn((
+                    Sprite::from_image(asset_server.load(text)),
+                    Transform::from_translation(wave.pos.extend(2.0)),
+                    Enemy { variety: wave.variety},
+                    Health { hp: wave.hp.hp },
+                    EnemyMovement { spawn_time: current_time, direction: wave.direction, pattern: wave.pattern },
+                ));
+            } else {
+                commands.spawn((
+                    Sprite::from_image(asset_server.load("enemies/boss.png")),
+                    Transform::from_translation(wave.pos.extend(2.0)),
+                    Enemy { variety: wave.variety},
+                    Health { hp: wave.hp.hp },
+                    Boss
+                ));
             }
-            else if wave.variety == 'c'{
-                text = "enemies/cherubin.png";
-            }
-            
-            commands.spawn((
-                Sprite::from_image(asset_server.load(text)),
-                Transform::from_translation(wave.pos.extend(2.0)),
-                Enemy { variety: wave.variety},
-                Health { hp: wave.hp.hp },
-                EnemyMovement { spawn_time: current_time, direction: wave.direction, pattern: wave.pattern },
-            ));
 
             *next_index += 1;
         }

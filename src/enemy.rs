@@ -13,7 +13,7 @@ impl Plugin for EnemyPlugin {
 
 fn move_enemies(
     time: Res<Time>,
-    mut query: Query<(&mut Transform, &EnemyMovement, &Enemy), (With<Enemy>, Without<Player>)>,
+    mut query: Query<(&mut Transform, &EnemyMovement, &Enemy), (With<Enemy>, Without<Player>, Without<Boss>)>,
     player_query: Single<&Transform, (With<Player>, Without<Enemy>)>,
 ) {
     let dt = time.delta_secs();
@@ -25,7 +25,6 @@ fn move_enemies(
 
     for (mut transform, movement, enemy) in &mut query {
         let local_time = elapsed - movement.spawn_time;
-
         if enemy.variety == 'c' {
             let p2 = transform.translation.truncate();
             let distance = p1.distance(p2);
@@ -71,7 +70,7 @@ fn move_enemies(
 
 fn confine_enemies_movement(    
     mut commands: Commands,
-    enemy_query: Query<(Entity, &Transform), With<Enemy>>,
+    enemy_query: Query<(Entity, &Transform), (With<Enemy>, Without<Boss>)>,
 
 ) {
     let half_enemy_size: f32 = ANGEL_SIZE / 2.0;

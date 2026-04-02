@@ -11,6 +11,7 @@ pub const ANGEL_SIZE: f32 = 32.0; // taille du sprite ange
 pub const CHERUB_SIZE: f32 = 22.0;
 pub const CROSS_PROJECTILE_SPEED: f32 = 100.0;
 pub const CROSS_PROJECTILE_SIZE: f32 = 18.0; // taille du sprite projectile
+pub const BOSS_SIZE: f32 = 32.0; // taille du sprite boss
 pub const POWER_UP_SIZE: f32 = 14.0;
 pub const BOMB_SIZE: f32 = 24.0;
 
