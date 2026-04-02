@@ -80,7 +80,10 @@ pub struct Damage {
 }
 
 #[derive(Component)]
-pub struct Boss;
+pub struct Boss {
+    pub first_spawn: bool,
+    pub stop_normal_move: bool
+}
 
 #[derive(Component)]
 pub struct BossHealthBar;
