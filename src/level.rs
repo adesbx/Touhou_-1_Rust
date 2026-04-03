@@ -48,7 +48,13 @@ pub fn spawn_from_level_data(
                     Transform::from_translation(wave.pos.extend(2.0)),
                     Enemy { variety: wave.variety},
                     Health { hp: wave.hp.hp },
-                    Boss { first_spawn: true, stop_normal_move: false}
+                    Boss { 
+                        first_spawn: true, 
+                        stop_normal_move: false,
+                        phase: 1,
+                        next_movement_timer: Timer::from_seconds(6.0, TimerMode::Repeating), 
+                        next_position: Vec3 { x: wave.pos.x, y: wave.pos.y, z: 2.0}
+                    }
                 ));
             }
 

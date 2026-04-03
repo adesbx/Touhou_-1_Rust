@@ -82,7 +82,10 @@ pub struct Damage {
 #[derive(Component)]
 pub struct Boss {
     pub first_spawn: bool,
-    pub stop_normal_move: bool
+    pub stop_normal_move: bool,
+    pub phase: u32,
+    pub next_movement_timer: Timer,
+    pub next_position: Vec3,
 }
 
 #[derive(Component)]

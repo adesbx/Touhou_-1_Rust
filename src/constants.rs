@@ -13,6 +13,7 @@ pub const CROSS_PROJECTILE_SPEED: f32 = 100.0;
 pub const CROSS_PROJECTILE_SIZE: f32 = 18.0; // taille du sprite projectile
 pub const BOSS_SIZE: f32 = 32.0; // taille du sprite boss
 pub const BOSS_HP: f32 = 1000.0;
+pub const BOSS_SPEED: f32 = 300.0;
 pub const POWER_UP_SIZE: f32 = 14.0;
 pub const BOMB_SIZE: f32 = 24.0;
 

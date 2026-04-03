@@ -22,14 +22,37 @@ pub fn move_boss(
     time: Res<Time>,
     boss_query: Query<(&mut Boss, &mut Transform), With<Boss>>,
 ) {
-    for (boss, mut transform)in boss_query {
-        if !boss.stop_normal_move {
-            let target_y = 150.0;
-            if transform.translation.y > target_y {
-                transform.translation.y -= 100.0 * time.delta_secs();
+    for (mut boss, mut transform)in boss_query {
+        if boss.stop_normal_move { continue; }
+        if boss.phase == 1 {
+            let distance = transform.translation.distance(boss.next_position);
+            if  distance < 5.0 {
+                boss.next_movement_timer.tick(time.delta());
+
+                if boss.next_movement_timer.just_finished() {
+                    let mut rng = rand::thread_rng();
+
+                    boss.next_position = match rng.gen_range(1..7) {
+                        1 => Vec3::new(-140.0, 180.0, 2.0),
+                        2 => Vec3::new(0.0, 180.0, 2.0),
+                        3 => Vec3::new(140.0, 180.0, 2.0),
+                        4 => Vec3::new(-140.0, 80.0, 2.0),
+                        5 => Vec3::new(0.0, 80.0, 2.0),
+                        6 => Vec3::new(140.0, 80.0, 2.0),
+                        _=> boss.next_position,
+                    };
+                }
+            } else {
+
+                let direction = (boss.next_position - transform.translation).normalize();
+                            
+                let velocity = direction * BOSS_SPEED * time.delta_secs();
                 
-                if transform.translation.y < target_y {
-                    transform.translation.y = target_y;
+                // Pour éviter de dépasser la cible (ce qui crée des vibrations)
+                if velocity.length() > distance {
+                    transform.translation = boss.next_position;
+                } else {
+                    transform.translation += velocity;
                 }
             }
         }
@@ -112,7 +135,7 @@ pub fn check_mid_hp(
     for (health, mut boss, mut transform) in boss_query {
         if health.hp <= BOSS_HP / 2.0 && boss.first_spawn{
             boss.stop_normal_move = true;
-            transform.translation.y += 150.0 * time.delta_secs();
+            transform.translation.y += 200.0 * time.delta_secs();
         }
     }
 }
