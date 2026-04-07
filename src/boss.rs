@@ -181,7 +181,7 @@ pub fn update_vortex(
                 let start_angle = (i as f32) * (std::f32::consts::TAU / num_fragments as f32);
                 
                 commands.spawn((
-                    Sprite::from_image(asset_server.load("projectiles/projectile.png")),
+                    Sprite::from_image(asset_server.load("projectiles/projectile_vortex_fragment.png")),
                     Transform::from_translation(transform.translation),
                     VortexFragment {
                         center,
@@ -227,7 +227,7 @@ fn basic_shoot_projectiles(
         boss.basic_shoot_timer.tick(time.delta());
 
         if  boss.basic_shoot_timer.just_finished() {
-            let texture: Handle<Image> = asset_serv.load("projectiles/projectile_cross.png");
+            let texture: Handle<Image> = asset_serv.load("projectiles/projectile_vortex.png");
             let mut rng = rand::thread_rng();
 
             commands.spawn((
@@ -269,7 +269,7 @@ pub fn spawn_boss_rain(
         if boss.rain_shoot_timer.just_finished() {
             let mut rng = rand::thread_rng();
             let bullet_count = 15; 
-            let texture = asset_server.load("projectiles/projectile_cross.png");
+            let texture = asset_server.load("projectiles/projectile_cross_electrised.png");
 
             for i in 0..bullet_count {
                 // réparti largeur autorisée (entre x_min et x_max)

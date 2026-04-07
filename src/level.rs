@@ -44,7 +44,7 @@ pub fn spawn_from_level_data(
                 ));
             } else {
                 commands.spawn((
-                    Sprite::from_image(asset_server.load("enemies/boss.png")),
+                    Sprite::from_image(asset_server.load("enemies/boss_v2.png")),
                     Transform::from_translation(wave.pos.extend(2.0)),
                     Enemy { variety: wave.variety},
                     Health { hp: wave.hp.hp },
