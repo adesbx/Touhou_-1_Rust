@@ -28,6 +28,23 @@ pub struct Projectile {
 }
 
 #[derive(Component)]
+pub struct BasicProjectileBoss {
+    pub start_pos: Vec2,
+    pub explosion_dist: f32,
+    pub is_spiral: bool,
+    pub rotation_speed: f32,
+}
+
+#[derive(Component)]
+pub struct VortexFragment {
+    pub center: Vec2,      
+    pub angle: f32,       
+    pub radius: f32,     
+    pub rotate_speed: f32,
+    pub expand_speed: f32,
+}
+
+#[derive(Component)]
 pub struct PowerUp;
 
 #[derive(Component)]
@@ -86,6 +103,7 @@ pub struct Boss {
     pub phase: u32,
     pub next_movement_timer: Timer,
     pub next_position: Vec3,
+    pub basic_shoot_timer: Timer,
 }
 
 #[derive(Component)]

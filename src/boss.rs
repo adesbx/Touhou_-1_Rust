@@ -13,7 +13,9 @@ impl Plugin for BossPlugin {
             show_health_bar, 
             update_health_bar, 
             delete_health_bar, 
-            check_mid_hp
+            check_mid_hp,
+            basic_shoot_projectiles,
+            update_vortex
         ));
     }
 }
@@ -153,5 +155,89 @@ pub fn check_mid_hp(
             boss.phase = 2;
             boss.next_position = Vec3::new(1.0, 0.0, 0.0);
         }
+    }
+}
+
+pub fn update_vortex(
+    mut commands: Commands,
+    time: Res<Time>,
+    asset_server: Res<AssetServer>,
+    mother_query: Query<(Entity, &Transform, &BasicProjectileBoss), Without<VortexFragment>>,
+    mut fragment_query: Query<(&mut Transform, &mut VortexFragment, Entity)>,
+) {
+    let dt = time.delta_secs();
+
+    for (entity, transform, special) in &mother_query {
+        let current_pos = transform.translation.truncate();
+        if current_pos.distance(special.start_pos) >= special.explosion_dist {
+            commands.entity(entity).despawn();
+
+            let center = transform.translation.truncate();
+            let num_fragments = 12;
+            
+            for i in 0..num_fragments {
+                let start_angle = (i as f32) * (std::f32::consts::TAU / num_fragments as f32);
+                
+                commands.spawn((
+                    Sprite::from_image(asset_server.load("projectiles/projectile.png")),
+                    Transform::from_translation(transform.translation),
+                    VortexFragment {
+                        center,
+                        angle: start_angle,
+                        radius: 0.0,
+                        rotate_speed: 4.0, 
+                        expand_speed: 100.0, 
+                    },
+                    EnemyProjectile {
+                        velocity: Vec2::new(0.0, -BOSS_VORTEX_SPEED),
+                    },
+                ));
+            }
+        }
+    }
+
+    for (mut transform, mut frag, entity) in &mut fragment_query {
+        frag.angle += frag.rotate_speed * dt;
+        
+        frag.radius += frag.expand_speed * dt;
+
+        let max_radius = 75.0; 
+        if frag.radius > max_radius {
+            commands.entity(entity).despawn();
+            continue;
+        }
+
+        let new_x = frag.center.x + frag.angle.cos() * frag.radius;
+        let new_y = frag.center.y + frag.angle.sin() * frag.radius;
+        
+        transform.translation = Vec3::new(new_x, new_y, 2.0);
+    }
+}
+
+fn basic_shoot_projectiles(
+    time: Res<Time>,
+    mut commands: Commands,
+    asset_serv: Res<AssetServer>,
+    mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
+) {
+    let (transform, boss) = &mut *boss_query;
+    boss.basic_shoot_timer.tick(time.delta());
+
+    if  boss.basic_shoot_timer.just_finished() {
+        let texture: Handle<Image> = asset_serv.load("projectiles/projectile_cross.png");
+
+        commands.spawn((
+            Sprite::from_image(texture),
+            Transform::from_translation(transform.translation), 
+            EnemyProjectile {
+                    velocity: Vec2::new(0.0, -BOSS_VORTEX_SPEED),
+            },
+            BasicProjectileBoss {
+                start_pos: transform.translation.truncate(),
+                explosion_dist: 200.0,
+                is_spiral: false,
+                rotation_speed: 0.0,
+            },
+        ));
     }
 }
