@@ -55,7 +55,9 @@ pub fn spawn_from_level_data(
                         next_movement_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
                         next_position: Vec3 { x: wave.pos.x, y: wave.pos.y, z: 2.0},
                         basic_shoot_timer: Timer::from_seconds(1.0, TimerMode::Repeating), 
-
+                        rain_shoot_timer: Timer::from_seconds(2.5, TimerMode::Repeating), 
+                        current_attack: 1,
+                        attack_switch_timer: Timer::from_seconds(5.0, TimerMode::Repeating), 
                     }
                 ));
             }

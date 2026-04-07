@@ -15,7 +15,9 @@ impl Plugin for BossPlugin {
             delete_health_bar, 
             check_mid_hp,
             basic_shoot_projectiles,
-            update_vortex
+            update_vortex,
+            spawn_boss_rain,
+            change_attack_type
         ));
     }
 }
@@ -221,23 +223,85 @@ fn basic_shoot_projectiles(
     mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
 ) {
     let (transform, boss) = &mut *boss_query;
-    boss.basic_shoot_timer.tick(time.delta());
+    if boss.current_attack == 1 {
+        boss.basic_shoot_timer.tick(time.delta());
 
-    if  boss.basic_shoot_timer.just_finished() {
-        let texture: Handle<Image> = asset_serv.load("projectiles/projectile_cross.png");
+        if  boss.basic_shoot_timer.just_finished() {
+            let texture: Handle<Image> = asset_serv.load("projectiles/projectile_cross.png");
+            let mut rng = rand::thread_rng();
 
-        commands.spawn((
-            Sprite::from_image(texture),
-            Transform::from_translation(transform.translation), 
-            EnemyProjectile {
-                    velocity: Vec2::new(0.0, -BOSS_VORTEX_SPEED),
-            },
-            BasicProjectileBoss {
-                start_pos: transform.translation.truncate(),
-                explosion_dist: 200.0,
-                is_spiral: false,
-                rotation_speed: 0.0,
-            },
-        ));
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_translation(transform.translation), 
+                EnemyProjectile {
+                        velocity: Vec2::new(0.0, -BOSS_VORTEX_SPEED),
+                },
+                BasicProjectileBoss {
+                    start_pos: transform.translation.truncate(),
+                    explosion_dist: rng.gen_range(100.0..300.0),
+                    is_spiral: false,
+                    rotation_speed: 0.0,
+                },
+            ));
+        }
+    }
+}
+
+pub fn spawn_boss_rain(
+    mut commands: Commands,
+    time: Res<Time>,
+    asset_server: Res<AssetServer>,
+    mut boss_query: Query<(&Transform, &mut Boss)>,
+) {
+    let half_width = GAME_WIDTH / 2.0;
+    let half_height = GAME_HEIGHT / 2.0;
+    let margin = 20.0; // marge pour être sûr d'être à l'intérieur
+    
+    let x_min = -half_width + margin;
+    let x_max = half_width - margin;
+    let y_max = half_height - margin; 
+
+    for (transform, mut boss) in &mut boss_query {
+        if boss.current_attack != 2 { continue; }
+
+        boss.rain_shoot_timer.tick(time.delta());
+
+        if boss.rain_shoot_timer.just_finished() {
+            let mut rng = rand::thread_rng();
+            let bullet_count = 15; 
+            let texture = asset_server.load("projectiles/projectile_cross.png");
+
+            for i in 0..bullet_count {
+                // réparti largeur autorisée (entre x_min et x_max)
+                let x_pos = x_min + (i as f32 * (x_max - x_min) / (bullet_count - 1) as f32);
+                
+                let y_spawn = y_max - rng.gen_range(0.0..100.0);
+
+                let speed = rng.gen_range(150.0..250.0);
+
+                commands.spawn((
+                    Sprite::from_image(texture.clone()),
+                    Transform::from_xyz(x_pos, y_spawn, transform.translation.z),
+                    EnemyProjectile {
+                        velocity: Vec2::new(0.0, -speed), 
+                    },
+                ));
+            }
+        }
+    }
+}
+
+pub fn change_attack_type(
+    time: Res<Time>,
+    mut boss_query: Single<&mut Boss, With<Boss>>,
+) {
+    boss_query.attack_switch_timer.tick(time.delta());
+
+    if boss_query.attack_switch_timer.just_finished() {
+        if boss_query.current_attack == 1 {
+            boss_query.current_attack = 2;
+        } else { 
+            boss_query.current_attack = 1;
+        }
     }
 }

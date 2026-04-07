@@ -104,6 +104,9 @@ pub struct Boss {
     pub next_movement_timer: Timer,
     pub next_position: Vec3,
     pub basic_shoot_timer: Timer,
+    pub rain_shoot_timer: Timer,
+    pub current_attack: u32,
+    pub attack_switch_timer: Timer,
 }
 
 #[derive(Component)]
