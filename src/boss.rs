@@ -44,7 +44,7 @@ pub fn move_boss(
                 }
             } else {
 
-                let direction = (boss.next_position - transform.translation).normalize();
+                let direction: Vec3 = (boss.next_position - transform.translation).normalize();
                             
                 let velocity = direction * BOSS_SPEED * time.delta_secs();
                 
@@ -55,6 +55,19 @@ pub fn move_boss(
                     transform.translation += velocity;
                 }
             }
+        } else if boss.phase == 2 {
+            let half_enemy_size: f32 = ANGEL_SIZE / 2.0;
+            let half_width: f32 = GAME_WIDTH / 2.0;
+            let x_min = -half_width + half_enemy_size;
+            let x_max = half_width - half_enemy_size;
+
+            if transform.translation.x >= x_max {
+                boss.next_position = Vec3::new(-1.0, 0.0, 0.0);
+            } else if transform.translation.x <= x_min  {
+                boss.next_position = Vec3::new(1.0, 0.0, 0.0);
+            }
+            let velocity =  boss.next_position * (BOSS_SPEED/2.0) * time.delta_secs();
+            transform.translation += velocity;
         }
     }
 }
@@ -136,6 +149,9 @@ pub fn check_mid_hp(
         if health.hp <= BOSS_HP / 2.0 && boss.first_spawn{
             boss.stop_normal_move = true;
             transform.translation.y += 200.0 * time.delta_secs();
+        } else if health.hp <= BOSS_HP / 2.0 && !boss.first_spawn && boss.phase == 1 {
+            boss.phase = 2;
+            boss.next_position = Vec3::new(1.0, 0.0, 0.0);
         }
     }
 }
