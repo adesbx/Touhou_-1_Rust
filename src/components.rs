@@ -31,8 +31,6 @@ pub struct Projectile {
 pub struct BasicProjectileBoss {
     pub start_pos: Vec2,
     pub explosion_dist: f32,
-    pub is_spiral: bool,
-    pub rotation_speed: f32,
 }
 
 #[derive(Component)]
@@ -62,7 +60,8 @@ pub struct DespawnTimer {
 
 #[derive(Component)]
 pub struct EnemyProjectile {
-    pub velocity: Vec2,
+    pub direction: Vec2,
+    pub speed: f32,
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]

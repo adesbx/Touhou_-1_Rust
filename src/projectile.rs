@@ -227,7 +227,10 @@ fn enemies_shoot_projectiles(
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_translation(transform.translation),
-                EnemyProjectile{velocity: direction*CROSS_PROJECTILE_SPEED},
+                EnemyProjectile{
+                    direction: direction,
+                    speed: CROSS_PROJECTILE_SPEED
+                },
             ));
           }
     }
@@ -238,7 +241,7 @@ fn move_enemy_projectiles(
     mut query: Query<(&mut Transform, &EnemyProjectile)>,
 ) {
     for (mut transform, projectile) in &mut query {
-        let movement = projectile.velocity.extend(0.0) * time.delta_secs();
-        transform.translation += movement;
+        let movement: Vec2 = projectile.direction.normalize() * projectile.speed * time.delta_secs();
+        transform.translation += movement.extend(0.0);
     }
 }

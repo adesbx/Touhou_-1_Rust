@@ -191,7 +191,8 @@ pub fn update_vortex(
                         expand_speed: 100.0, 
                     },
                     EnemyProjectile {
-                        velocity: Vec2::new(0.0, -BOSS_VORTEX_SPEED),
+                        direction: Vec2::new(0.0, -1.0),
+                        speed: BOSS_VORTEX_SPEED
                     },
                 ));
             }
@@ -225,24 +226,48 @@ fn basic_shoot_projectiles(
     let (transform, boss) = &mut *boss_query;
     if boss.current_attack == 1 {
         boss.basic_shoot_timer.tick(time.delta());
+        let number_projectile = 4;
 
         if  boss.basic_shoot_timer.just_finished() {
-            let texture: Handle<Image> = asset_serv.load("projectiles/projectile_vortex.png");
             let mut rng = rand::thread_rng();
 
             commands.spawn((
-                Sprite::from_image(texture),
+                Sprite::from_image(asset_serv.load("projectiles/projectile_vortex.png")),
                 Transform::from_translation(transform.translation), 
                 EnemyProjectile {
-                        velocity: Vec2::new(0.0, -BOSS_VORTEX_SPEED),
+                    direction: Vec2::new(0.0, -1.0),
+                    speed: BOSS_VORTEX_SPEED,
                 },
                 BasicProjectileBoss {
                     start_pos: transform.translation.truncate(),
                     explosion_dist: rng.gen_range(100.0..300.0),
-                    is_spiral: false,
-                    rotation_speed: 0.0,
                 },
             ));
+
+            //right
+            for i in 1..number_projectile {
+                commands.spawn((
+                    Sprite::from_image(asset_serv.load("projectiles/projectile_vortex.png")),
+                    Transform::from_translation(transform.translation), 
+                    EnemyProjectile {
+                        direction : Vec2::new(0.19*i as f32 , -1.0),
+                        speed: BOSS_VORTEX_SPEED,
+                    },
+                ));
+            }
+
+            //left
+            for i in 1..number_projectile {
+                commands.spawn((
+                    Sprite::from_image(asset_serv.load("projectiles/projectile_vortex.png")),
+                    Transform::from_translation(transform.translation), 
+                    EnemyProjectile {
+                        direction : Vec2::new(-0.19*i as f32 , -1.0),
+                        speed: BOSS_VORTEX_SPEED,
+                    },
+                ));
+            }
+
         }
     }
 }
@@ -283,7 +308,8 @@ pub fn spawn_boss_rain(
                     Sprite::from_image(texture.clone()),
                     Transform::from_xyz(x_pos, y_spawn, transform.translation.z),
                     EnemyProjectile {
-                        velocity: Vec2::new(0.0, -speed), 
+                        direction: Vec2::new(0.0, -1.0), 
+                        speed: speed,
                     },
                 ));
             }
