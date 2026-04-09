@@ -50,25 +50,12 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
     ));
 
     commands.spawn((
-        Sprite::from_color(
-            Color::srgb(0.1, 0.1, 0.9),
-            Vec2::new(50.0, GAME_HEIGHT * 2.0),
-        ),
-        Transform::from_xyz(-GAME_WIDTH / 2.0 - 50.0 / 2.0, 0.0, -10.0),
-    ));
+            Sprite::from_image(asset_serv.load("hud/hud_bg.png")),
+            Transform::from_xyz(80.0, 0.0, -100.0),
+        ));
 
     commands.spawn((
-        Sprite::from_color(
-            Color::srgb(0.1, 0.1, 0.9),
-            Vec2::new(200.0, GAME_HEIGHT * 2.0),
-        ),
-        Transform::from_xyz(GAME_WIDTH / 2.0 + 200.0 / 2.0, 0.0, -10.0),
-    ));
-
-    let texture = asset_serv.load("characters/character.png");
-
-    commands.spawn((
-        Sprite::from_image(texture),
+        Sprite::from_image(asset_serv.load("characters/character.png")),
         Transform::from_xyz(0., 0., 0.),
         Player { 
             last_hit: 0.0, 
