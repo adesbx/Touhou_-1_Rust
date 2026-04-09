@@ -69,8 +69,13 @@ fn move_player(
         direction = direction.normalize_or_zero();
     }
 
-    player_transform.translation.x += direction.x * time.delta_secs() * PLAYER_SPEED;
-    player_transform.translation.y += direction.y * time.delta_secs() * PLAYER_SPEED;
+    if keyboard.pressed(KeyCode::ShiftLeft) {
+        player_transform.translation.x += direction.x * time.delta_secs() * PLAYER_SPEED * 0.5;
+        player_transform.translation.y += direction.y * time.delta_secs() * PLAYER_SPEED * 0.5;
+    } else {
+        player_transform.translation.x += direction.x * time.delta_secs() * PLAYER_SPEED;
+        player_transform.translation.y += direction.y * time.delta_secs() * PLAYER_SPEED;
+    }
 }
 
 fn move_power_up(
