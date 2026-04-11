@@ -148,11 +148,16 @@ pub fn delete_health_bar(
 pub fn check_mid_hp(
     time: Res<Time>,
     boss_query: Query<(&mut Health, &mut Boss, &mut Transform), With<Boss>>,
+    mut manager: ResMut<LevelManager>, 
 ) {
     for (health, mut boss, mut transform) in boss_query {
-        if health.hp <= BOSS_HP / 2.0 && boss.first_spawn{
+        if health.hp <= BOSS_HP / 2.0 && boss.first_spawn {
             boss.stop_normal_move = true;
             transform.translation.y += 200.0 * time.delta_secs();
+
+            manager.current_phase = GamePhase::PostBoss;
+            manager.phase_timer = 0.0;
+            manager.next_index = 0;
         } else if health.hp <= BOSS_HP / 2.0 && !boss.first_spawn && boss.phase == 1 {
             boss.phase = 2;
             boss.next_position = Vec3::new(1.0, 0.0, 0.0);

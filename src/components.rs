@@ -112,7 +112,7 @@ pub struct Boss {
 pub struct BossHealthBar;
 
 #[derive(Deserialize, Debug)]
-pub struct  EnemyWave {
+pub struct EnemyWave {
     pub spawn_time: f32,
     pub pos: Vec2,
     pub direction: f32,
@@ -124,7 +124,23 @@ pub struct  EnemyWave {
 
 #[derive(Deserialize, Asset, TypePath, Debug)]
 pub struct LevelData {
-    pub waves: Vec<EnemyWave>
+    pub pre_boss: Vec<EnemyWave>,
+    pub boss: EnemyWave,
+    pub post_boss: Vec<EnemyWave>,
+}
+
+#[derive(Resource)]
+pub struct LevelManager {
+    pub current_phase: GamePhase,
+    pub phase_timer: f32,
+    pub next_index: usize,
+}
+
+#[derive(Deserialize, Asset, TypePath, Debug, PartialEq)]
+pub enum GamePhase {
+    PreBoss,
+    PostBoss,
+    BossFight
 }
 
 #[derive(Resource)]

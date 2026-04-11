@@ -17,6 +17,11 @@ use crate::constants::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .insert_resource(LevelManager {
+            current_phase: GamePhase::PreBoss,
+            phase_timer: 0.0,
+            next_index: 0,
+        })
         .init_asset::<LevelData>()
         .register_asset_loader(LevelDataLoader)
         .add_plugins(player::PlayerPlugin)

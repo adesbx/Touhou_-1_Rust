@@ -15,54 +15,93 @@ impl Plugin for LevelPlugin {
 pub fn spawn_from_level_data(
     time: Res<Time>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    asset_serv: Res<AssetServer>,
     level_assets: Res<Assets<LevelData>>,
     level_handle: Res<LevelHandle>, 
-    mut next_index: Local<usize>,
+    mut manager: ResMut<LevelManager>, 
 ) {    
     if let Some(level) = level_assets.get(&level_handle.0) {
-        let current_time = time.elapsed_secs();
+        manager.phase_timer += time.delta_secs();
 
-        while *next_index < level.waves.len() && current_time >= level.waves[*next_index].spawn_time {
-            let wave = &level.waves[*next_index];
-            
-            if wave.variety != 'b' {
-                let mut text = "";
-                if wave.variety == 'a'{
-                    text = "enemies/angel.png";
-                }
-                else if wave.variety == 'c'{
-                    text = "enemies/cherubin.png";
-                }
-                
-                commands.spawn((
-                    Sprite::from_image(asset_server.load(text)),
-                    Transform::from_translation(wave.pos.extend(2.0)),
-                    Enemy { variety: wave.variety},
-                    Health { hp: wave.hp.hp },
-                    EnemyMovement { spawn_time: current_time, direction: wave.direction, pattern: wave.pattern },
-                ));
-            } else {
-                commands.spawn((
-                    Sprite::from_image(asset_server.load("enemies/boss_v2.png")),
-                    Transform::from_translation(wave.pos.extend(2.0)),
-                    Enemy { variety: wave.variety},
-                    Health { hp: wave.hp.hp },
-                    Boss { 
-                        first_spawn: true, 
-                        stop_normal_move: false,
-                        phase: 1,
-                        next_movement_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
-                        next_position: Vec3 { x: wave.pos.x, y: wave.pos.y, z: 2.0},
-                        basic_shoot_timer: Timer::from_seconds(1.0, TimerMode::Repeating), 
-                        rain_shoot_timer: Timer::from_seconds(2.5, TimerMode::Repeating), 
-                        current_attack: 1,
-                        attack_switch_timer: Timer::from_seconds(5.0, TimerMode::Repeating), 
-                    }
-                ));
+        let current_waves = match manager.current_phase {
+            GamePhase::PreBoss => &level.pre_boss,
+            GamePhase::PostBoss => &level.post_boss,
+            GamePhase::BossFight => {
+                return; //temporaire moche
             }
+        };
 
-            *next_index += 1;
+        while manager.next_index < current_waves.len() && manager.phase_timer >= current_waves[manager.next_index].spawn_time {
+            let wave = &current_waves[manager.next_index];
+            
+            let mut texture_path = "enemies/angel.png";
+            if wave.variety == 'c' { texture_path = "enemies/cherubin.png"; }
+            
+            commands.spawn((
+                Sprite::from_image(asset_serv.load(texture_path)),
+                Transform::from_translation(wave.pos.extend(2.0)),
+                Enemy { variety: wave.variety},
+                Health { hp: wave.hp.hp },
+                EnemyMovement { 
+                    spawn_time: manager.phase_timer,
+                    direction: wave.direction, 
+                    pattern: wave.pattern 
+                },
+            ));
+
+            manager.next_index += 1;
+        }
+
+        if manager.current_phase == GamePhase::PreBoss && manager.next_index >= level.pre_boss.len() { // ajoute dimension temps
+            manager.phase_timer = 0.0;
+            manager.next_index = 0;
+            manager.current_phase = GamePhase::BossFight;
+            let texture: Handle<Image> = asset_serv.load("enemies/boss_v2.png");
+            let wave = &level.boss;
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_translation(wave.pos.extend(2.0)),
+                Enemy { variety: wave.variety},
+                Health { hp: wave.hp.hp },
+                Boss {
+                    first_spawn: true,
+                    stop_normal_move: false,
+                    phase: 1,
+                    next_movement_timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+                    next_position: Vec3 { x: wave.pos.x, y: wave.pos.y, z: 2.0},
+                    basic_shoot_timer: Timer::from_seconds(1.0, TimerMode::Repeating),
+                    rain_shoot_timer: Timer::from_seconds(2.5, TimerMode::Repeating),
+                    current_attack: 1,
+                    attack_switch_timer: Timer::from_seconds(5.0, TimerMode::Repeating),
+
+                } 
+            ));
+        }
+
+        if manager.current_phase == GamePhase::PostBoss && manager.next_index >= level.post_boss.len() {
+            manager.phase_timer = 0.0;
+            manager.next_index = 0;
+            manager.current_phase = GamePhase::BossFight;
+            let texture: Handle<Image> = asset_serv.load("enemies/boss_v2.png");
+            let wave = &level.boss;
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_translation(wave.pos.extend(2.0)),
+                Enemy { variety: wave.variety},
+                Health { hp: wave.hp.hp },
+                Boss {
+                    first_spawn: false,
+                    stop_normal_move: false,
+                    phase: 1,
+                    next_movement_timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+                    next_position: Vec3 { x: wave.pos.x, y: wave.pos.y, z: 2.0},
+                    basic_shoot_timer: Timer::from_seconds(1.0, TimerMode::Repeating),
+                    rain_shoot_timer: Timer::from_seconds(2.5, TimerMode::Repeating),
+                    current_attack: 1,
+                    attack_switch_timer: Timer::from_seconds(5.0, TimerMode::Repeating),
+
+                } 
+            ));
         }
     }
 }
