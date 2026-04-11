@@ -1,5 +1,6 @@
 use bevy::app::App;
 use bevy::prelude::*;
+use bevy::audio::*;
 
 mod components;
 mod constants;
@@ -32,6 +33,7 @@ fn main() {
         .add_plugins(ui::UiPlugin)
         .add_plugins(background::BackgroundPlugin)
         .add_systems(Startup, setup)
+        .add_systems(Startup, play_main_theme)
         .run();
 }
 
@@ -85,7 +87,7 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
             left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
             ..default()
         },
-        TextColor(Color::srgb(1.0, 0.0, 0.0)), 
+        TextColor(Color::srgb(1.0, 1.0, 1.0)), 
         PlayerHealthText, 
     ));
 
@@ -101,7 +103,7 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
             left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
             ..default()
         },
-        TextColor(Color::srgb(1.0, 0.0, 0.0)), 
+        TextColor(Color::srgb(1.0, 1.0, 1.0)), 
         PlayerDamageText, 
     ));
 
@@ -117,7 +119,18 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
             left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
             ..default()
         },
-        TextColor(Color::srgb(1.0, 0.0, 0.0)), 
+        TextColor(Color::srgb(1.0, 1.0, 1.0)), 
         PlayerBombsText, 
+    ));
+}
+
+
+fn play_main_theme(
+    asset_serv: Res<AssetServer>, 
+    mut commands: Commands
+) {
+    commands.spawn((
+        AudioPlayer::new(asset_serv.load("sounds/main_theme.ogg")),
+        PlaybackSettings::LOOP,
     ));
 }
