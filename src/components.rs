@@ -7,7 +7,8 @@ pub struct Player {
     pub shoot_timer: Timer,
     pub shoot_timer_fire: Timer,
     pub shoot_from_left: bool,
-    pub nbr_bombs: i32
+    pub nbr_bombs: i32,
+    pub animation_timer: Timer,
 }
 
 #[derive(Component)]

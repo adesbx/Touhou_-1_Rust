@@ -66,7 +66,7 @@ fn setup(
     ));
 
     let texture = asset_serv.load("characters/character.png");
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 2, None, None);
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 3, None, None);
     let texture_atlas_layout = texture_atlas_layout.add(layout);
 
     commands.spawn((
@@ -78,6 +78,7 @@ fn setup(
             shoot_from_left: false,
             shoot_timer_fire: Timer::from_seconds(0.5, TimerMode::Repeating), 
             nbr_bombs: 0,
+            animation_timer: Timer::from_seconds(0.2, TimerMode::Repeating), 
         },
         Health { hp: PLAYER_HP},
         Damage { damage: PLAYER_DAMAGE}

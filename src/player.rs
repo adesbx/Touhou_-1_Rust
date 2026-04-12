@@ -150,23 +150,33 @@ fn use_bombs(
 
 }
 
-fn update_player_sprites(mut players: Query<&mut Sprite, With<Player>>, keyboard: Res<ButtonInput<KeyCode>>) {
-    for mut sprite in &mut players {
-        if let Some(atlas) = sprite.texture_atlas.as_mut() {
-            if keyboard.just_pressed(KeyCode::KeyW) {
-                atlas.index = 0;
+fn update_player_sprites(
+    time:  Res<Time>,
+    mut player: Single<(&mut Sprite, &mut Player), With<Player>>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+) {
+    let (sprite, player) = &mut *player;
+
+    if let Some(atlas) = sprite.texture_atlas.as_mut() {
+
+
+        if keyboard.pressed(KeyCode::KeyD) || keyboard.pressed(KeyCode::KeyA) {
+            if keyboard.pressed(KeyCode::KeyD) {
+                atlas.index = 3;
             }
 
-            if keyboard.just_pressed(KeyCode::KeyS) {
-                atlas.index = 0;
+            if keyboard.pressed(KeyCode::KeyA) {
+                atlas.index = 4;
             }
+        } else {
+            player.animation_timer.tick(time.delta());
 
-            if keyboard.just_pressed(KeyCode::KeyD) {
-                atlas.index = 1;
-            }
-
-            if keyboard.just_pressed(KeyCode::KeyA) {
-                atlas.index = 2;
+            if player.animation_timer.just_finished() {
+                if atlas.index >=2 {
+                    atlas.index = 0
+                } else {
+                    atlas.index += 1;
+                }
             }
         }
     }
