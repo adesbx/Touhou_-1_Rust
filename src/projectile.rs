@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use rand::Rng;
 use crate::components::*;
 use crate::constants::*;
 
@@ -209,17 +208,18 @@ fn check_collison_projectile_player(
 }
 
 fn enemies_shoot_projectiles(
+    time: Res<Time>,
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
-    enemy_transform: Query<(&Transform, &Enemy), With<Enemy>>,
+    mut enemy_query: Query<(&Transform, &mut Enemy), With<Enemy>>,
     player_transform: Single<&Transform, With<Player>>,
 ) {
     let player_pos = player_transform.translation.truncate(); 
 
-    for (transform, enemy) in &enemy_transform {
-        let mut rng = rand::thread_rng();
-
-        if rng.gen_range(1..101) == 1 && enemy.variety == 'a' {  
+    for (transform, mut enemy) in &mut enemy_query {
+        
+        enemy.shoot_timer.tick(time.delta());
+        if enemy.shoot_timer.is_finished() && enemy.variety == 'a' {  
             let enemy_pos = transform.translation.truncate();
             let direction = (player_pos - enemy_pos).normalize_or_zero();
 
