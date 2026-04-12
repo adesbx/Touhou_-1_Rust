@@ -37,7 +37,11 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {   
+fn setup(
+    mut commands: Commands, 
+    asset_serv: Res<AssetServer>,
+    mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
+) {   
     let handle = asset_serv.load("enemies.ron");
     commands.insert_resource(LevelHandle(handle));
     commands.insert_resource(BombSpawner {
@@ -59,17 +63,21 @@ fn setup(mut commands: Commands, asset_serv: Res<AssetServer>) {
     commands.spawn((
             Sprite::from_image(asset_serv.load("hud/hud_bg.png")),
             Transform::from_xyz(80.0, 0.0, -100.0),
-        ));
+    ));
+
+    let texture = asset_serv.load("characters/character.png");
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 2, None, None);
+    let texture_atlas_layout = texture_atlas_layout.add(layout);
 
     commands.spawn((
-        Sprite::from_image(asset_serv.load("characters/character.png")),
+        Sprite::from_atlas_image(texture, TextureAtlas { layout: texture_atlas_layout, index: 0}),
         Transform::from_xyz(0., 0., 0.),
         Player { 
             last_hit: 0.0, 
             shoot_timer: Timer::from_seconds(0.1, TimerMode::Repeating), 
             shoot_from_left: false,
             shoot_timer_fire: Timer::from_seconds(0.5, TimerMode::Repeating), 
-            nbr_bombs: 0
+            nbr_bombs: 0,
         },
         Health { hp: PLAYER_HP},
         Damage { damage: PLAYER_DAMAGE}

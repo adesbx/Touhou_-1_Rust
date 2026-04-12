@@ -7,7 +7,7 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (move_player, confine_player_movement, move_power_up, check_collison_power_up, use_bombs));
+        app.add_systems(Update, (move_player, confine_player_movement, move_power_up, check_collison_power_up, use_bombs, update_player_sprites));
     }
 }
 
@@ -148,4 +148,26 @@ fn use_bombs(
         player.nbr_bombs -= 1;
     }
 
+}
+
+fn update_player_sprites(mut players: Query<&mut Sprite, With<Player>>, keyboard: Res<ButtonInput<KeyCode>>) {
+    for mut sprite in &mut players {
+        if let Some(atlas) = sprite.texture_atlas.as_mut() {
+            if keyboard.just_pressed(KeyCode::KeyW) {
+                atlas.index = 0;
+            }
+
+            if keyboard.just_pressed(KeyCode::KeyS) {
+                atlas.index = 0;
+            }
+
+            if keyboard.just_pressed(KeyCode::KeyD) {
+                atlas.index = 1;
+            }
+
+            if keyboard.just_pressed(KeyCode::KeyA) {
+                atlas.index = 2;
+            }
+        }
+    }
 }
