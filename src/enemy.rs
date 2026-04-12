@@ -21,7 +21,7 @@ fn move_enemies(
     let p1 = player_query.translation.truncate();
     
     let attraction_speed = 150.0;
-    let attraction_range = 100.0; 
+    let attraction_range = 70.0; 
 
     for (mut transform, movement, enemy) in &mut query {
         let local_time = elapsed - movement.spawn_time;
@@ -63,6 +63,12 @@ fn move_enemies(
                 transform.translation.y -= 70.0 * dt;
                 let x_force = local_time * local_time * curve_strength;
                 transform.translation.x += x_force * movement.direction * dt;
+            }
+
+            MovePattern::StraightPause(pause) => {
+                if transform.translation.y > pause {
+                    transform.translation.y -= 80.0 * dt;
+                }
             }
         }
     }

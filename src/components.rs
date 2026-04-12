@@ -72,6 +72,7 @@ pub enum MovePattern {
     Spiral(f32),
     Arc(f32),
     SineWave,
+    StraightPause(f32)
 }
 
 #[derive(Component)]
