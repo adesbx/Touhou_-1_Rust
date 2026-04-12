@@ -84,6 +84,7 @@ pub struct EnemyMovement {
 #[derive(Component)]
 pub struct Enemy {
     pub variety: char,
+    pub animation_timer: Timer,
 }
 
 #[derive(Component, Debug, Deserialize)]

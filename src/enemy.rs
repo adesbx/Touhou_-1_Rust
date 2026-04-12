@@ -7,7 +7,7 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (move_enemies, confine_enemies_movement, check_collison_enemies, check_health));
+        app.add_systems(Update, (move_enemies, confine_enemies_movement, check_collison_enemies, check_health, update_player_sprites));
     }
 }
 
@@ -134,6 +134,25 @@ fn check_health(
                     Transform::from_translation(transform.translation),
                     PowerUp
                 ));
+            }
+        }
+    }
+}
+
+fn update_player_sprites(
+    time:  Res<Time>,
+    mut enemies: Query<(&mut Sprite, &mut Enemy), With<Enemy>>,
+) {
+    for (mut sprite, mut enemy) in &mut enemies {
+        if let Some(atlas) = sprite.texture_atlas.as_mut() {
+            enemy.animation_timer.tick(time.delta());
+
+            if enemy.animation_timer.just_finished() {
+                if atlas.index >=1 {
+                    atlas.index = 0
+                } else {
+                    atlas.index += 1;
+                }
             }
         }
     }

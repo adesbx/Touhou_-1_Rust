@@ -19,6 +19,7 @@ pub fn spawn_from_level_data(
     level_assets: Res<Assets<LevelData>>,
     level_handle: Res<LevelHandle>, 
     mut manager: ResMut<LevelManager>, 
+    mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
 ) {    
     if let Some(level) = level_assets.get(&level_handle.0) {
         manager.phase_timer += time.delta_secs();
@@ -36,11 +37,18 @@ pub fn spawn_from_level_data(
             
             let mut texture_path = "enemies/angel.png";
             if wave.variety == 'c' { texture_path = "enemies/cherubin.png"; }
+
+            let texture: Handle<_> = asset_serv.load(texture_path);
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 1, 2, None, None);
+            let texture_atlas_layout = texture_atlas_layout.add(layout);
             
             commands.spawn((
-                Sprite::from_image(asset_serv.load(texture_path)),
+                Sprite::from_atlas_image(texture, TextureAtlas { layout: texture_atlas_layout, index: 0}),
                 Transform::from_translation(wave.pos.extend(2.0)),
-                Enemy { variety: wave.variety},
+                Enemy {
+                    variety: wave.variety,
+                    animation_timer: Timer::from_seconds(0.3, TimerMode::Repeating), 
+                },
                 Health { hp: wave.hp.hp },
                 EnemyMovement { 
                     spawn_time: manager.phase_timer,
@@ -61,7 +69,10 @@ pub fn spawn_from_level_data(
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_translation(wave.pos.extend(2.0)),
-                Enemy { variety: wave.variety},
+                Enemy { 
+                    variety: wave.variety,
+                    animation_timer: Timer::from_seconds(0.3, TimerMode::Repeating), 
+                },
                 Health { hp: wave.hp.hp },
                 Boss {
                     first_spawn: true,
@@ -87,7 +98,10 @@ pub fn spawn_from_level_data(
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_translation(wave.pos.extend(2.0)),
-                Enemy { variety: wave.variety},
+                Enemy { 
+                    variety: wave.variety,
+                    animation_timer: Timer::from_seconds(0.3, TimerMode::Repeating), 
+                },
                 Health { hp: wave.hp.hp },
                 Boss {
                     first_spawn: false,
