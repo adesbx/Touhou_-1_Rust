@@ -97,18 +97,22 @@ fn confine_boss_movement(
 
 pub fn show_health_bar(
     mut commands: Commands,
-    boss_query: Query<Entity, With<Boss>>,
+    boss_query: Query<(Entity, &Transform), With<Boss>>,
     bar_query: Query<Entity, With<BossHealthBar>>, 
 ) {
     if !boss_query.is_empty() && bar_query.is_empty() {
-        commands.spawn((
-            Sprite::from_color(
-                Color::srgb(0.8, 0.1, 0.1),
-                Vec2::new(300.0, 20.0),
-            ),
-            Transform::from_xyz(0.0, -GAME_HEIGHT / 2.0 + 30.0, 20.0),
-            BossHealthBar,
-        ));
+        for (entity,transform) in boss_query {
+            commands.entity(entity).with_children(|parent| {
+                parent.spawn((
+                    Sprite::from_color(
+                        Color::srgb(0.8, 0.1, 0.1),
+                        Vec2::new(20.0, 4.0),
+                    ),
+                    Transform::from_xyz(0.0, 20.0, 1.0),
+                    BossHealthBar,
+                ));
+            });
+        }
     }
 }
 
@@ -117,8 +121,8 @@ pub fn update_health_bar(
     bar_query: Query<(&mut Sprite, &mut Transform), With<BossHealthBar>>, 
 ) {
     let max_hp = BOSS_HP;
-    let initial_width = 300.0;
-    let initial_height: f32 = 20.0;
+    let initial_width = 20.0;
+    let initial_height: f32 = 4.0;
 
     if !boss_query.is_empty() && !bar_query.is_empty() {
             for (mut sprite, mut transform) in bar_query {
@@ -313,7 +317,7 @@ pub fn spawn_boss_rain(
                 AudioPlayer::new(assets.cross_electricity.clone()),
                 PlaybackSettings {
                     mode: bevy::audio::PlaybackMode::Despawn,
-                    volume: Volume::Decibels(-0.3),
+                    volume: Volume::Decibels(-1.0),
                     ..default()
                 },
             ));

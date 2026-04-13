@@ -44,7 +44,7 @@ fn setup(
     let handle = asset_serv.load("enemies.ron");
     commands.insert_resource(LevelHandle(handle));
     commands.insert_resource(BombSpawner {
-        spawn_timer: Timer::from_seconds(5.0, TimerMode::Once),
+        spawn_timer: Timer::from_seconds(3.0, TimerMode::Repeating),
     });
 
     commands.spawn((

@@ -246,7 +246,7 @@ fn enemies_shoot_projectiles(
             AudioPlayer::new(assets.enemy_shoot_sound.clone()),
             PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Despawn,
-                volume: Volume::Decibels(-0.7),
+                volume: Volume::Decibels(-5.0),
                 ..default()
             },
         ));
