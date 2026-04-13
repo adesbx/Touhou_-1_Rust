@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use rand::Rng;
 use crate::components::*;
 use crate::constants::*;
+use bevy::audio::Volume;
 
 pub struct BossPlugin;
 
@@ -169,6 +170,7 @@ pub fn update_vortex(
     mut commands: Commands,
     time: Res<Time>,
     asset_server: Res<AssetServer>,
+    assets: Res<GameAssets>,
     mother_query: Query<(Entity, &Transform, &BasicProjectileBoss), Without<VortexFragment>>,
     mut fragment_query: Query<(&mut Transform, &mut VortexFragment, Entity)>,
 ) {
@@ -181,7 +183,16 @@ pub fn update_vortex(
 
             let center = transform.translation.truncate();
             let num_fragments = 12;
-            
+
+            commands.spawn((
+                AudioPlayer::new(assets.vortex_explosion.clone()),
+                PlaybackSettings {
+                    mode: bevy::audio::PlaybackMode::Despawn,
+                    volume: Volume::Decibels(0.2),
+                    ..default()
+                },
+            ));
+                
             for i in 0..num_fragments {
                 let start_angle = (i as f32) * (std::f32::consts::TAU / num_fragments as f32);
                 
@@ -281,6 +292,7 @@ pub fn spawn_boss_rain(
     mut commands: Commands,
     time: Res<Time>,
     asset_server: Res<AssetServer>,
+    assets: Res<GameAssets>,
     mut boss_query: Query<(&Transform, &mut Boss)>,
 ) {
     let half_width = GAME_WIDTH / 2.0;
@@ -289,7 +301,7 @@ pub fn spawn_boss_rain(
     
     let x_min = -half_width + margin;
     let x_max = half_width - margin;
-    let y_max = half_height - margin; 
+    let y_max = half_height - margin;
 
     for (transform, mut boss) in &mut boss_query {
         if boss.current_attack != 2 { continue; }
@@ -297,6 +309,14 @@ pub fn spawn_boss_rain(
         boss.rain_shoot_timer.tick(time.delta());
 
         if boss.rain_shoot_timer.just_finished() {
+            commands.spawn((
+                AudioPlayer::new(assets.cross_electricity.clone()),
+                PlaybackSettings {
+                    mode: bevy::audio::PlaybackMode::Despawn,
+                    volume: Volume::Decibels(-0.3),
+                    ..default()
+                },
+            ));
             let mut rng = rand::thread_rng();
             let bullet_count = 15; 
             let texture = asset_server.load("projectiles/projectile_cross_electrised.png");

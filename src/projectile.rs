@@ -97,6 +97,13 @@ fn shoot_projectile(
             ));
             
             if  player.shoot_timer_fire.is_finished() {
+                commands.spawn((
+                    AudioPlayer::new(assets.shoot_fire_sound.clone()),
+                    PlaybackSettings {
+                        mode: bevy::audio::PlaybackMode::Despawn,
+                        ..default()
+                    },
+                ));
                 if player.shoot_from_left {
                 commands.spawn((
                         Sprite::from_image(fire_texture),
@@ -222,6 +229,7 @@ fn enemies_shoot_projectiles(
     time: Res<Time>,
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
+    assets: Res<GameAssets>,
     mut enemy_query: Query<(&Transform, &mut Enemy), With<Enemy>>,
     player_transform: Single<&Transform, With<Player>>,
 ) {
@@ -233,6 +241,15 @@ fn enemies_shoot_projectiles(
         if enemy.shoot_timer.is_finished() && enemy.variety == 'a' {  
             let enemy_pos = transform.translation.truncate();
             let direction = (player_pos - enemy_pos).normalize_or_zero();
+
+        commands.spawn((
+            AudioPlayer::new(assets.enemy_shoot_sound.clone()),
+            PlaybackSettings {
+                mode: bevy::audio::PlaybackMode::Despawn,
+                volume: Volume::Decibels(-0.7),
+                ..default()
+            },
+        ));
 
             let texture: Handle<Image> = asset_serv.load("projectiles/projectile_cross.png");
             commands.spawn((
