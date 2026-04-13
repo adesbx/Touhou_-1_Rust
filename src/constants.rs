@@ -1,6 +1,6 @@
 pub const INVINCIBILITY_TIME: f32 = 3.0;
 pub const PLAYER_DAMAGE: f32 = 10.0;
-pub const PLAYER_HP: f32 = 30.0;
+pub const PLAYER_HP: f32 = 3.0;
 pub const PLAYER_SPEED: f32 = 200.0;
 pub const PLAYER_SIZE: f32 = 32.0; // taille du sprite du joueur
 pub const PROJECTILE_SPEED: f32 = 400.0;
