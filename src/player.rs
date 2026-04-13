@@ -8,7 +8,7 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (move_player, confine_player_movement, move_power_up, check_collison_power_up, use_bombs, update_player_sprites));
+        app.add_systems(Update, (move_player, confine_player_movement, move_power_up, check_collison_power_up, use_bombs, update_player_sprites, update_explosion_sprite));
     }
 }
 
@@ -118,7 +118,8 @@ fn use_bombs(
     assets: Res<GameAssets>,
     mut player_query: Single<(&Transform, &mut Player), With<Player>>,
     mut enemy_query: Query<(&Transform, &mut Health), With<Enemy>>, 
-    keyboard: Res<ButtonInput<KeyCode>>
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
 ) {
 
     let (transform, player) = &mut *player_query; // possiblement sale voir pour faire autrement
@@ -134,16 +135,25 @@ fn use_bombs(
             
             }
         }
+
+        let texture: Handle<_> = asset_serv.load("projectiles/explosion_ring.png");
+        let layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 2, 3, None, None);
+        let texture_atlas_layout = texture_atlas_layout.add(layout);
         
         commands.spawn((
             Sprite {
-                image: asset_serv.load("projectiles/explosion_ring.png"),
-                custom_size: Some(Vec2::new(128.0, 128.0)), 
+                image: texture,
+                texture_atlas: Some(TextureAtlas {
+                    layout: texture_atlas_layout,
+                    index: 0,
+                }),
+                custom_size: Some(Vec2::new(128.0, 128.0)),
                 ..default()
             },
             Transform::from_translation(transform.translation),
             DespawnTimer {
                 timer: Timer::from_seconds(0.5, TimerMode::Once),
+                animation_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
             },
         ));
 
@@ -188,6 +198,24 @@ fn update_player_sprites(
                 } else {
                     atlas.index += 1;
                 }
+            }
+        }
+    }
+}
+
+fn update_explosion_sprite(
+    time:  Res<Time>,
+    explosion: Single<(&mut Sprite, &mut DespawnTimer), With<DespawnTimer>>,
+) {
+
+    let (mut sprite, mut timer) = explosion.into_inner();
+
+    if let Some(atlas) = sprite.texture_atlas.as_mut() {
+        timer.animation_timer.tick(time.delta());
+
+        if timer.animation_timer.just_finished() {
+            if atlas.index < 4 {
+                atlas.index += 1;
             }
         }
     }

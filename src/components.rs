@@ -57,6 +57,7 @@ pub struct BombSpawner{
 #[derive(Component)]
 pub struct DespawnTimer {
     pub timer: Timer,
+    pub animation_timer: Timer,
 }
 
 #[derive(Component)]

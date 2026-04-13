@@ -97,11 +97,11 @@ fn confine_boss_movement(
 
 pub fn show_health_bar(
     mut commands: Commands,
-    boss_query: Query<(Entity, &Transform), With<Boss>>,
+    boss_query: Query<Entity, With<Boss>>,
     bar_query: Query<Entity, With<BossHealthBar>>, 
 ) {
     if !boss_query.is_empty() && bar_query.is_empty() {
-        for (entity,transform) in boss_query {
+        for entity in boss_query {
             commands.entity(entity).with_children(|parent| {
                 parent.spawn((
                     Sprite::from_color(
