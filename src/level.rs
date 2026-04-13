@@ -8,7 +8,7 @@ pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (spawn_from_level_data, spawn_bombs, move_bombs, check_collison_bombs, handle_despawn_timers));
+        app.add_systems(Update, (spawn_from_level_data, spawn_bombs, move_bombs, check_collison_bombs, spawn_power_up, handle_despawn_timers));
     }
 }
 
@@ -144,9 +144,38 @@ pub fn spawn_bombs(
             Bomb
         ));
 
-        let next_wait = rng.gen_range(25.0..50.0);
+        let next_wait = rng.gen_range(5.0..20.0);
         spawner.spawn_timer.set_duration(std::time::Duration::from_secs_f32(next_wait));
         spawner.spawn_timer.reset();
+    }
+}
+
+pub fn spawn_power_up(
+    time: Res<Time>,
+    mut commands: Commands,
+    asset_serv: Res<AssetServer>,
+    mut manager: ResMut<LevelManager>, 
+){
+
+
+    manager.power_up_timer.tick(time.delta());
+
+    if manager.power_up_timer.is_finished() {
+        let mut rng = rand::thread_rng();
+
+        let texture: Handle<Image> = asset_serv.load("items/power_up.png");
+        let random_x = rng.gen_range(-GAME_WIDTH / 2.0 .. GAME_WIDTH / 2.0);
+        let spawn_pos = Vec3::new(random_x, GAME_HEIGHT / 2.0 + 50.0, 5.0);
+
+        commands.spawn((
+            Sprite::from_image(texture),
+            Transform::from_translation(spawn_pos),
+            PowerUp
+        ));
+
+        let next_wait = rng.gen_range(2.0..10.0);
+        manager.power_up_timer.set_duration(std::time::Duration::from_secs_f32(next_wait));
+        manager.power_up_timer.reset();
     }
 }
 

@@ -1,5 +1,6 @@
 use bevy::app::App;
 use bevy::prelude::*;
+use bevy::audio::Volume;
 
 mod components;
 mod constants;
@@ -21,6 +22,7 @@ fn main() {
             current_phase: GamePhase::PreBoss,
             phase_timer: 0.0,
             next_index: 0,
+            power_up_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
         })
         .init_asset::<LevelData>()
         .register_asset_loader(LevelDataLoader)
@@ -139,7 +141,11 @@ fn play_main_theme(
 ) {
     commands.spawn((
         AudioPlayer::new(asset_serv.load("sounds/main_theme.ogg")),
-        PlaybackSettings::LOOP,
+        PlaybackSettings {
+            mode: bevy::audio::PlaybackMode::Despawn,
+            volume: Volume::Decibels(-7.0),
+            ..default()
+        },
     ));
 }
 

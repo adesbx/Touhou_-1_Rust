@@ -139,6 +139,7 @@ pub struct LevelManager {
     pub current_phase: GamePhase,
     pub phase_timer: f32,
     pub next_index: usize,
+    pub power_up_timer: Timer,
 }
 
 #[derive(Deserialize, Asset, TypePath, Debug, PartialEq)]
