@@ -1,3 +1,4 @@
+use bevy::audio::Volume;
 use bevy::prelude::*;
 use crate::components::*;
 use crate::constants::*;
@@ -21,6 +22,7 @@ fn shoot_projectile(
     time:  Res<Time>,
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
+    assets: Res<GameAssets>,
     mut player_query: Single<(&Transform, &mut Damage, &mut Player), With<Player>>,
     keyboard: Res<ButtonInput<KeyCode>>,
 ) {
@@ -37,6 +39,15 @@ fn shoot_projectile(
         let base_x = transform.translation.x;
         let base_y = transform.translation.y + 10.0;
         let z = transform.translation.z;
+
+        commands.spawn((
+            AudioPlayer::new(assets.shoot_sound.clone()),
+            PlaybackSettings {
+                mode: bevy::audio::PlaybackMode::Despawn,
+                volume: Volume::Decibels(-0.4),
+                ..default()
+            },
+        ));
 
         if damage_player.damage < 50.0 {
             commands.spawn((

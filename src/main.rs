@@ -32,7 +32,7 @@ fn main() {
         .add_plugins(ui::UiPlugin)
         .add_plugins(background::BackgroundPlugin)
         .add_systems(Startup, setup)
-        .add_systems(Startup, play_main_theme)
+        .add_systems(Startup, (play_main_theme, setup_assets))
         .run();
 }
 
@@ -141,4 +141,11 @@ fn play_main_theme(
         AudioPlayer::new(asset_serv.load("sounds/main_theme.ogg")),
         PlaybackSettings::LOOP,
     ));
+}
+
+fn setup_assets(mut commands: Commands, asset_serv: Res<AssetServer>) {
+    commands.insert_resource(GameAssets {
+        shoot_sound: asset_serv.load("sounds/player_shooting.ogg"),
+        explosion_sound: asset_serv.load("sounds/explosion.ogg"),
+    });
 }

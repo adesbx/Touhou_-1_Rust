@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use std::time::Duration;
 use crate::components::*;
 use crate::constants::*;
+use bevy::audio::Volume;
 
 pub struct PlayerPlugin;
 
@@ -114,6 +115,7 @@ fn check_collison_power_up(
 fn use_bombs(
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
+    assets: Res<GameAssets>,
     mut player_query: Single<(&Transform, &mut Player), With<Player>>,
     mut enemy_query: Query<(&Transform, &mut Health), With<Enemy>>, 
     keyboard: Res<ButtonInput<KeyCode>>
@@ -142,6 +144,15 @@ fn use_bombs(
             Transform::from_translation(transform.translation),
             DespawnTimer {
                 timer: Timer::from_seconds(0.5, TimerMode::Once),
+            },
+        ));
+
+        commands.spawn((
+            AudioPlayer::new(assets.explosion_sound.clone()),
+            PlaybackSettings {
+                mode: bevy::audio::PlaybackMode::Despawn,
+                volume: Volume::Decibels(0.8),
+                ..default()
             },
         ));
 

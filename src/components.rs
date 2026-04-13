@@ -157,3 +157,9 @@ pub struct LevelDataLoader;
 
 #[derive(Component)]
 pub struct Background;
+
+#[derive(Resource)]
+pub struct GameAssets {
+    pub shoot_sound: Handle<AudioSource>,
+    pub explosion_sound: Handle<AudioSource>,
+}
