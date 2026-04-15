@@ -44,7 +44,7 @@ fn shoot_projectile(
             AudioPlayer::new(assets.shoot_sound.clone()),
             PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Despawn,
-                volume: Volume::Decibels(-0.4),
+                volume: Volume::Decibels(-10.0),
                 ..default()
             },
         ));
@@ -101,18 +101,27 @@ fn shoot_projectile(
                     AudioPlayer::new(assets.shoot_fire_sound.clone()),
                     PlaybackSettings {
                         mode: bevy::audio::PlaybackMode::Despawn,
+                        volume: Volume::Decibels(-8.0),
                         ..default()
                     },
                 ));
                 if player.shoot_from_left {
                 commands.spawn((
-                        Sprite::from_image(fire_texture),
+                        Sprite {
+                            image: fire_texture,
+                            custom_size: Some(Vec2::new(64.0, 64.0)),
+                            ..default()
+                        },
                         Transform::from_xyz(base_x-10.0, base_y, z),
                         Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
                     ));
                 } else {
                     commands.spawn((
-                        Sprite::from_image(fire_texture),
+                        Sprite {
+                            image: fire_texture,
+                            custom_size: Some(Vec2::new(64.0, 64.0)),
+                            ..default()
+                        },
                         Transform::from_xyz(base_x+10.0, base_y, z),
                         Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
                     ));
@@ -246,7 +255,7 @@ fn enemies_shoot_projectiles(
             AudioPlayer::new(assets.enemy_shoot_sound.clone()),
             PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Despawn,
-                volume: Volume::Decibels(-10.0),
+                volume: Volume::Decibels(-15.0),
                 ..default()
             },
         ));

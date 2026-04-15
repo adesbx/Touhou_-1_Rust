@@ -142,7 +142,7 @@ fn play_main_theme(
     commands.spawn((
         AudioPlayer::new(asset_serv.load("sounds/main_theme.ogg")),
         PlaybackSettings {
-            mode: bevy::audio::PlaybackMode::Despawn,
+            mode: bevy::audio::PlaybackMode::Loop,
             volume: Volume::Decibels(-7.0),
             ..default()
         },

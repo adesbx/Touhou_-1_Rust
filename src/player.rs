@@ -161,7 +161,7 @@ fn use_bombs(
             AudioPlayer::new(assets.explosion_sound.clone()),
             PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Despawn,
-                volume: Volume::Decibels(0.8),
+                volume: Volume::Decibels(-5.0),
                 ..default()
             },
         ));
