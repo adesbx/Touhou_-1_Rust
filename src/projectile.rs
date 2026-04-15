@@ -78,7 +78,7 @@ fn shoot_projectile(
                 Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
             ));
         } else if damage_player.damage < 150.0 {
-                        commands.spawn((
+            commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
                 Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
@@ -128,9 +128,57 @@ fn shoot_projectile(
                 }
                 player.shoot_from_left = !player.shoot_from_left
             }
+        } else {
+            commands.spawn((
+                Sprite::from_image(texture.clone()),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+            ));
+
+            commands.spawn((
+                Sprite::from_image(texture.clone()),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+            ));
+
+            commands.spawn((
+                Sprite::from_image(texture),
+                Transform::from_xyz(base_x, base_y, z),
+                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+            ));
+            
+            if  player.shoot_timer_fire.is_finished() {
+                commands.spawn((
+                    AudioPlayer::new(assets.shoot_fire_sound.clone()),
+                    PlaybackSettings {
+                        mode: bevy::audio::PlaybackMode::Despawn,
+                        volume: Volume::Decibels(-8.0),
+                        ..default()
+                    },
+                ));
+                //tire des deux cotés mtn
+                commands.spawn((
+                        Sprite {
+                            image: fire_texture.clone(),
+                            custom_size: Some(Vec2::new(64.0, 64.0)),
+                            ..default()
+                        },
+                        Transform::from_xyz(base_x-10.0, base_y, z),
+                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
+                    ));
+                commands.spawn((
+                    Sprite {
+                        image: fire_texture.clone(),
+                        custom_size: Some(Vec2::new(64.0, 64.0)),
+                        ..default()
+                    },
+                    Transform::from_xyz(base_x+10.0, base_y, z),
+                    Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
+                ));
         }
 
     }
+}
 }
 
 
