@@ -164,7 +164,7 @@ fn shoot_projectile(
                             ..default()
                         },
                         Transform::from_xyz(base_x-10.0, base_y, z),
-                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
+                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: time.elapsed_secs()},
                     ));
                 commands.spawn((
                     Sprite {
@@ -173,10 +173,9 @@ fn shoot_projectile(
                         ..default()
                     },
                     Transform::from_xyz(base_x+10.0, base_y, z),
-                    Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
+                    Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: time.elapsed_secs()},
                 ));
         }
-
     }
 }
 }
@@ -184,7 +183,8 @@ fn shoot_projectile(
 
 fn move_projectile(
     time:  Res<Time>,
-    mut projectile_query: Query<(&mut Transform, &Projectile)>,
+    mut projectile_query: Query<(&mut Transform, &Projectile), Without<Enemy>>,
+    enemy_query: Query<(&Transform, &Enemy), (With<Enemy>, Without<Boss>)>,
 ) {
     let elapsed = time.elapsed_secs();
     let dt = time.delta_secs();
@@ -192,12 +192,34 @@ fn move_projectile(
     for (mut transform, projectile) in &mut projectile_query {
 
         if projectile.variety == 'b' {// projectile basique fonce dans sa direction
-            let movement = projectile.direction.normalize() * projectile.speed * time.delta_secs();
+            let movement = projectile.direction.normalize() * projectile.speed * dt;
             transform.translation += movement.extend(0.0);
-        } else if projectile.variety == 'f' {
+        } else if projectile.variety == 'f' { // feu basique
             let local_time: f32 = elapsed - projectile.spawn_time;
             transform.translation.y += projectile.speed * dt;
             let x_force = local_time * local_time * 300.0;
+            transform.translation.x += x_force * projectile.direction.x * dt;
+        } else if projectile.variety == 't' { //feu homing tear
+            let local_time: f32 = elapsed - projectile.spawn_time;
+            let mut closest_enemy = Vec3::ZERO;
+            let mut min_distance = f32::MAX; 
+            for (enemy_transform, _) in &enemy_query {
+                let distance = transform.translation.distance(enemy_transform.translation);
+                if min_distance > distance {
+                    min_distance = distance;
+                    closest_enemy = enemy_transform.translation;
+                }
+            }
+
+            if closest_enemy != Vec3::ZERO {
+                let direction = (closest_enemy - transform.translation).normalize();
+                transform.translation += direction * projectile.speed * dt;
+            } else {
+                transform.translation.y += projectile.speed * dt;
+            }
+
+            let x_force = local_time * local_time * 300.0;
+            
             transform.translation.x += x_force * projectile.direction.x * dt;
         }
     }
