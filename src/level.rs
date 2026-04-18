@@ -43,7 +43,12 @@ pub fn spawn_from_level_data(
             let texture_atlas_layout = texture_atlas_layout.add(layout);
             
             commands.spawn((
-                Sprite::from_atlas_image(texture, TextureAtlas { layout: texture_atlas_layout, index: 0}),
+                Sprite {
+                    image: texture,
+                    texture_atlas: Some(TextureAtlas { layout: texture_atlas_layout, index: 0}),
+                    custom_size: if wave.variety == 'c' { Some(Vec2::new(CHERUB_SIZE, CHERUB_SIZE)) } else { Some(Vec2::new(ANGEL_SIZE, ANGEL_SIZE)) },
+                    ..default()
+                },
                 Transform::from_translation(wave.pos.extend(2.0)),
                 Enemy {
                     variety: wave.variety,

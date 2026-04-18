@@ -321,14 +321,15 @@ fn enemies_shoot_projectiles(
             let enemy_pos = transform.translation.truncate();
             let direction = (player_pos - enemy_pos).normalize_or_zero();
 
-        commands.spawn((
-            AudioPlayer::new(assets.enemy_shoot_sound.clone()),
-            PlaybackSettings {
-                mode: bevy::audio::PlaybackMode::Despawn,
-                volume: Volume::Decibels(-15.0),
-                ..default()
-            },
-        ));
+        // TODO : Voir si laisser son tir ennemi
+        // commands.spawn((
+        //     AudioPlayer::new(assets.enemy_shoot_sound.clone()),
+        //     PlaybackSettings {
+        //         mode: bevy::audio::PlaybackMode::Despawn,
+        //         volume: Volume::Decibels(-15.0),
+        //         ..default()
+        //     },
+        // ));
 
             let texture: Handle<Image> = asset_serv.load("projectiles/projectile_cross.png");
             commands.spawn((
