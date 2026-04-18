@@ -53,7 +53,7 @@ pub fn spawn_from_level_data(
                 Enemy {
                     variety: wave.variety,
                     animation_timer: Timer::from_seconds(0.3, TimerMode::Repeating), 
-                    shoot_timer: Timer::from_seconds(0.8, TimerMode::Repeating), 
+                    shoot_timer: Timer::from_seconds(0.9, TimerMode::Repeating), 
                 },
                 Health { hp: wave.hp.hp },
                 EnemyMovement { 
@@ -168,12 +168,15 @@ pub fn spawn_power_up(
     if manager.power_up_timer.is_finished() {
         let mut rng = rand::thread_rng();
 
-        let texture: Handle<Image> = asset_serv.load("items/power_up.png");
         let random_x = rng.gen_range(-GAME_WIDTH / 2.0 .. GAME_WIDTH / 2.0);
         let spawn_pos = Vec3::new(random_x, GAME_HEIGHT / 2.0 + 50.0, 5.0);
 
         commands.spawn((
-            Sprite::from_image(texture),
+            Sprite {
+                image: asset_serv.load("items/power_up.png"),
+                custom_size: Some(Vec2::new(POWER_UP_SIZE, POWER_UP_SIZE)),
+                ..default()
+            },
             Transform::from_translation(spawn_pos),
             PowerUp
         ));

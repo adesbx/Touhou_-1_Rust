@@ -134,9 +134,12 @@ fn check_health(
             commands.entity(entity).despawn();
             let mut rng = rand::thread_rng();
             if rng.gen_range(1..4) == 1 { // 1/3 de faire spawbn un power up  
-                let texture: Handle<Image> = asset_serv.load("items/power_up.png");
                 commands.spawn((
-                    Sprite::from_image(texture),
+                    Sprite {
+                        image: asset_serv.load("items/power_up.png"),
+                        custom_size: Some(Vec2::new(POWER_UP_SIZE, POWER_UP_SIZE)),
+                        ..default()
+                    },
                     Transform::from_translation(transform.translation),
                     PowerUp
                 ));
