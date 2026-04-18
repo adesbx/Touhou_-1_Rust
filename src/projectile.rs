@@ -25,6 +25,7 @@ fn shoot_projectile(
     assets: Res<GameAssets>,
     mut player_query: Single<(&Transform, &mut Damage, &mut Player), With<Player>>,
     keyboard: Res<ButtonInput<KeyCode>>,
+    mut last_sound_time: Local<f32>,
 ) {
     let (transform, damage_player, player) = &mut *player_query;
 
@@ -40,14 +41,17 @@ fn shoot_projectile(
         let base_y = transform.translation.y + 10.0;
         let z = transform.translation.z;
 
-        commands.spawn((
-            AudioPlayer::new(assets.shoot_sound.clone()),
-            PlaybackSettings {
-                mode: bevy::audio::PlaybackMode::Despawn,
-                volume: Volume::Decibels(-10.0),
-                ..default()
-            },
-        ));
+        if time.elapsed_secs() - *last_sound_time > 0.1 {
+            commands.spawn((
+                AudioPlayer::new(assets.shoot_sound.clone()),
+                PlaybackSettings {
+                    mode: bevy::audio::PlaybackMode::Despawn,
+                    volume: Volume::Decibels(-10.0),
+                    ..default()
+                },
+            ));
+            *last_sound_time = time.elapsed_secs();
+        }
 
         if damage_player.damage < 50.0 {
             commands.spawn((
