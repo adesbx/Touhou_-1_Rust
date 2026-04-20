@@ -111,6 +111,7 @@ pub struct Boss {
     pub rain_shoot_timer: Timer,
     pub current_attack: u32,
     pub attack_switch_timer: Timer,
+    pub diagonal_attack_timer: Timer
 }
 
 #[derive(Component)]
