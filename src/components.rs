@@ -66,6 +66,11 @@ pub struct EnemyProjectile {
     pub speed: f32,
 }
 
+#[derive(Component)]
+pub struct DiagonalMovement {
+    pub spawn_time: f32,
+}
+
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum MovePattern {
     Straight,

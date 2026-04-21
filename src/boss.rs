@@ -18,7 +18,8 @@ impl Plugin for BossPlugin {
             basic_shoot_projectiles,
             update_vortex,
             spawn_boss_rain,
-            change_attack_type
+            change_attack_type,
+            spawn_boss_diagonal_attack
         ));
     }
 }
@@ -244,7 +245,7 @@ fn basic_shoot_projectiles(
     mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
 ) {
     let (transform, boss) = &mut *boss_query;
-    if boss.current_attack == 1 {
+    if boss.current_attack == 1 && boss.phase == 1 {
         boss.basic_shoot_timer.tick(time.delta());
         let number_projectile = 4;
 
@@ -308,39 +309,89 @@ pub fn spawn_boss_rain(
     let y_max = half_height - margin;
 
     for (transform, mut boss) in &mut boss_query {
-        if boss.current_attack != 2 { continue; }
+        if boss.current_attack == 2 && boss.phase == 1 {  
 
-        boss.rain_shoot_timer.tick(time.delta());
+            boss.rain_shoot_timer.tick(time.delta());
 
-        if boss.rain_shoot_timer.just_finished() {
-            commands.spawn((
-                AudioPlayer::new(assets.cross_electricity.clone()),
-                PlaybackSettings {
-                    mode: bevy::audio::PlaybackMode::Despawn,
-                    volume: Volume::Decibels(-1.0),
-                    ..default()
-                },
-            ));
-            let mut rng = rand::thread_rng();
-            let bullet_count = 15; 
-            let texture = asset_server.load("projectiles/projectile_cross_electrised.png");
-
-            for i in 0..bullet_count {
-                // réparti largeur autorisée (entre x_min et x_max)
-                let x_pos = x_min + (i as f32 * (x_max - x_min) / (bullet_count - 1) as f32);
-                
-                let y_spawn = y_max - rng.gen_range(0.0..100.0);
-
-                let speed = rng.gen_range(150.0..250.0);
-
+            if boss.rain_shoot_timer.just_finished() {
                 commands.spawn((
-                    Sprite::from_image(texture.clone()),
-                    Transform::from_xyz(x_pos, y_spawn, transform.translation.z),
-                    EnemyProjectile {
-                        direction: Vec2::new(0.0, -1.0), 
-                        speed: speed,
+                    AudioPlayer::new(assets.cross_electricity.clone()),
+                    PlaybackSettings {
+                        mode: bevy::audio::PlaybackMode::Despawn,
+                        volume: Volume::Decibels(-1.0),
+                        ..default()
                     },
                 ));
+                let mut rng = rand::thread_rng();
+                let bullet_count = 15; 
+                let texture = asset_server.load("projectiles/projectile_cross_electrised.png");
+
+                for i in 0..bullet_count {
+                    // réparti largeur autorisée (entre x_min et x_max)
+                    let x_pos = x_min + (i as f32 * (x_max - x_min) / (bullet_count - 1) as f32);
+                    
+                    let y_spawn = y_max - rng.gen_range(0.0..100.0);
+
+                    let speed = rng.gen_range(150.0..250.0);
+
+                    commands.spawn((
+                        Sprite::from_image(texture.clone()),
+                        Transform::from_xyz(x_pos, y_spawn, transform.translation.z),
+                        EnemyProjectile {
+                            direction: Vec2::new(0.0, -1.0), 
+                            speed: speed,
+                        },
+                    ));
+                }
+            }
+        }
+    }
+}
+
+pub fn spawn_boss_diagonal_attack(
+    mut commands: Commands,
+    mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
+    asset_serv: Res<AssetServer>,
+    time: Res<Time>,
+) {
+    let (transform, boss) = &mut *boss_query;
+    if boss.current_attack == 1 && boss.phase == 2 {
+        boss.diagonal_attack_timer.tick(time.delta());
+        
+        if boss.diagonal_attack_timer.just_finished() {
+            let spacing = 45.0; 
+            let start_x = -(GAME_WIDTH / 2.0);
+            let end_x = GAME_WIDTH / 2.0;
+            let start_y = (GAME_HEIGHT / 2.0) - 50.0;
+            let thickness = 5; 
+            let now = time.elapsed_secs();
+
+            let safe_limit_x = start_x + (GAME_WIDTH * 0.3);
+
+            let num_cols = ((end_x - start_x) / spacing).floor() as i32;
+
+            for i in 0..num_cols {
+                let x = start_x + (i as f32 * spacing);
+                
+                if x < safe_limit_x { continue; }
+
+                let column_delay = i as f32 * 0.15; 
+
+                for row in 0..thickness {
+                    let y = start_y - (row as f32 * spacing);
+
+                    commands.spawn((
+                        Sprite::from_image(asset_serv.load("projectiles/projectile.png")),
+                        Transform::from_translation(Vec3::new(x, y, -10.0)),
+                        EnemyProjectile {
+                            speed: 0.0,
+                            direction: Vec2::ZERO,
+                        },
+                        DiagonalMovement {
+                            spawn_time: now + column_delay,
+                        },
+                    ));
+                }
             }
         }
     }

@@ -13,7 +13,8 @@ impl Plugin for ProjectilePlugin {
             confine_projectile_movement, 
             check_collison_projectile_player, 
             enemies_shoot_projectiles, 
-            move_enemy_projectiles
+            move_enemy_projectiles,
+            move_diagonal_projectiles
         ));
     }
 }
@@ -229,6 +230,26 @@ fn move_projectile(
     }
 }
 
+pub fn move_diagonal_projectiles(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut Transform, &DiagonalMovement)>,
+) {
+    let now = time.elapsed_secs();
+    let lifetime = 3.0; 
+
+    for (entity, mut transform, movement) in &mut query {
+        if now >= movement.spawn_time {
+            
+            if now >= movement.spawn_time + lifetime {
+                commands.entity(entity).despawn();
+            } else {
+                transform.translation.z = 10.0;
+            }
+        }
+    }
+}
+
 fn confine_projectile_movement(    
     mut commands: Commands,
     projectile_query: Query<(Entity, &Transform), With<Projectile>>,
@@ -350,7 +371,7 @@ fn enemies_shoot_projectiles(
 
 fn move_enemy_projectiles(
     time: Res<Time>,
-    mut query: Query<(&mut Transform, &EnemyProjectile)>,
+    mut query: Query<(&mut Transform, &EnemyProjectile), Without<DiagonalMovement>>,
 ) {
     for (mut transform, projectile) in &mut query {
         let movement: Vec2 = projectile.direction.normalize() * projectile.speed * time.delta_secs();
