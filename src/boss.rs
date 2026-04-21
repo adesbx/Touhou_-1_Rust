@@ -351,44 +351,36 @@ pub fn spawn_boss_rain(
 pub fn spawn_boss_diagonal_attack(
     mut commands: Commands,
     mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
-    asset_serv: Res<AssetServer>,
     time: Res<Time>,
 ) {
-    let (transform, boss) = &mut *boss_query;
+    let (_, boss) = &mut *boss_query;
     if boss.current_attack == 1 && boss.phase == 2 {
         boss.diagonal_attack_timer.tick(time.delta());
         
         if boss.diagonal_attack_timer.just_finished() {
-            let spacing = 45.0; 
+            let spacing = 30.0; 
             let start_x = -(GAME_WIDTH / 2.0);
-            let end_x = GAME_WIDTH / 2.0;
+            let end_x: f32 = GAME_WIDTH / 2.0;
             let start_y = (GAME_HEIGHT / 2.0) - 50.0;
-            let thickness = 5; 
+            let thickness = 40; 
             let now = time.elapsed_secs();
-
-            let safe_limit_x = start_x + (GAME_WIDTH * 0.3);
-
+            let safe_limit_x = start_x + (GAME_WIDTH * 0.1);
             let num_cols = ((end_x - start_x) / spacing).floor() as i32;
 
             for i in 0..num_cols {
                 let x = start_x + (i as f32 * spacing);
-                
                 if x < safe_limit_x { continue; }
-
-                let column_delay = i as f32 * 0.15; 
 
                 for row in 0..thickness {
                     let y = start_y - (row as f32 * spacing);
+                    let delay = (i as f32 * 0.15) + (row as f32 * 0.10); 
 
+                    //Créer un spawner pour créer un projectile (dans projectile.rs)
                     commands.spawn((
-                        Sprite::from_image(asset_serv.load("projectiles/projectile.png")),
-                        Transform::from_translation(Vec3::new(x, y, -10.0)),
-                        EnemyProjectile {
-                            speed: 0.0,
-                            direction: Vec2::ZERO,
-                        },
-                        DiagonalMovement {
-                            spawn_time: now + column_delay,
+                        DiagonalMovementSpawner {
+                            x: x,
+                            y: y,
+                            spawn_time: now + delay,
                         },
                     ));
                 }

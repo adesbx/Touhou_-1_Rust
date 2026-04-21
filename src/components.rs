@@ -67,7 +67,14 @@ pub struct EnemyProjectile {
 }
 
 #[derive(Component)]
-pub struct DiagonalMovement {
+pub struct DiagonalMovementSpawner {
+    pub x: f32,
+    pub y: f32,
+    pub spawn_time: f32,
+}
+
+#[derive(Component)]
+pub struct DiagonalMovementDespawner {
     pub spawn_time: f32,
 }
 

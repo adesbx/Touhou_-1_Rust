@@ -233,19 +233,33 @@ fn move_projectile(
 pub fn move_diagonal_projectiles(
     mut commands: Commands,
     time: Res<Time>,
-    mut query: Query<(Entity, &mut Transform, &DiagonalMovement)>,
+    mut spawner_query: Query<(Entity, &DiagonalMovementSpawner)>,
+    mut despawner_query: Query<(Entity, &DiagonalMovementDespawner)>,
+    asset_serv: Res<AssetServer>,
 ) {
     let now = time.elapsed_secs();
     let lifetime = 3.0; 
 
-    for (entity, mut transform, movement) in &mut query {
+    for (entity, movement) in &mut spawner_query {
         if now >= movement.spawn_time {
-            
-            if now >= movement.spawn_time + lifetime {
-                commands.entity(entity).despawn();
-            } else {
-                transform.translation.z = 10.0;
-            }
+            commands.spawn((
+                Sprite::from_image(asset_serv.load("projectiles/projectile.png")),
+                Transform::from_translation(Vec3::new(movement.x, movement.y, 10.0)),
+                EnemyProjectile {
+                    speed: 0.0,
+                    direction: Vec2::ZERO,
+                },
+                DiagonalMovementDespawner {
+                    spawn_time: now,
+                },
+            ));
+            commands.entity(entity).despawn();
+        }
+    }
+
+    for (entity, movement) in &mut despawner_query {
+        if now >= movement.spawn_time + lifetime {
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -314,13 +328,19 @@ fn check_collison_projectile_player(
 
             let mut size = 0.0;
             if enemy.variety == 'c' {
-                size = CHERUB_SIZE
+                size = CHERUB_SIZE;
             } else if enemy.variety == 'a' {
-                size = ANGEL_SIZE
+                size = ANGEL_SIZE;
+            } else if enemy.variety == 'b' {
+                size = BOSS_SIZE;
             }
 
-            if distance < (size + PLAYER_SIZE) / 2.0 {                
+            if distance < (size + PLAYER_SIZE) / 2.0 && enemy.variety != 'b' {                
                 commands.entity(enemy_entity).despawn();
+                health.hp -= 1.0;
+                player.last_hit = time.elapsed_secs();
+                break;
+            } else if distance < (size + PLAYER_SIZE) / 2.0 && enemy.variety == 'b'{
                 health.hp -= 1.0;
                 player.last_hit = time.elapsed_secs();
                 break;
@@ -371,7 +391,7 @@ fn enemies_shoot_projectiles(
 
 fn move_enemy_projectiles(
     time: Res<Time>,
-    mut query: Query<(&mut Transform, &EnemyProjectile), Without<DiagonalMovement>>,
+    mut query: Query<(&mut Transform, &EnemyProjectile), Without<DiagonalMovementDespawner>>,
 ) {
     for (mut transform, projectile) in &mut query {
         let movement: Vec2 = projectile.direction.normalize() * projectile.speed * time.delta_secs();
