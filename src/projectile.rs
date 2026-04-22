@@ -14,7 +14,8 @@ impl Plugin for ProjectilePlugin {
             check_collison_projectile_player, 
             enemies_shoot_projectiles, 
             move_enemy_projectiles,
-            move_diagonal_projectiles
+            move_diagonal_projectiles,
+            update_diagonal_sprites
         ));
     }
 }
@@ -236,14 +237,20 @@ pub fn move_diagonal_projectiles(
     mut spawner_query: Query<(Entity, &DiagonalMovementSpawner)>,
     mut despawner_query: Query<(Entity, &DiagonalMovementDespawner)>,
     asset_serv: Res<AssetServer>,
+    mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     let now = time.elapsed_secs();
     let lifetime = 3.0; 
 
     for (entity, movement) in &mut spawner_query {
         if now >= movement.spawn_time {
+                
+            let texture = asset_serv.load("projectiles/diagonal_attack.png");
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(24), 3, 3, None, None);
+            let texture_atlas_layout = texture_atlas_layout.add(layout);
+
             commands.spawn((
-                Sprite::from_image(asset_serv.load("projectiles/projectile.png")),
+                Sprite::from_atlas_image(texture, TextureAtlas { layout: texture_atlas_layout, index: 0}),
                 Transform::from_translation(Vec3::new(movement.x, movement.y, 10.0)),
                 EnemyProjectile {
                     speed: 0.0,
@@ -251,6 +258,7 @@ pub fn move_diagonal_projectiles(
                 },
                 DiagonalMovementDespawner {
                     spawn_time: now,
+                    animation_timer: Timer::from_seconds(0.33, TimerMode::Repeating),
                 },
             ));
             commands.entity(entity).despawn();
@@ -396,5 +404,24 @@ fn move_enemy_projectiles(
     for (mut transform, projectile) in &mut query {
         let movement: Vec2 = projectile.direction.normalize() * projectile.speed * time.delta_secs();
         transform.translation += movement.extend(0.0);
+    }
+}
+
+fn update_diagonal_sprites(
+    time:  Res<Time>,
+    mut despawner_query: Query<(&mut Sprite, &mut DiagonalMovementDespawner)>,
+) {
+    for (mut sprite, mut projectile) in &mut despawner_query {
+        if let Some(atlas) = sprite.texture_atlas.as_mut() {
+            projectile.animation_timer.tick(time.delta());
+
+            if projectile.animation_timer.just_finished() {
+                if atlas.index >= 8 {
+                    atlas.index = 0
+                } else {
+                    atlas.index += 1;
+                }
+            }
+        }
     }
 }

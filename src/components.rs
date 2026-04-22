@@ -76,6 +76,7 @@ pub struct DiagonalMovementSpawner {
 #[derive(Component)]
 pub struct DiagonalMovementDespawner {
     pub spawn_time: f32,
+    pub animation_timer: Timer
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
