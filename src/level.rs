@@ -121,7 +121,7 @@ pub fn spawn_from_level_data(
                     rain_shoot_timer: Timer::from_seconds(2.5, TimerMode::Repeating),
                     current_attack: 1,
                     attack_switch_timer: Timer::from_seconds(5.0, TimerMode::Repeating),
-                    diagonal_attack_timer: Timer::from_seconds(4.0, TimerMode::Repeating),
+                    diagonal_attack_timer: Timer::from_seconds(3.0, TimerMode::Repeating),
                 } 
             ));
         }
