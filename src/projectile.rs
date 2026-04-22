@@ -14,8 +14,7 @@ impl Plugin for ProjectilePlugin {
             check_collison_projectile_player, 
             enemies_shoot_projectiles, 
             move_enemy_projectiles,
-            move_diagonal_projectiles,
-            update_diagonal_sprites
+            move_diagonal_projectiles
         ));
     }
 }
@@ -357,7 +356,6 @@ fn enemies_shoot_projectiles(
     time: Res<Time>,
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
-    assets: Res<GameAssets>,
     mut enemy_query: Query<(&Transform, &mut Enemy), With<Enemy>>,
     player_transform: Single<&Transform, With<Player>>,
 ) {
@@ -395,7 +393,7 @@ fn enemies_shoot_projectiles(
 
 fn move_enemy_projectiles(
     time: Res<Time>,
-    mut query: Query<(&mut Transform, &EnemyProjectile), Without<DiagonalMovementDespawner>>,
+    mut query: Query<(&mut Transform, &EnemyProjectile), (Without<DiagonalMovementDespawner>, Without<BoomerangProjectile>)>,
 ) {
     for (mut transform, projectile) in &mut query {
         let movement: Vec2 = projectile.direction.normalize() * projectile.speed * time.delta_secs();

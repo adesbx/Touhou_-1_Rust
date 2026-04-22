@@ -44,6 +44,13 @@ pub struct VortexFragment {
 }
 
 #[derive(Component)]
+pub struct BoomerangProjectile {
+    pub angle: f32,      
+    pub start_pos: Vec3, 
+    pub start_time: f32,
+}
+
+#[derive(Component)]
 pub struct PowerUp;
 
 #[derive(Component)]
@@ -123,7 +130,8 @@ pub struct Boss {
     pub rain_shoot_timer: Timer,
     pub current_attack: u32,
     pub attack_switch_timer: Timer,
-    pub diagonal_attack_timer: Timer
+    pub diagonal_attack_timer: Timer,
+    pub boomerang_attack_timer: Timer
 }
 
 #[derive(Component)]

@@ -19,7 +19,9 @@ impl Plugin for BossPlugin {
             update_vortex,
             spawn_boss_rain,
             change_attack_type,
-            spawn_boss_diagonal_attack
+            spawn_boss_diagonal_attack,
+            spawn_boomerang_attack,
+            move_boomerang_projectiles,
         ));
     }
 }
@@ -386,6 +388,75 @@ pub fn spawn_boss_diagonal_attack(
                 }
             }
         }
+    }
+}
+
+pub fn spawn_boomerang_attack(
+    mut commands: Commands,
+    time: Res<Time>,
+    asset_serv: Res<AssetServer>,
+    mut current_angle: Local<f32>,
+    mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
+) {
+    let (transform, boss) = &mut *boss_query;
+    
+    if boss.current_attack == 2 && boss.phase == 2 {
+
+        boss.boomerang_attack_timer.tick(time.delta());
+    
+        if boss.boomerang_attack_timer.just_finished() {
+            let num_projectiles = 16; 
+            let num_waves = 5;
+            let step = (std::f32::consts::PI * 2.0) / num_projectiles as f32;
+
+            for i in 0..num_waves{
+                for i in 0..num_projectiles {
+                    let angle = *current_angle + (i as f32 * step);
+
+                    commands.spawn((
+                        Sprite::from_image(asset_serv.load("projectiles/projectile.png")),
+                        Transform::from_translation(transform.translation),
+                        BoomerangProjectile {
+                            angle,
+                            start_pos: transform.translation,
+                            start_time: time.elapsed_secs(),
+                        },
+                        EnemyProjectile { speed: 0.0, direction: Vec2::ZERO },
+                    ));
+                }
+            }
+            *current_angle += 0.2; // Plus ce chiffre est grand, plus la spirale est serrée
+        }
+    }
+}
+
+pub fn move_boomerang_projectiles(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut Transform, &BoomerangProjectile)>,
+) {
+    let now = time.elapsed_secs();
+    let max_distance = 300.0; 
+    let speed_factor = 1.0; 
+
+    for (entity, mut transform, proj) in &mut query {
+        let elapsed = now - proj.start_time;
+        
+        let progress = (elapsed * speed_factor).sin();
+        
+        if progress < 0.0 { 
+                commands.entity(entity).despawn();
+                continue; 
+            }
+
+        let current_dist: f32 = progress * max_distance;
+
+        let offset_x = proj.angle.cos() * current_dist;
+        let offset_y = proj.angle.sin() * current_dist;
+
+        transform.translation.x = proj.start_pos.x + offset_x;
+        transform.translation.y = proj.start_pos.y + offset_y;
+        transform.translation.z = 15.0
     }
 }
 
