@@ -269,34 +269,44 @@ pub fn move_diagonal_projectiles(
 
 fn confine_projectile_movement(    
     mut commands: Commands,
-    projectile_query: Query<(Entity, &Transform), With<Projectile>>,
-    enemy_projectile_query: Query<(Entity, &Transform), With<EnemyProjectile>>,
-
+    mut set: ParamSet<(
+        Query<(Entity, &Transform), With<Projectile>>,
+        Query<(Entity, &Transform), (With<EnemyProjectile>, Without<BoomerangProjectile>)>,
+        Query<&mut Transform, With<BoomerangProjectile>>,
+    )>,
 ) {
-    let half_projectile_size: f32 = PROJECTILE_SIZE / 2.0;
-    let half_cross_projectile_size: f32 = CROSS_PROJECTILE_SIZE / 2.0;
     let half_height: f32 = GAME_HEIGHT / 2.0;
     let half_width: f32 = GAME_WIDTH / 2.0;
 
+    let x_min_p = -half_width + (PROJECTILE_SIZE / 2.0);
+    let x_max_p = half_width - (PROJECTILE_SIZE / 2.0);
+    let y_min_p = -half_height + (PROJECTILE_SIZE / 2.0);
+    let y_max_p = half_height - (PROJECTILE_SIZE / 2.0);
 
-    let x_min = -half_width + half_projectile_size;
-    let x_max = half_width - half_projectile_size;
-    let y_min = -half_height + half_projectile_size;
-    let y_max = half_height - half_projectile_size;
-
-    for (entity, transform) in &projectile_query {
-        if transform.translation.y > y_max || transform.translation.y < y_min || transform.translation.x > x_max || transform.translation.x < x_min {
+    for (entity, transform) in set.p0().iter() {
+        if transform.translation.y > y_max_p || transform.translation.y < y_min_p || 
+           transform.translation.x > x_max_p || transform.translation.x < x_min_p {
             commands.entity(entity).despawn();
         }
     }
 
-    let x_min = -half_width + half_cross_projectile_size;
-    let x_max = half_width - half_cross_projectile_size;
-    let y_min = -half_height + half_cross_projectile_size;
-    let y_max = half_height - half_cross_projectile_size;
+    for mut transform in set.p2().iter_mut() {
+        if transform.translation.y > y_max_p || transform.translation.y < y_min_p || 
+           transform.translation.x > x_max_p || transform.translation.x < x_min_p {
+            transform.translation.z = -1500.0; 
+        } else {
+            transform.translation.z = 15.0;
+        }
+    }
 
-    for (entity, transform) in &enemy_projectile_query {
-        if transform.translation.y > y_max || transform.translation.y < y_min || transform.translation.x > x_max || transform.translation.x < x_min {
+    let x_min_e = -half_width + (CROSS_PROJECTILE_SIZE / 2.0);
+    let x_max_e = half_width - (CROSS_PROJECTILE_SIZE / 2.0);
+    let y_min_e = -half_height + (CROSS_PROJECTILE_SIZE / 2.0);
+    let y_max_e = half_height - (CROSS_PROJECTILE_SIZE / 2.0);
+
+    for (entity, transform) in set.p1().iter() {
+        if transform.translation.y > y_max_e || transform.translation.y < y_min_e || 
+           transform.translation.x > x_max_e || transform.translation.x < x_min_e {
             commands.entity(entity).despawn();
         }
     }

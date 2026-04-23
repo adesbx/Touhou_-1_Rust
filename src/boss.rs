@@ -408,24 +408,29 @@ pub fn spawn_boomerang_attack(
             let num_projectiles = 16; 
             let num_waves = 5;
             let step = (std::f32::consts::PI * 2.0) / num_projectiles as f32;
+            let now = time.elapsed_secs();
 
-            for i in 0..num_waves{
+            for w in 0..num_waves{
+                let wave_distance = 350.0 - (w as f32 * 50.0);
+                let wave_angle_offset = w as f32 * 0.15;
+
                 for i in 0..num_projectiles {
-                    let angle = *current_angle + (i as f32 * step);
+                    let angle = *current_angle + (i as f32 * step) + wave_angle_offset;
 
                     commands.spawn((
-                        Sprite::from_image(asset_serv.load("projectiles/projectile.png")),
+                        Sprite::from_image(asset_serv.load("projectiles/projectile_vortex_fragment.png")),
                         Transform::from_translation(transform.translation),
                         BoomerangProjectile {
                             angle,
                             start_pos: transform.translation,
-                            start_time: time.elapsed_secs(),
+                            start_time: now,
+                            custom_distance: wave_distance
                         },
                         EnemyProjectile { speed: 0.0, direction: Vec2::ZERO },
                     ));
                 }
             }
-            *current_angle += 0.2; // Plus ce chiffre est grand, plus la spirale est serrée
+            *current_angle += 0.4; // Plus ce chiffre est grand, plus la spirale est serrée
         }
     }
 }
@@ -436,27 +441,30 @@ pub fn move_boomerang_projectiles(
     mut query: Query<(Entity, &mut Transform, &BoomerangProjectile)>,
 ) {
     let now = time.elapsed_secs();
-    let max_distance = 300.0; 
-    let speed_factor = 1.0; 
+    let speed_factor = 0.8; 
 
     for (entity, mut transform, proj) in &mut query {
         let elapsed = now - proj.start_time;
-        
         let progress = (elapsed * speed_factor).sin();
-        
+
+        if elapsed * speed_factor > std::f32::consts::PI {
+            commands.entity(entity).despawn();
+            continue;
+        }        
+
         if progress < 0.0 { 
-                commands.entity(entity).despawn();
                 continue; 
             }
 
-        let current_dist: f32 = progress * max_distance;
+        let current_dist: f32 = progress * proj.custom_distance;
 
-        let offset_x = proj.angle.cos() * current_dist;
-        let offset_y = proj.angle.sin() * current_dist;
+        let spiral_effect = elapsed * 1.5; 
+        let final_angle = proj.angle + spiral_effect;
+        let offset_x = final_angle.cos() * current_dist;
+        let offset_y = final_angle.sin() * current_dist;
 
         transform.translation.x = proj.start_pos.x + offset_x;
         transform.translation.y = proj.start_pos.y + offset_y;
-        transform.translation.z = 15.0
     }
 }
 

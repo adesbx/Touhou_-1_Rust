@@ -48,6 +48,7 @@ pub struct BoomerangProjectile {
     pub angle: f32,      
     pub start_pos: Vec3, 
     pub start_time: f32,
+    pub custom_distance: f32,
 }
 
 #[derive(Component)]
