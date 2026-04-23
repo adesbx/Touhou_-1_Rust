@@ -71,13 +71,9 @@ pub fn move_boss(
             boss.next_position = Vec3::new(1.0, 0.0, 0.0);
         }
 
-        if transform.translation.y != 140.0 { // le boss sera toujours a cette auteur en phase2
-            boss.next_position.y = 140.0;
-            let direction: Vec3 = (boss.next_position - transform.translation).normalize();    
-        }
-
         let velocity =  boss.next_position * (BOSS_SPEED/2.0) * time.delta_secs();
         transform.translation += velocity;
+        transform.translation.y = 140.0;
     }
 }
 

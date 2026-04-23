@@ -124,7 +124,7 @@ fn use_bombs(
 
     let (transform, player) = &mut *player_query; // possiblement sale voir pour faire autrement
 
-    if keyboard.pressed(KeyCode::KeyL) && player.nbr_bombs > 0 {
+    if keyboard.just_pressed(KeyCode::KeyL) && player.nbr_bombs > 0 {
         let player_pos = transform.translation.truncate();
         let bomb_radius = 180.0;
         let bomb_damage = 200.0;
