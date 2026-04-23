@@ -14,7 +14,10 @@ impl Plugin for ProjectilePlugin {
             check_collison_projectile_player, 
             enemies_shoot_projectiles, 
             move_enemy_projectiles,
-            move_diagonal_projectiles
+            move_diagonal_projectiles,
+            update_diagonal_sprites,
+            update_vortex,
+            move_boomerang_projectiles,
         ));
     }
 }
@@ -236,6 +239,7 @@ pub fn move_diagonal_projectiles(
     mut spawner_query: Query<(Entity, &DiagonalMovementSpawner)>,
     mut despawner_query: Query<(Entity, &DiagonalMovementDespawner)>,
     asset_serv: Res<AssetServer>,
+    mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     let now = time.elapsed_secs();
     let lifetime = 2.0; 
@@ -243,17 +247,24 @@ pub fn move_diagonal_projectiles(
     for (entity, movement) in &mut spawner_query {
         if now >= movement.spawn_time {
                 
-            let texture = asset_serv.load("projectiles/projectile_diagonal.png");
-        
+            let texture = asset_serv.load("projectiles/projectile_diagonal_2.png");
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(20), 2, 3, None, None);
+            let texture_atlas_layout = texture_atlas_layout.add(layout);        
             commands.spawn((
-                Sprite::from_image(texture),
+                Sprite {
+                    image:texture, 
+                    texture_atlas: Some(TextureAtlas { layout: texture_atlas_layout, index: 0}),
+                    custom_size: Some(Vec2::new(28.0, 28.0)),
+                    ..default()
+                },
                 Transform::from_translation(Vec3::new(movement.x, movement.y, 10.0)),
                 EnemyProjectile {
                     speed: 0.0,
                     direction: Vec2::ZERO,
                 },
                 DiagonalMovementDespawner {
-                    spawn_time: now
+                    spawn_time: now,
+                    animation_timer: Timer::from_seconds(0.4, TimerMode::Repeating),
                 },
             ));
             commands.entity(entity).despawn();
@@ -408,5 +419,126 @@ fn move_enemy_projectiles(
     for (mut transform, projectile) in &mut query {
         let movement: Vec2 = projectile.direction.normalize() * projectile.speed * time.delta_secs();
         transform.translation += movement.extend(0.0);
+    }
+}
+
+// Boss projectile
+
+pub fn update_vortex(
+    mut commands: Commands,
+    time: Res<Time>,
+    asset_server: Res<AssetServer>,
+    assets: Res<GameAssets>,
+    mother_query: Query<(Entity, &Transform, &BasicProjectileBoss), Without<VortexFragment>>,
+    mut fragment_query: Query<(&mut Transform, &mut VortexFragment, Entity)>,
+) {
+    let dt = time.delta_secs();
+
+    for (entity, transform, special) in &mother_query {
+        let current_pos = transform.translation.truncate();
+        if current_pos.distance(special.start_pos) >= special.explosion_dist {
+            commands.entity(entity).despawn();
+
+            let center = transform.translation.truncate();
+            let num_fragments = 12;
+
+            commands.spawn((
+                AudioPlayer::new(assets.vortex_explosion.clone()),
+                PlaybackSettings {
+                    mode: bevy::audio::PlaybackMode::Despawn,
+                    volume: Volume::Decibels(0.2),
+                    ..default()
+                },
+            ));
+                
+            for i in 0..num_fragments {
+                let start_angle = (i as f32) * (std::f32::consts::TAU / num_fragments as f32);
+                
+                commands.spawn((
+                    Sprite::from_image(asset_server.load("projectiles/projectile_vortex_fragment.png")),
+                    Transform::from_translation(transform.translation),
+                    VortexFragment {
+                        center,
+                        angle: start_angle,
+                        radius: 0.0,
+                        rotate_speed: 4.0, 
+                        expand_speed: 100.0, 
+                    },
+                    EnemyProjectile {
+                        direction: Vec2::new(0.0, -1.0),
+                        speed: BOSS_VORTEX_SPEED
+                    },
+                ));
+            }
+        }
+    }
+
+    for (mut transform, mut frag, entity) in &mut fragment_query {
+        frag.angle += frag.rotate_speed * dt;
+        
+        frag.radius += frag.expand_speed * dt;
+
+        let max_radius = 75.0; 
+        if frag.radius > max_radius {
+            commands.entity(entity).despawn();
+            continue;
+        }
+
+        let new_x = frag.center.x + frag.angle.cos() * frag.radius;
+        let new_y = frag.center.y + frag.angle.sin() * frag.radius;
+        
+        transform.translation = Vec3::new(new_x, new_y, 2.0);
+    }
+}
+
+pub fn move_boomerang_projectiles(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut Transform, &BoomerangProjectile)>,
+) {
+    let now = time.elapsed_secs();
+    let speed_factor = 0.8; 
+
+    for (entity, mut transform, proj) in &mut query {
+        let elapsed = now - proj.start_time;
+        let progress = (elapsed * speed_factor).sin();
+
+        if elapsed * speed_factor > std::f32::consts::PI {
+            commands.entity(entity).despawn();
+            continue;
+        }        
+
+        if progress < 0.0 { 
+                continue; 
+            }
+
+        let current_dist: f32 = progress * proj.custom_distance;
+
+        let spiral_effect = elapsed * 1.5; 
+        let final_angle = proj.angle + spiral_effect;
+        let offset_x = final_angle.cos() * current_dist;
+        let offset_y = final_angle.sin() * current_dist;
+
+        transform.translation.x = proj.start_pos.x + offset_x;
+        transform.translation.y = proj.start_pos.y + offset_y;
+    }
+}
+
+fn update_diagonal_sprites(
+    time:  Res<Time>,
+    mut despawner_query: Query<(&mut Sprite, &mut DiagonalMovementDespawner)>,
+) {
+    for (mut sprite, mut projectile) in &mut despawner_query {
+        if let Some(atlas) = sprite.texture_atlas.as_mut() {
+            projectile.animation_timer.tick(time.delta());
+
+            if projectile.animation_timer.just_finished() {
+                if atlas.index >= 4 {
+                    atlas.index = 0
+                } else {
+                    atlas.index += 1;
+                }
+            }
+        }
     }
 }

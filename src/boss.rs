@@ -16,85 +16,84 @@ impl Plugin for BossPlugin {
             delete_health_bar, 
             check_mid_hp,
             basic_shoot_projectiles,
-            update_vortex,
-            spawn_boss_rain,
+            shoot_boss_rain,
+            shoot_boss_diagonal_attack,
+            shoot_boomerang_attack,
             change_attack_type,
-            spawn_boss_diagonal_attack,
-            spawn_boomerang_attack,
-            move_boomerang_projectiles,
         ));
     }
 }
 
 pub fn move_boss(
     time: Res<Time>,
-    boss_query: Query<(&mut Boss, &mut Transform), With<Boss>>,
+    mut boss_query: Single<(&mut Boss, &mut Transform), With<Boss>>,
 ) {
-    for (mut boss, mut transform)in boss_query {
-        if boss.stop_normal_move { continue; }
-        if boss.phase == 1 {
-            let distance = transform.translation.distance(boss.next_position);
-            if  distance < 5.0 {
-                boss.next_movement_timer.tick(time.delta());
+    let (boss, transform) = &mut *boss_query;
+    if boss.stop_normal_move { return; }
+    if boss.phase == 1 {
+        let distance = transform.translation.distance(boss.next_position);
+        if  distance < 5.0 {
+            boss.next_movement_timer.tick(time.delta());
 
-                if boss.next_movement_timer.just_finished() {
-                    let mut rng = rand::thread_rng();
+            if boss.next_movement_timer.just_finished() {
+                let mut rng = rand::thread_rng();
 
-                    boss.next_position = match rng.gen_range(1..7) {
-                        1 => Vec3::new(-140.0, 180.0, 2.0),
-                        2 => Vec3::new(0.0, 180.0, 2.0),
-                        3 => Vec3::new(140.0, 180.0, 2.0),
-                        4 => Vec3::new(-140.0, 80.0, 2.0),
-                        5 => Vec3::new(0.0, 80.0, 2.0),
-                        6 => Vec3::new(140.0, 80.0, 2.0),
-                        _=> boss.next_position,
-                    };
-                }
+                boss.next_position = match rng.gen_range(1..7) {
+                    1 => Vec3::new(-140.0, 180.0, 2.0),
+                    2 => Vec3::new(0.0, 180.0, 2.0),
+                    3 => Vec3::new(140.0, 180.0, 2.0),
+                    4 => Vec3::new(-140.0, 80.0, 2.0),
+                    5 => Vec3::new(0.0, 80.0, 2.0),
+                    6 => Vec3::new(140.0, 80.0, 2.0),
+                    _=> boss.next_position,
+                };
+            }
+        } else {
+            let direction: Vec3 = (boss.next_position - transform.translation).normalize();    
+            let velocity = direction * BOSS_SPEED * time.delta_secs();
+            
+            // Pour éviter de dépasser la cible (ce qui crée des vibrations)
+            if velocity.length() > distance {
+                transform.translation = boss.next_position;
             } else {
-
-                let direction: Vec3 = (boss.next_position - transform.translation).normalize();
-                            
-                let velocity = direction * BOSS_SPEED * time.delta_secs();
-                
-                // Pour éviter de dépasser la cible (ce qui crée des vibrations)
-                if velocity.length() > distance {
-                    transform.translation = boss.next_position;
-                } else {
-                    transform.translation += velocity;
-                }
+                transform.translation += velocity;
             }
-        } else if boss.phase == 2 {
-            let half_enemy_size: f32 = ANGEL_SIZE / 2.0;
-            let half_width: f32 = GAME_WIDTH / 2.0;
-            let x_min = -half_width + half_enemy_size;
-            let x_max = half_width - half_enemy_size;
-
-            if transform.translation.x >= x_max {
-                boss.next_position = Vec3::new(-1.0, 0.0, 0.0);
-            } else if transform.translation.x <= x_min  {
-                boss.next_position = Vec3::new(1.0, 0.0, 0.0);
-            }
-            let velocity =  boss.next_position * (BOSS_SPEED/2.0) * time.delta_secs();
-            transform.translation += velocity;
         }
+    } else if boss.phase == 2 {
+        let half_enemy_size: f32 = ANGEL_SIZE / 2.0;
+        let half_width: f32 = GAME_WIDTH / 2.0;
+        let x_min = -half_width + half_enemy_size;
+        let x_max = half_width - half_enemy_size;
+
+        if transform.translation.x >= x_max {
+            boss.next_position = Vec3::new(-1.0, 0.0, 0.0);
+        } else if transform.translation.x <= x_min  {
+            boss.next_position = Vec3::new(1.0, 0.0, 0.0);
+        }
+
+        if transform.translation.y != 140.0 { // le boss sera toujours a cette auteur en phase2
+            boss.next_position.y = 140.0;
+            let direction: Vec3 = (boss.next_position - transform.translation).normalize();    
+        }
+
+        let velocity =  boss.next_position * (BOSS_SPEED/2.0) * time.delta_secs();
+        transform.translation += velocity;
     }
 }
 
 fn confine_boss_movement(    
     mut commands: Commands,
-    enemy_query: Query<(Entity, &Transform), With<Boss>>,
+    mut boss_query: Single<(Entity, &Transform), With<Boss>>,
 
 ) {
+    let (mut entity, transform) = &mut *boss_query;
     let half_enemy_size: f32 = BOSS_SIZE / 2.0;
     let half_height: f32 = GAME_HEIGHT / 2.0;
 
-
     let y_max = half_height + half_enemy_size + 100.0;
 
-    for (entity, transform) in &enemy_query {
-        if transform.translation.y > y_max {
-            commands.entity(entity).despawn();
-        }
+    if transform.translation.y > y_max {
+        commands.entity(entity).despawn();
     }
 }
 
@@ -173,72 +172,8 @@ pub fn check_mid_hp(
     }
 }
 
-pub fn update_vortex(
-    mut commands: Commands,
-    time: Res<Time>,
-    asset_server: Res<AssetServer>,
-    assets: Res<GameAssets>,
-    mother_query: Query<(Entity, &Transform, &BasicProjectileBoss), Without<VortexFragment>>,
-    mut fragment_query: Query<(&mut Transform, &mut VortexFragment, Entity)>,
-) {
-    let dt = time.delta_secs();
-
-    for (entity, transform, special) in &mother_query {
-        let current_pos = transform.translation.truncate();
-        if current_pos.distance(special.start_pos) >= special.explosion_dist {
-            commands.entity(entity).despawn();
-
-            let center = transform.translation.truncate();
-            let num_fragments = 12;
-
-            commands.spawn((
-                AudioPlayer::new(assets.vortex_explosion.clone()),
-                PlaybackSettings {
-                    mode: bevy::audio::PlaybackMode::Despawn,
-                    volume: Volume::Decibels(0.2),
-                    ..default()
-                },
-            ));
-                
-            for i in 0..num_fragments {
-                let start_angle = (i as f32) * (std::f32::consts::TAU / num_fragments as f32);
-                
-                commands.spawn((
-                    Sprite::from_image(asset_server.load("projectiles/projectile_vortex_fragment.png")),
-                    Transform::from_translation(transform.translation),
-                    VortexFragment {
-                        center,
-                        angle: start_angle,
-                        radius: 0.0,
-                        rotate_speed: 4.0, 
-                        expand_speed: 100.0, 
-                    },
-                    EnemyProjectile {
-                        direction: Vec2::new(0.0, -1.0),
-                        speed: BOSS_VORTEX_SPEED
-                    },
-                ));
-            }
-        }
-    }
-
-    for (mut transform, mut frag, entity) in &mut fragment_query {
-        frag.angle += frag.rotate_speed * dt;
-        
-        frag.radius += frag.expand_speed * dt;
-
-        let max_radius = 75.0; 
-        if frag.radius > max_radius {
-            commands.entity(entity).despawn();
-            continue;
-        }
-
-        let new_x = frag.center.x + frag.angle.cos() * frag.radius;
-        let new_y = frag.center.y + frag.angle.sin() * frag.radius;
-        
-        transform.translation = Vec3::new(new_x, new_y, 2.0);
-    }
-}
+//différent tir de boss
+//phase 1
 
 fn basic_shoot_projectiles(
     time: Res<Time>,
@@ -295,13 +230,15 @@ fn basic_shoot_projectiles(
     }
 }
 
-pub fn spawn_boss_rain(
+pub fn shoot_boss_rain(
     mut commands: Commands,
     time: Res<Time>,
     asset_server: Res<AssetServer>,
     assets: Res<GameAssets>,
-    mut boss_query: Query<(&Transform, &mut Boss)>,
+    mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
 ) {
+    let (transform, boss) = &mut *boss_query;
+
     let half_width = GAME_WIDTH / 2.0;
     let half_height = GAME_HEIGHT / 2.0;
     let margin = 20.0; // marge pour être sûr d'être à l'intérieur
@@ -310,47 +247,45 @@ pub fn spawn_boss_rain(
     let x_max = half_width - margin;
     let y_max = half_height - margin;
 
-    for (transform, mut boss) in &mut boss_query {
-        if boss.current_attack == 2 && boss.phase == 1 {  
+    if boss.current_attack == 2 && boss.phase == 1 {  
 
-            boss.rain_shoot_timer.tick(time.delta());
+        boss.rain_shoot_timer.tick(time.delta());
 
-            if boss.rain_shoot_timer.just_finished() {
+        if boss.rain_shoot_timer.just_finished() {
+            commands.spawn((
+                AudioPlayer::new(assets.cross_electricity.clone()),
+                PlaybackSettings {
+                    mode: bevy::audio::PlaybackMode::Despawn,
+                    volume: Volume::Decibels(-1.0),
+                    ..default()
+                },
+            ));
+            let mut rng = rand::thread_rng();
+            let bullet_count = 15; 
+            let texture = asset_server.load("projectiles/projectile_cross_electrised.png");
+
+            for i in 0..bullet_count {
+                // réparti largeur autorisée (entre x_min et x_max)
+                let x_pos = x_min + (i as f32 * (x_max - x_min) / (bullet_count - 1) as f32);
+                let y_spawn = y_max - rng.gen_range(0.0..100.0);
+                let speed = rng.gen_range(150.0..250.0);
+
                 commands.spawn((
-                    AudioPlayer::new(assets.cross_electricity.clone()),
-                    PlaybackSettings {
-                        mode: bevy::audio::PlaybackMode::Despawn,
-                        volume: Volume::Decibels(-1.0),
-                        ..default()
+                    Sprite::from_image(texture.clone()),
+                    Transform::from_xyz(x_pos, y_spawn, transform.translation.z),
+                    EnemyProjectile {
+                        direction: Vec2::new(0.0, -1.0), 
+                        speed: speed,
                     },
                 ));
-                let mut rng = rand::thread_rng();
-                let bullet_count = 15; 
-                let texture = asset_server.load("projectiles/projectile_cross_electrised.png");
-
-                for i in 0..bullet_count {
-                    // réparti largeur autorisée (entre x_min et x_max)
-                    let x_pos = x_min + (i as f32 * (x_max - x_min) / (bullet_count - 1) as f32);
-                    
-                    let y_spawn = y_max - rng.gen_range(0.0..100.0);
-
-                    let speed = rng.gen_range(150.0..250.0);
-
-                    commands.spawn((
-                        Sprite::from_image(texture.clone()),
-                        Transform::from_xyz(x_pos, y_spawn, transform.translation.z),
-                        EnemyProjectile {
-                            direction: Vec2::new(0.0, -1.0), 
-                            speed: speed,
-                        },
-                    ));
-                }
             }
         }
     }
 }
 
-pub fn spawn_boss_diagonal_attack(
+//phase 2
+
+pub fn shoot_boss_diagonal_attack(
     mut commands: Commands,
     mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
     time: Res<Time>,
@@ -364,7 +299,7 @@ pub fn spawn_boss_diagonal_attack(
             let start_x = -(GAME_WIDTH / 2.0);
             let end_x: f32 = GAME_WIDTH / 2.0;
             let start_y = (GAME_HEIGHT / 2.0) - 50.0;
-            let thickness = 40; 
+            let thickness = 50; 
             let now = time.elapsed_secs();
             let safe_limit_x = start_x + (GAME_WIDTH * 0.1);
             let num_cols = ((end_x - start_x) / spacing).floor() as i32;
@@ -391,7 +326,7 @@ pub fn spawn_boss_diagonal_attack(
     }
 }
 
-pub fn spawn_boomerang_attack(
+pub fn shoot_boomerang_attack(
     mut commands: Commands,
     time: Res<Time>,
     asset_serv: Res<AssetServer>,
@@ -411,7 +346,7 @@ pub fn spawn_boomerang_attack(
             let now = time.elapsed_secs();
 
             for w in 0..num_waves{
-                let wave_distance = 350.0 - (w as f32 * 50.0);
+                let wave_distance = 300.0 - (w as f32 * 50.0);
                 let wave_angle_offset = w as f32 * 0.15;
 
                 for i in 0..num_projectiles {
@@ -430,41 +365,8 @@ pub fn spawn_boomerang_attack(
                     ));
                 }
             }
-            *current_angle += 0.4; // Plus ce chiffre est grand, plus la spirale est serrée
+            *current_angle += 0.4; // si grand, spirale sérée
         }
-    }
-}
-
-pub fn move_boomerang_projectiles(
-    mut commands: Commands,
-    time: Res<Time>,
-    mut query: Query<(Entity, &mut Transform, &BoomerangProjectile)>,
-) {
-    let now = time.elapsed_secs();
-    let speed_factor = 0.8; 
-
-    for (entity, mut transform, proj) in &mut query {
-        let elapsed = now - proj.start_time;
-        let progress = (elapsed * speed_factor).sin();
-
-        if elapsed * speed_factor > std::f32::consts::PI {
-            commands.entity(entity).despawn();
-            continue;
-        }        
-
-        if progress < 0.0 { 
-                continue; 
-            }
-
-        let current_dist: f32 = progress * proj.custom_distance;
-
-        let spiral_effect = elapsed * 1.5; 
-        let final_angle = proj.angle + spiral_effect;
-        let offset_x = final_angle.cos() * current_dist;
-        let offset_y = final_angle.sin() * current_dist;
-
-        transform.translation.x = proj.start_pos.x + offset_x;
-        transform.translation.y = proj.start_pos.y + offset_y;
     }
 }
 

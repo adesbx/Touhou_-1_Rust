@@ -1,6 +1,33 @@
 use bevy::prelude::*;
 use serde::Deserialize;
 
+#[derive(Component, Debug, Deserialize)]
+pub struct Health {
+    pub hp: f32
+}
+
+#[derive(Component)]
+pub struct Damage {
+    pub damage: f32
+}
+
+#[derive(Component)]
+pub struct PowerUp;
+
+#[derive(Component)]
+pub struct Bomb;
+
+#[derive(Resource)]
+pub struct BombSpawner{
+    pub spawn_timer: Timer,
+}
+
+#[derive(Component)]
+pub struct DespawnTimer {
+    pub timer: Timer,
+    pub animation_timer: Timer,
+}
+
 #[derive(Component)]
 pub struct Player {
     pub last_hit: f32,
@@ -52,23 +79,6 @@ pub struct BoomerangProjectile {
 }
 
 #[derive(Component)]
-pub struct PowerUp;
-
-#[derive(Component)]
-pub struct Bomb;
-
-#[derive(Resource)]
-pub struct BombSpawner{
-    pub spawn_timer: Timer,
-}
-
-#[derive(Component)]
-pub struct DespawnTimer {
-    pub timer: Timer,
-    pub animation_timer: Timer,
-}
-
-#[derive(Component)]
 pub struct EnemyProjectile {
     pub direction: Vec2,
     pub speed: f32,
@@ -84,6 +94,21 @@ pub struct DiagonalMovementSpawner {
 #[derive(Component)]
 pub struct DiagonalMovementDespawner {
     pub spawn_time: f32,
+    pub animation_timer: Timer
+}
+
+#[derive(Component)]
+pub struct Enemy {
+    pub variety: char,
+    pub animation_timer: Timer,
+    pub shoot_timer: Timer,
+}
+
+#[derive(Component)]
+pub struct EnemyMovement {
+    pub spawn_time: f32,
+    pub direction: f32, // 1.0 pour la droite vers la gauche, -1.0 pour l'inverse
+    pub pattern: MovePattern,
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -94,30 +119,6 @@ pub enum MovePattern {
     Arc(f32),
     SineWave,
     StraightPause(f32)
-}
-
-#[derive(Component)]
-pub struct EnemyMovement {
-    pub spawn_time: f32,
-    pub direction: f32, // 1.0 pour la droite vers la gauche, -1.0 pour l'inverse
-    pub pattern: MovePattern,
-}
-
-#[derive(Component)]
-pub struct Enemy {
-    pub variety: char,
-    pub animation_timer: Timer,
-    pub shoot_timer: Timer,
-}
-
-#[derive(Component, Debug, Deserialize)]
-pub struct Health {
-    pub hp: f32
-}
-
-#[derive(Component)]
-pub struct Damage {
-    pub damage: f32
 }
 
 #[derive(Component)]
@@ -185,7 +186,6 @@ pub struct Background;
 #[derive(Resource)]
 pub struct GameAssets {
     pub shoot_sound: Handle<AudioSource>,
-    pub enemy_shoot_sound: Handle<AudioSource>,
     pub explosion_sound: Handle<AudioSource>,
     pub cross_electricity: Handle<AudioSource>,
     pub vortex_explosion: Handle<AudioSource>,
