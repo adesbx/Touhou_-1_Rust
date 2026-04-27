@@ -11,6 +11,7 @@ mod projectile;
 mod level;
 mod ui;
 mod background;
+mod pause;
 
 use crate::components::*;
 use crate::constants::*;
@@ -18,6 +19,7 @@ use crate::constants::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .init_state::<GameState>()
         .insert_resource(LevelManager {
             current_phase: GamePhase::PreBoss,
             phase_timer: 0.0,
@@ -25,7 +27,9 @@ fn main() {
             power_up_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
         })
         .init_asset::<LevelData>()
+        .init_asset::<Dialogue>()
         .register_asset_loader(LevelDataLoader)
+        .register_asset_loader(DialogueLoader)
         .add_plugins(player::PlayerPlugin)
         .add_plugins(enemy::EnemyPlugin)
         .add_plugins(boss::BossPlugin)
@@ -33,6 +37,7 @@ fn main() {
         .add_plugins(level::LevelPlugin)
         .add_plugins(ui::UiPlugin)
         .add_plugins(background::BackgroundPlugin)
+        .add_plugins(pause::PausePlugin)
         .add_systems(Startup, setup)
         .add_systems(Startup, (play_main_theme, setup_assets))
         .run();
@@ -45,6 +50,8 @@ fn setup(
 ) {   
     let handle = asset_serv.load("enemies.ron");
     commands.insert_resource(LevelHandle(handle));
+    let handle = asset_serv.load("dialogue.ron");
+    commands.insert_resource(DialogueHandle(handle));
     commands.insert_resource(BombSpawner {
         spawn_timer: Timer::from_seconds(3.0, TimerMode::Repeating),
     });

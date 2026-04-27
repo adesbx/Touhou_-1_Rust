@@ -165,12 +165,48 @@ pub struct LevelManager {
     pub power_up_timer: Timer,
 }
 
+#[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
+pub enum GameState {
+    #[default]
+    Running,
+    Paused,
+}
+
 #[derive(Deserialize, Asset, TypePath, Debug, PartialEq)]
 pub enum GamePhase {
     PreBoss,
     PostBoss,
-    BossFight
+    BossFight,
+    Dialogue
 }
+
+#[derive(Deserialize, Asset, TypePath, Debug)]
+pub struct Dialogue {
+    pub dialogues: Vec<DialogueLine>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct DialogueLine {
+    pub speaker: String,
+    pub text: String
+}
+
+#[derive(Resource)]
+pub struct DialogueHandle(
+    pub Handle<Dialogue>
+);
+
+#[derive(Default)]
+pub struct DialogueLoader;
+
+#[derive(Component)]
+pub struct DialogueText;
+
+#[derive(Component)]
+pub struct WitchHero;
+
+#[derive(Component)]
+pub struct AngelHero;
 
 #[derive(Resource)]
 pub struct LevelHandle(

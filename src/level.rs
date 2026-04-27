@@ -20,6 +20,7 @@ pub fn spawn_from_level_data(
     level_handle: Res<LevelHandle>, 
     mut manager: ResMut<LevelManager>, 
     mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
+    state: Res<State<GameState>>,
 ) {    
     if let Some(level) = level_assets.get(&level_handle.0) {
         manager.phase_timer += time.delta_secs();
@@ -29,6 +30,9 @@ pub fn spawn_from_level_data(
             GamePhase::PostBoss => &level.post_boss,
             GamePhase::BossFight => {
                 return; //temporaire moche
+            }
+            GamePhase::Dialogue => {
+                return; //
             }
         };
 
@@ -98,6 +102,11 @@ pub fn spawn_from_level_data(
         }
 
         if manager.current_phase == GamePhase::PostBoss && manager.next_index >= level.post_boss.len() {
+            commands.set_state(GameState::Paused);
+            manager.current_phase = GamePhase::Dialogue;
+        }
+
+        if manager.current_phase == GamePhase::Dialogue && state.get() == &GameState::Running {
             manager.phase_timer = 0.0;
             manager.next_index = 0;
             manager.current_phase = GamePhase::BossFight;
