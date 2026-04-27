@@ -1,0 +1,48 @@
+(
+    dialogues: [
+        (
+            speaker: "Witch",
+            text: "Hé toi ! L'ange au milieu du chemin ! Prépare-toi à goûter à ma nouvelle potion explosive !",
+        ),
+        (
+            speaker: "Angel",
+            text: "Euh... Pardon ? Je ne faisais que ramasser des fleurs de cerisier. Qui es-tu ?",
+        ),
+        (
+            speaker: "Witch",
+            text: "Ne joue pas l'innocente ! On m'a dit qu'une entité céleste semait le chaos dans la forêt. C'est forcément toi !",
+        ),
+        (
+            speaker: "Witch",
+            text: "Allez, prends ça ! *Agite maladroitement son balai*",
+        ),
+        (
+            speaker: "Angel",
+            text: "Mais je suis l'Ange Gardienne du Sanctuaire de l'Est... Le fauteur de troubles est un démon cornu, là-bas, à trois kilomètres d'ici.",
+        ),
+        (
+            speaker: "Witch",
+            text: "Ah... Oh. *Regarde à gauche, puis à droite*",
+        ),
+        (
+            speaker: "Witch",
+            text: "Mince... Pardon, je me suis trompée de cible alors.",
+        ),
+        (
+            speaker: "Angel",
+            text: "C'est pas grave. On oublie tout ? Je retourne à mes fleurs.",
+        ),
+        (
+            speaker: "Witch",
+            text: "Attends ! J'ai déjà fait tout ce chemin et mon balai est déjà chaud...",
+        ),
+        (
+            speaker: "Witch",
+            text: "Tant pis, je vais te battre quand même pour 'finir' ma mission ! On dira que c'était un entraînement !",
+        ),
+        (
+            speaker: "Angel",
+            text: "Quoi ? Mais c'est absurde ! Reviens ici !",
+        ),
+    ]
+)

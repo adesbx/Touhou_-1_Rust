@@ -20,7 +20,7 @@ impl Plugin for BossPlugin {
             shoot_boss_diagonal_attack,
             shoot_boomerang_attack,
             change_attack_type,
-        ));
+        ).run_if(in_state(GameState::Running)));
     }
 }
 

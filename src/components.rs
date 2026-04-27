@@ -200,6 +200,9 @@ pub struct DialogueHandle(
 pub struct DialogueLoader;
 
 #[derive(Component)]
+pub struct DialogueBox;
+
+#[derive(Component)]
 pub struct DialogueText;
 
 #[derive(Component)]
