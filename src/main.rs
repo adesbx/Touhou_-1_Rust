@@ -1,4 +1,5 @@
 use bevy::app::App;
+use bevy::ecs::relationship::RelationshipSourceCollection;
 use bevy::prelude::*;
 use bevy::audio::Volume;
 
@@ -38,8 +39,8 @@ fn main() {
         .add_plugins(ui::UiPlugin)
         .add_plugins(background::BackgroundPlugin)
         .add_plugins(pause::PausePlugin)
-        .add_systems(Startup, setup)
-        .add_systems(Startup, (play_main_theme, setup_assets))
+        .add_systems(Startup, (setup, setup_assets))
+        .add_systems(Update, play_music_theme)
         .run();
 }
 
@@ -142,18 +143,62 @@ fn setup(
 }
 
 
-fn play_main_theme(
+fn play_music_theme(
     asset_serv: Res<AssetServer>, 
-    mut commands: Commands
+    mut commands: Commands,
+    manager: Res<LevelManager>,
+    music_query: Query<Entity, With<MusicPlayed>>,
+    mut current_music: Local<String>,
 ) {
-    commands.spawn((
-        AudioPlayer::new(asset_serv.load("sounds/main_theme.ogg")),
-        PlaybackSettings {
-            mode: bevy::audio::PlaybackMode::Loop,
-            volume: Volume::Decibels(-7.0),
-            ..default()
-        },
-    ));
+
+    if !music_query.is_empty() {
+        if manager.current_phase != GamePhase::BossFight && manager.current_phase != GamePhase::PreBoss {
+            return;
+        }
+
+        let sound_path = if manager.current_phase == GamePhase::BossFight {
+            "sounds/boss_theme.ogg"
+        } else {
+            "sounds/main_theme.ogg"
+        };
+
+        let volume = if manager.current_phase == GamePhase::BossFight {
+            Volume::Decibels(-3.0)
+        } else {
+            Volume::Decibels(-7.0)
+        };
+
+        if *current_music == sound_path {
+            return;
+        }
+
+        for entity in &music_query {
+            commands.entity(entity).despawn();
+        }
+
+
+        commands.spawn((
+            AudioPlayer::new(asset_serv.load(sound_path)),
+            PlaybackSettings {
+                mode: bevy::audio::PlaybackMode::Loop,
+                volume: volume,
+                ..default()
+            },
+            MusicPlayed
+        ));
+        *current_music =  sound_path.to_string();
+    } else {
+        commands.spawn((
+            AudioPlayer::new(asset_serv.load( "sounds/main_theme.ogg")),
+            PlaybackSettings {
+                mode: bevy::audio::PlaybackMode::Loop,
+                volume: Volume::Decibels(-7.0),
+                ..default()
+            },
+            MusicPlayed
+        ));
+        *current_music =  "sounds/main_theme.ogg".to_string();
+    }
 }
 
 fn setup_assets(mut commands: Commands, asset_serv: Res<AssetServer>) {

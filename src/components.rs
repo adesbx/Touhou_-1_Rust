@@ -230,3 +230,6 @@ pub struct GameAssets {
     pub vortex_explosion: Handle<AudioSource>,
     pub shoot_fire_sound: Handle<AudioSource>,
 }
+
+#[derive(Component)]
+pub struct MusicPlayed;
