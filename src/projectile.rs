@@ -18,7 +18,7 @@ impl Plugin for ProjectilePlugin {
             update_diagonal_sprites,
             update_vortex,
             move_boomerang_projectiles,
-        ));
+        ).run_if(in_state(GameState::Running)));
     }
 }
 

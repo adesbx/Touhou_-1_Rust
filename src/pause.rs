@@ -27,7 +27,6 @@ pub fn start_discution(
     mut witch_hero_query: Single<(Entity, &mut Sprite), (With<WitchHero>, Without<AngelHero>)>,
     mut angel_hero_query: Single<(Entity, &mut Sprite), (With<AngelHero>, Without<WitchHero>)>,
 ) {
-
     let Some(dialogue_data) = dialogue_assets.get(&dialogue_handle.0) else {
         println!("Asset Dialogue non trouvé ou non chargé !");
         return; 
@@ -38,33 +37,33 @@ pub fn start_discution(
 
     if !witch_entity.is_empty() && !angel_entity.is_empty() {
         if keyboard.just_pressed(KeyCode::KeyK) {
-                *current_index +=1;
-                if *current_index >= dialogue_data.dialogues.len() {
-                        *current_index = 0;
-                        commands.set_state(GameState::Running);
-                        commands.entity(dialog_query.entity()).despawn();
-                        commands.entity(*witch_entity).despawn();
-                        commands.entity(*angel_entity).despawn();
-                } else {
-                    let line: &DialogueLine = &dialogue_data.dialogues[*current_index];
-                    println!("{}: {}", line.speaker, line.text);
+            *current_index +=1;
+            if *current_index >= dialogue_data.dialogues.len() {
+                *current_index = 0;
+                commands.set_state(GameState::Running);
+                commands.entity(dialog_query.entity()).despawn();
+                commands.entity(*witch_entity).despawn();
+                commands.entity(*angel_entity).despawn();
+            } else {
+                let line: &DialogueLine = &dialogue_data.dialogues[*current_index];
+                println!("{}: {}", line.speaker, line.text);
 
-                    let speak_color = Color::WHITE;
-                    let silent_color = Color::srgba(0.3, 0.3, 0.3, 1.0);
+                let speak_color = Color::WHITE;
+                let silent_color = Color::srgba(0.3, 0.3, 0.3, 1.0);
 
-                    if line.speaker == "Witch" {
-                        witch_bg.color = speak_color;  
-                        angel_bg.color = silent_color;  
-                    } else if line.speaker == "Angel" {
-                        witch_bg.color = silent_color;  
-                        angel_bg.color = speak_color;
-                    }
-                    
-                    if let Ok(mut text) = text_query.single_mut() {
-                        **text = format!("{}: {}", line.speaker, line.text);
-                    }
+                if line.speaker == "Witch" {
+                    witch_bg.color = speak_color;  
+                    angel_bg.color = silent_color;  
+                } else if line.speaker == "Angel" {
+                    witch_bg.color = silent_color;  
+                    angel_bg.color = speak_color;
+                }
+                
+                if let Ok(mut text) = text_query.single_mut() {
+                    **text = format!("{}: {}", line.speaker, line.text);
                 }
             }
+        }
     }
 }
 

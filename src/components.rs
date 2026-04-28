@@ -175,6 +175,7 @@ pub enum GameState {
 #[derive(Deserialize, Asset, TypePath, Debug, PartialEq)]
 pub enum GamePhase {
     PreBoss,
+    FistBossEncounter,
     PostBoss,
     BossFight,
     Dialogue

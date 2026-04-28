@@ -21,6 +21,8 @@ pub fn spawn_from_level_data(
     mut manager: ResMut<LevelManager>, 
     mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
     state: Res<State<GameState>>,
+    enemy_query: Query<&Enemy, With<Enemy>>,
+    projectile_query: Query<Entity, With<Projectile>>,
 ) {    
     if let Some(level) = level_assets.get(&level_handle.0) {
         manager.phase_timer += time.delta_secs();
@@ -28,8 +30,11 @@ pub fn spawn_from_level_data(
         let current_waves = match manager.current_phase {
             GamePhase::PreBoss => &level.pre_boss,
             GamePhase::PostBoss => &level.post_boss,
+            GamePhase::FistBossEncounter => {
+                return;
+            }
             GamePhase::BossFight => {
-                return; //temporaire moche
+                return; //
             }
             GamePhase::Dialogue => {
                 return; //
@@ -70,10 +75,10 @@ pub fn spawn_from_level_data(
             manager.next_index += 1;
         }
 
-        if manager.current_phase == GamePhase::PreBoss && manager.next_index >= level.pre_boss.len() { // ajoute dimension temps
+        if manager.current_phase == GamePhase::PreBoss && manager.next_index >= level.pre_boss.len() && enemy_query.iter().count() == 0 { // ajoute dimension temps
             manager.phase_timer = 0.0;
             manager.next_index = 0;
-            manager.current_phase = GamePhase::BossFight;
+            manager.current_phase = GamePhase::FistBossEncounter;
             let texture: Handle<Image> = asset_serv.load("enemies/boss_v2.png");
             let wave = &level.boss;
             commands.spawn((
@@ -101,12 +106,16 @@ pub fn spawn_from_level_data(
             ));
         }
 
-        if manager.current_phase == GamePhase::PostBoss && manager.next_index >= level.post_boss.len() {
+        if manager.current_phase == GamePhase::PostBoss && manager.next_index >= current_waves.len() && enemy_query.iter().count() == 0 {
             commands.set_state(GameState::Paused);
             manager.current_phase = GamePhase::Dialogue;
+
+            for entity in projectile_query{
+                commands.entity(entity).despawn();
+            }
         }
 
-        if manager.current_phase == GamePhase::Dialogue && state.get() == &GameState::Running {
+        if manager.current_phase == GamePhase::Dialogue && state.get() == &GameState::Running && enemy_query.iter().count() == 0 {
             manager.phase_timer = 0.0;
             manager.next_index = 0;
             manager.current_phase = GamePhase::BossFight;
