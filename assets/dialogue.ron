@@ -21,6 +21,10 @@
             text: "Mais je suis l'Ange Gardienne du Sanctuaire de l'Est... Le fauteur de troubles est un démon cornu, là-bas, à trois kilomètres d'ici.",
         ),
         (
+            speaker: "Angel",
+            text: "Le fauteur de troubles est un démon cornu, là-bas, à trois kilomètres d'ici.",
+        ),
+        (
             speaker: "Witch",
             text: "Ah... Oh. *Regarde à gauche, puis à droite*",
         ),
@@ -38,7 +42,7 @@
         ),
         (
             speaker: "Witch",
-            text: "Tant pis, je vais te battre quand même pour 'finir' ma mission ! On dira que c'était un entraînement !",
+            text: "Tant pis, je vais te battre quand même pour finir ma mission !",
         ),
         (
             speaker: "Angel",

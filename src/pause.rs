@@ -12,7 +12,7 @@ impl Plugin for PausePlugin {
             spawn_dialog_box,
             start_discution,
             spawn_heroes,
-        ).run_if(in_state(GameState::Paused)));
+        ).run_if(in_state(GameState::Running)));
     }
 }
 
@@ -80,6 +80,7 @@ pub fn start_discution(
 pub fn spawn_dialog_box(
     mut commands: Commands,
     dialog_query: Query<Entity, With<DialogueBox>>,
+    asset_serv: Res<AssetServer>,
 ) {
     if dialog_query.is_empty() {
         commands.spawn((
@@ -106,7 +107,8 @@ pub fn spawn_dialog_box(
             parent.spawn((
                 Text::new(""), 
                 TextFont {
-                    font_size: 17.0,
+                    font_size: 14.0,
+                    font: asset_serv.load("PressStart2P-Regular.ttf"),
                     ..default()
                 },
                 TextColor(Color::WHITE),
@@ -126,8 +128,8 @@ pub fn spawn_heroes(
         let half_width = GAME_WIDTH / 2.0;
         let half_height = GAME_HEIGHT / 2.0;
 
-        let bottom_left = Vec2::new(-half_width + 100.0, -half_height + 100.0);
-        let bottom_right = Vec2::new(half_width - 100.0, -half_height + 100.0);
+        let bottom_left = Vec2::new(-half_width + 75.0, -half_height + 80.0);
+        let bottom_right = Vec2::new(half_width - 60.0, -half_height + 85.0);
 
         let witch_original_width = 2508.0;
         let witch_original_height = 3252.0;
@@ -135,7 +137,7 @@ pub fn spawn_heroes(
 
         commands.spawn((
             Sprite {
-                image: asset_serv.load("witch_v2.png"),
+                image: asset_serv.load("witch_hero.png"),
                 custom_size: Some(Vec2::new(
                     witch_original_width * (1.0 - witch_reduction), 
                     witch_original_height * (1.0 - witch_reduction)
@@ -152,7 +154,7 @@ pub fn spawn_heroes(
 
         commands.spawn((
             Sprite {
-                image: asset_serv.load("TEST-COLOR.png"),
+                image: asset_serv.load("angel_hero.png"),
                 custom_size: Some(Vec2::new(
                     angel_original_width * (1.0 - angel_reduction), 
                     angel_original_height * (1.0 - angel_reduction)
