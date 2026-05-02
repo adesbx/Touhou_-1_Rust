@@ -70,8 +70,12 @@ fn setup(
     ));
 
     commands.spawn((
-            Sprite::from_image(asset_serv.load("hud/hud_bg.png")),
-            Transform::from_xyz(80.0, 0.0, -100.0),
+            Sprite {
+                image: asset_serv.load("hud/hud_bg.png"),
+                custom_size: Some(Vec2::new(900.0, 448.0)),
+                ..default()
+            },
+            Transform::from_xyz(0.0, 0.0, -100.0),
     ));
 
     let texture = asset_serv.load("characters/character.png");
@@ -104,7 +108,7 @@ fn setup(
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0),
-            left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 875.0),
             ..default()
         },
         PlayerHealthText, 
@@ -121,7 +125,7 @@ fn setup(
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0 + 30.0),
-            left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 875.0),
             ..default()
         },
         PlayerDamageText, 
@@ -138,10 +142,27 @@ fn setup(
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0 + 60.0),
-            left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 875.0),
             ..default()
         },
         PlayerBombsText, 
+    ));
+
+    commands.spawn((
+        Text::new("Touhou -1"), 
+        TextFont {
+            font_size: 35.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0),
+            left: Val::Px(10.0),
+            ..default()
+        },
+        PlayerHealthText, 
     ));
 }
 
