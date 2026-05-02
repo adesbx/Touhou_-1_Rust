@@ -96,48 +96,51 @@ fn setup(
     commands.spawn((
         Text::new("HP: 3"), 
         TextFont {
-            font_size: 40.0,
+            font_size: 20.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
             ..default()
         },
+        TextColor(Color::WHITE),
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0),
             left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
             ..default()
         },
-        TextColor(Color::srgb(1.0, 1.0, 1.0)), 
         PlayerHealthText, 
     ));
 
     commands.spawn((
-        Text::new("Power: 10"), 
+        Text::new("HP: 3"), 
         TextFont {
-            font_size: 40.0,
+            font_size: 20.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
             ..default()
         },
+        TextColor(Color::WHITE),
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0 + 30.0),
             left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
             ..default()
         },
-        TextColor(Color::srgb(1.0, 1.0, 1.0)), 
         PlayerDamageText, 
     ));
 
     commands.spawn((
         Text::new("Bombs: 0"), 
         TextFont {
-            font_size: 40.0,
+            font_size: 20.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
             ..default()
         },
+        TextColor(Color::WHITE),
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0 + 60.0),
             left: Val::Px(GAME_HEIGHT/2.0 + 800.0),
             ..default()
         },
-        TextColor(Color::srgb(1.0, 1.0, 1.0)), 
         PlayerBombsText, 
     ));
 }

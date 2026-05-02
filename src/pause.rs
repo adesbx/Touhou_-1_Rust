@@ -12,7 +12,7 @@ impl Plugin for PausePlugin {
             spawn_dialog_box,
             start_discution,
             spawn_heroes,
-        ).run_if(in_state(GameState::Running)));
+        ).run_if(in_state(GameState::Paused)));
     }
 }
 
