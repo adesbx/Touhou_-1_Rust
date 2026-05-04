@@ -98,7 +98,7 @@ fn setup(
     ));
 
     commands.spawn((
-        Text::new("HP:3"), 
+        Text::new(format!("HP:{:.0}", PLAYER_HP)), 
         TextFont {
             font_size: 20.0,
             font: asset_serv.load("PressStart2P-Regular.ttf"),
@@ -162,7 +162,6 @@ fn setup(
             left: Val::Px(10.0),
             ..default()
         },
-        PlayerHealthText, 
     ));
 }
 
