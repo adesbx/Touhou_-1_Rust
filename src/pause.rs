@@ -137,7 +137,7 @@ pub fn spawn_heroes(
 
         commands.spawn((
             Sprite {
-                image: asset_serv.load("witch_hero.png"),
+                image: asset_serv.load("hud/witch_hero.png"),
                 custom_size: Some(Vec2::new(
                     witch_original_width * (1.0 - witch_reduction), 
                     witch_original_height * (1.0 - witch_reduction)
@@ -154,7 +154,7 @@ pub fn spawn_heroes(
 
         commands.spawn((
             Sprite {
-                image: asset_serv.load("angel_hero.png"),
+                image: asset_serv.load("hud/angel_hero.png"),
                 custom_size: Some(Vec2::new(
                     angel_original_width * (1.0 - angel_reduction), 
                     angel_original_height * (1.0 - angel_reduction)

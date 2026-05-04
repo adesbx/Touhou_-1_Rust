@@ -93,12 +93,12 @@ fn setup(
             nbr_bombs: 0,
             animation_timer: Timer::from_seconds(0.2, TimerMode::Repeating), 
         },
-        Health { hp: PLAYER_HP},
+        Health { hp: PLAYER_HP, ..default()},
         Damage { damage: PLAYER_DAMAGE}
     ));
 
     commands.spawn((
-        Text::new("HP: 3"), 
+        Text::new("HP:3"), 
         TextFont {
             font_size: 20.0,
             font: asset_serv.load("PressStart2P-Regular.ttf"),
@@ -115,7 +115,7 @@ fn setup(
     ));
 
     commands.spawn((
-        Text::new("HP: 3"), 
+        Text::new("Power:10"), 
         TextFont {
             font_size: 20.0,
             font: asset_serv.load("PressStart2P-Regular.ttf"),
@@ -132,7 +132,7 @@ fn setup(
     ));
 
     commands.spawn((
-        Text::new("Bombs: 0"), 
+        Text::new("Bombs:0"), 
         TextFont {
             font_size: 20.0,
             font: asset_serv.load("PressStart2P-Regular.ttf"),

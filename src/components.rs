@@ -1,9 +1,14 @@
 use bevy::prelude::*;
 use serde::Deserialize;
 
-#[derive(Component, Debug, Deserialize)]
+#[derive(Component, Debug, Deserialize, Clone)]
+#[serde(default)]
 pub struct Health {
-    pub hp: f32
+    pub hp: f32,
+    #[serde(skip)]
+    pub is_dying : bool,
+    #[serde(skip)]
+    pub dying_timer: Timer,
 }
 
 #[derive(Component)]
@@ -101,7 +106,7 @@ pub struct DiagonalMovementDespawner {
 pub struct Enemy {
     pub variety: char,
     pub animation_timer: Timer,
-    pub shoot_timer: Timer,
+    pub shoot_timer: Timer
 }
 
 #[derive(Component)]
@@ -234,3 +239,13 @@ pub struct GameAssets {
 
 #[derive(Component)]
 pub struct MusicPlayed;
+
+impl Default for Health {
+    fn default() -> Self {
+        Self {
+            hp: 100.0,
+            is_dying: false,
+            dying_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+        }
+    }
+}

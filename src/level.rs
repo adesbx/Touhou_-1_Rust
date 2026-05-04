@@ -64,7 +64,7 @@ pub fn spawn_from_level_data(
                     animation_timer: Timer::from_seconds(0.3, TimerMode::Repeating), 
                     shoot_timer: Timer::from_seconds(0.9, TimerMode::Repeating), 
                 },
-                Health { hp: wave.hp.hp },
+                Health { hp: wave.hp.hp, ..default()},
                 EnemyMovement { 
                     spawn_time: manager.phase_timer,
                     direction: wave.direction, 
@@ -87,9 +87,9 @@ pub fn spawn_from_level_data(
                 Enemy { 
                     variety: wave.variety,
                     animation_timer: Timer::from_seconds(0.3, TimerMode::Repeating), 
-                    shoot_timer: Timer::from_seconds(0.0, TimerMode::Once), 
+                    shoot_timer: Timer::from_seconds(0.0, TimerMode::Once),
                 },
-                Health { hp: wave.hp.hp },
+                Health { hp: wave.hp.hp, ..default()},
                 Boss {
                     first_spawn: true,
                     stop_normal_move: false,
@@ -129,7 +129,7 @@ pub fn spawn_from_level_data(
                     animation_timer: Timer::from_seconds(0.3, TimerMode::Repeating), 
                     shoot_timer: Timer::from_seconds(0.0, TimerMode::Once), 
                 },
-                Health { hp: wave.hp.hp },
+                Health { hp: wave.hp.hp, ..default()},
                 Boss {
                     first_spawn: false,
                     stop_normal_move: false,
