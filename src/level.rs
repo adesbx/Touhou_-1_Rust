@@ -79,10 +79,13 @@ pub fn spawn_from_level_data(
             manager.phase_timer = 0.0;
             manager.next_index = 0;
             manager.current_phase = GamePhase::FistBossEncounter;
-            let texture: Handle<Image> = asset_serv.load("enemies/boss_v2.png");
             let wave = &level.boss;
+            let texture = asset_serv.load("enemies/boss_v2_sheet_test.png");
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(28), 3, 4, None, None);
+            let texture_atlas_layout = texture_atlas_layout.add(layout);
+
             commands.spawn((
-                Sprite::from_image(texture),
+                Sprite::from_atlas_image(texture, TextureAtlas { layout: texture_atlas_layout, index: 0}),
                 Transform::from_translation(wave.pos.extend(2.0)),
                 Enemy { 
                     variety: wave.variety,
@@ -102,6 +105,7 @@ pub fn spawn_from_level_data(
                     attack_switch_timer: Timer::from_seconds(5.0, TimerMode::Repeating),
                     diagonal_attack_timer: Timer::from_seconds(3.0, TimerMode::Repeating),
                     boomerang_attack_timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+                    animation_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
                 } 
             ));
         }
@@ -119,10 +123,13 @@ pub fn spawn_from_level_data(
             manager.phase_timer = 0.0;
             manager.next_index = 0;
             manager.current_phase = GamePhase::BossFight;
-            let texture: Handle<Image> = asset_serv.load("enemies/boss_v2.png");
             let wave = &level.boss;
+            let texture = asset_serv.load("enemies/boss_v2_sheet_test.png");
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 3, 4, None, None);
+            let texture_atlas_layout = texture_atlas_layout.add(layout);
+
             commands.spawn((
-                Sprite::from_image(texture),
+                Sprite::from_atlas_image(texture, TextureAtlas { layout: texture_atlas_layout, index: 8}),
                 Transform::from_translation(wave.pos.extend(2.0)),
                 Enemy { 
                     variety: wave.variety,
@@ -142,6 +149,7 @@ pub fn spawn_from_level_data(
                     attack_switch_timer: Timer::from_seconds(5.0, TimerMode::Repeating),
                     diagonal_attack_timer: Timer::from_seconds(3.0, TimerMode::Repeating),
                     boomerang_attack_timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+                    animation_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
                 } 
             ));
         }

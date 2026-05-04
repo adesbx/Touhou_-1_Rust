@@ -7,7 +7,14 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (move_enemies, confine_enemies_movement, check_collison_enemies, check_health, update_player_sprites));
+        app.add_systems(Update, (
+            move_enemies, 
+            confine_enemies_movement, 
+            check_collison_enemies, 
+            check_health, 
+            update_player_sprites,
+            update_disappearance_sprites
+        ));
     }
 }
 
@@ -126,31 +133,32 @@ fn check_collison_enemies(
 fn check_health(
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
-    health_query: Query<(Entity, &Transform ,&Health), With<Health>>,
+    mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
+    mut health_query: Query<(Entity, &mut Health, &Transform), With<Health>>,
 ) {
 
-    for (entity, transform, health) in &health_query {
-        if health.hp <= 0.0 {
+    for (entity, mut health, transform) in &mut health_query {
+        if health.hp <= 0.0  && !health.is_dying{
+            health.is_dying = true;
+
+            let texture: Handle<_> = asset_serv.load("projectiles/smoke.png");
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(24), 2, 3, None, None);
+            let texture_atlas_layout = texture_atlas_layout.add(layout);
+
+            commands.spawn((
+                Sprite::from_atlas_image(texture, TextureAtlas { layout: texture_atlas_layout, index: 0}),
+                Transform::from_translation(transform.translation),
+                health.clone(),
+            ));
+
             commands.entity(entity).despawn();
-            let mut rng = rand::thread_rng();
-            if rng.gen_range(1..4) == 1 { // 1/3 de faire spawbn un power up  
-                commands.spawn((
-                    Sprite {
-                        image: asset_serv.load("items/power_up.png"),
-                        custom_size: Some(Vec2::new(POWER_UP_SIZE, POWER_UP_SIZE)),
-                        ..default()
-                    },
-                    Transform::from_translation(transform.translation),
-                    PowerUp
-                ));
-            }
         }
     }
 }
 
 fn update_player_sprites(
     time:  Res<Time>,
-    mut enemies: Query<(&mut Sprite, &mut Enemy), With<Enemy>>,
+    mut enemies: Query<(&mut Sprite, &mut Enemy),(With<Enemy>, Without<Boss>)>,
 ) {
     for (mut sprite, mut enemy) in &mut enemies {
         if let Some(atlas) = sprite.texture_atlas.as_mut() {
@@ -161,6 +169,41 @@ fn update_player_sprites(
                     atlas.index = 0
                 } else {
                     atlas.index += 1;
+                }
+            }
+        }
+    }
+}
+
+fn update_disappearance_sprites(
+    mut commands: Commands,
+    asset_serv: Res<AssetServer>,
+    time:  Res<Time>,
+    mut health_query: Query<(Entity, &Transform ,&mut Health, &mut Sprite), With<Health>>,
+) {
+    for (entity, transform, mut health, mut sprite) in &mut health_query {
+        if health.is_dying {
+            if let Some(atlas) = sprite.texture_atlas.as_mut() {
+                health.dying_timer.tick(time.delta());
+
+                if health.dying_timer.just_finished() {
+                    if atlas.index >=4 {
+                        commands.entity(entity).despawn();
+                        let mut rng = rand::thread_rng();
+                        if rng.gen_range(1..4) == 1 { // 1/3 de faire spawbn un power up  
+                            commands.spawn((
+                                Sprite {
+                                    image: asset_serv.load("items/power_up.png"),
+                                    custom_size: Some(Vec2::new(POWER_UP_SIZE, POWER_UP_SIZE)),
+                                    ..default()
+                                },
+                                Transform::from_translation(transform.translation),
+                                PowerUp
+                            ));
+                        }
+                    } else {
+                        atlas.index += 1;
+                    }
                 }
             }
         }

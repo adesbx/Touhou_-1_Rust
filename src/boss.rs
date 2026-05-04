@@ -20,6 +20,7 @@ impl Plugin for BossPlugin {
             shoot_boss_diagonal_attack,
             shoot_boomerang_attack,
             change_attack_type,
+            update_boss_sprite
         ).run_if(in_state(GameState::Running)));
     }
 }
@@ -377,6 +378,27 @@ pub fn change_attack_type(
             boss_query.current_attack = 2;
         } else { 
             boss_query.current_attack = 1;
+        }
+    }
+}
+
+fn update_boss_sprite(
+    time:  Res<Time>,
+    boss: Single<(&mut Sprite, &mut Boss), With<Boss>>,
+) {
+
+    let (mut sprite, mut boss) = boss.into_inner();
+
+    if let Some(atlas) = sprite.texture_atlas.as_mut() {
+        boss.animation_timer.tick(time.delta());
+
+        if boss.animation_timer.just_finished() {
+            if atlas.index >= 9 {
+                atlas.index = 0;
+            } else {
+                atlas.index += 1;
+                println!("Changeùent de sprite");
+            }
         }
     }
 }
