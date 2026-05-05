@@ -21,14 +21,14 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .init_state::<GameState>()
+        .init_asset::<LevelData>()
+        .init_asset::<Dialogue>()
         .insert_resource(LevelManager {
             current_phase: GamePhase::PreBoss,
             phase_timer: 0.0,
             next_index: 0,
             power_up_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
         })
-        .init_asset::<LevelData>()
-        .init_asset::<Dialogue>()
         .register_asset_loader(LevelDataLoader)
         .register_asset_loader(DialogueLoader)
         .add_plugins(player::PlayerPlugin)
@@ -100,7 +100,7 @@ fn setup(
     commands.spawn((
         Text::new(format!("HP:{:.0}", PLAYER_HP)), 
         TextFont {
-            font_size: 20.0,
+            font_size: 32.0,
             font: asset_serv.load("PressStart2P-Regular.ttf"),
             ..default()
         },
@@ -108,7 +108,7 @@ fn setup(
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0),
-            left: Val::Px(GAME_HEIGHT/2.0 + 875.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 750.0),
             ..default()
         },
         PlayerHealthText, 
@@ -117,7 +117,7 @@ fn setup(
     commands.spawn((
         Text::new("Power:10"), 
         TextFont {
-            font_size: 20.0,
+            font_size: 32.0,
             font: asset_serv.load("PressStart2P-Regular.ttf"),
             ..default()
         },
@@ -125,7 +125,7 @@ fn setup(
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0 + 30.0),
-            left: Val::Px(GAME_HEIGHT/2.0 + 875.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 750.0),
             ..default()
         },
         PlayerDamageText, 
@@ -134,7 +134,7 @@ fn setup(
     commands.spawn((
         Text::new("Bombs:0"), 
         TextFont {
-            font_size: 20.0,
+            font_size: 32.0,
             font: asset_serv.load("PressStart2P-Regular.ttf"),
             ..default()
         },
@@ -142,24 +142,24 @@ fn setup(
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(GAME_HEIGHT/2.0 + 60.0),
-            left: Val::Px(GAME_HEIGHT/2.0 + 875.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 750.0),
             ..default()
         },
         PlayerBombsText, 
     ));
 
     commands.spawn((
-        Text::new("Touhou -1"), 
+        Text::new("Touhou-1"), 
         TextFont {
-            font_size: 35.0,
+            font_size: 40.0,
             font: asset_serv.load("PressStart2P-Regular.ttf"),
             ..default()
         },
         TextColor(Color::WHITE),
         Node {
             position_type: PositionType::Absolute,
-            top: Val::Px(GAME_HEIGHT/2.0),
-            left: Val::Px(10.0),
+            top: Val::Px(GAME_HEIGHT/2.0 + 30.0),
+            left: Val::Px(0.0),
             ..default()
         },
     ));
