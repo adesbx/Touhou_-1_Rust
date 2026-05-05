@@ -98,10 +98,17 @@ pub fn show_health_bar(
     mut commands: Commands,
     boss_query: Query<Entity, With<Boss>>,
     bar_query: Query<Entity, With<BossHealthBar>>, 
+    asset_server: Res<AssetServer>
 ) {
     if !boss_query.is_empty() && bar_query.is_empty() {
         for entity in boss_query {
             commands.entity(entity).with_children(|parent| {
+
+                parent.spawn((
+                    Sprite::from_image(asset_server.load("hud/boss_bar.png")),
+                    Transform::from_xyz(0.0, 20.0, 1.0),
+                ));
+
                 parent.spawn((
                     Sprite::from_color(
                         Color::srgb(0.8, 0.1, 0.1),

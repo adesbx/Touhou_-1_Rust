@@ -125,7 +125,7 @@ pub fn spawn_from_level_data(
             manager.current_phase = GamePhase::BossFight;
             let wave = &level.boss;
             let texture = asset_serv.load("enemies/boss.png");
-            let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 3, 4, None, None);
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(28), 3, 4, None, None);
             let texture_atlas_layout = texture_atlas_layout.add(layout);
 
             commands.spawn((
