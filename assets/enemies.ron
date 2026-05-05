@@ -28,28 +28,19 @@
         (spawn_time: 18.3, pos: (100.0, 240.0), direction: -1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
         (spawn_time: 18.7, pos: (100.0, 240.0), direction: -1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
 
-        // Groupe de GAUCHE (Arc positif pour aller vers le centre)
-        (spawn_time: 22.0, pos: (-180.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.3, pos: (-175.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.6, pos: (-170.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.9, pos: (-165.0, 240.0), direction: 1.0,  hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-
-        // Droite : On fait de même pour éviter la superposition totale
-        (spawn_time: 22.0, pos: (180.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.3, pos: (175.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.6, pos: (170.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
-        (spawn_time: 22.9, pos: (165.0, 240.0),  direction: -1.0, hp: (hp: 100.0), variety: 'c', pattern: Arc(35.0)),
+        (spawn_time: 20.5, pos: (-150.0, 350.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: StraightPause(120.0)),
+        (spawn_time: 21.0, pos: (150.0, 350.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: StraightPause(120.0)),
+        (spawn_time: 21.5, pos: (0.0, 350.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: StraightPause(160.0)),
 
         // 3 paires d'anges en ZigZag descendant au milieu
-        (spawn_time: 23.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
-        (spawn_time: 23.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+        (spawn_time: 23.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: Straight),
+        (spawn_time: 23.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: Straight),
 
-        (spawn_time: 24.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
-        (spawn_time: 24.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+        (spawn_time: 24.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: Straight),
+        (spawn_time: 24.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: Straight),
 
-        (spawn_time: 25.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
-        (spawn_time: 25.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
-
+        (spawn_time: 27.5, pos: (-20.0, 240.0),  direction: 1.0,  hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
+        (spawn_time: 28.5, pos: (20.0, 240.0),   direction: -1.0, hp: (hp: 150.0), variety: 'a', pattern: ZigZag(100.0)),
 
         // Ils utilisent Arc(100.0) pour traverser l'écran vers le bas-droite
         (spawn_time: 30.0, pos: (-180.0, 240.0), direction: 1.0, hp: (hp: 80.0), variety: 'c', pattern: Arc(100.0)),

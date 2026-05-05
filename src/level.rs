@@ -62,7 +62,7 @@ pub fn spawn_from_level_data(
                 Enemy {
                     variety: wave.variety,
                     animation_timer: Timer::from_seconds(0.3, TimerMode::Repeating), 
-                    shoot_timer: Timer::from_seconds(0.9, TimerMode::Repeating), 
+                    shoot_timer: Timer::from_seconds(1.2, TimerMode::Repeating), 
                 },
                 Health { hp: wave.hp.hp, ..default()},
                 EnemyMovement { 
