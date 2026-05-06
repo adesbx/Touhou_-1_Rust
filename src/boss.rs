@@ -404,7 +404,6 @@ fn update_boss_sprite(
                 atlas.index = 0;
             } else {
                 atlas.index += 1;
-                println!("Changeùent de sprite");
             }
         }
     }

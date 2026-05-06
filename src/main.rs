@@ -1,7 +1,6 @@
 use bevy::app::App;
-use bevy::ecs::relationship::RelationshipSourceCollection;
 use bevy::prelude::*;
-use bevy::audio::Volume;
+use bevy::audio::{AudioSink, Volume};
 
 mod components;
 mod constants;
@@ -29,6 +28,7 @@ fn main() {
             next_index: 0,
             power_up_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
         })
+        .init_resource::<AudioSettings>()
         .register_asset_loader(LevelDataLoader)
         .register_asset_loader(DialogueLoader)
         .add_plugins(player::PlayerPlugin)
@@ -40,7 +40,7 @@ fn main() {
         .add_plugins(background::BackgroundPlugin)
         .add_plugins(pause::PausePlugin)
         .add_systems(Startup, (setup, setup_assets))
-        .add_systems(Update, play_music_theme)
+        .add_systems(Update, (play_music_theme, toggle_mute))
         .run();
 }
 
@@ -220,7 +220,26 @@ fn play_music_theme(
             },
             MusicPlayed
         ));
-        *current_music =  "sounds/main_theme.ogg".to_string();
+        *current_music = "sounds/main_theme.ogg".to_string();
+    }
+}
+
+fn toggle_mute(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut settings: ResMut<AudioSettings>,
+    mut music_query: Query<&mut AudioSink, With<MusicPlayed>>,
+    mut last_decibel: Local<Volume>,
+) {
+    if keyboard.just_pressed(KeyCode::KeyT) {
+        settings.is_muted = !settings.is_muted;
+        for mut sink in &mut music_query {
+            if settings.is_muted {
+                *last_decibel = sink.volume();
+                sink.set_volume(Volume::Decibels(-1000.0));
+            } else {
+                sink.set_volume(*last_decibel); 
+            }
+        }
     }
 }
 

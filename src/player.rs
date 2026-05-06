@@ -103,8 +103,9 @@ fn check_collison_power_up(
             if distance < (POWER_UP_SIZE + PLAYER_SIZE) / 2.0 {                
                 damage_player.damage += PLAYER_DAMAGE;
                 commands.entity(power_entity).despawn();
-
-                let new_delay = (0.1 - (damage_player.damage - 10.0) * 0.0005).max(0.02);
+                
+                // ICI pour changer la vitesse de tir du joueur
+                let new_delay = (0.1 - (damage_player.damage - 10.0) * 0.0005).max(0.01);
                 player.shoot_timer.set_duration(Duration::from_secs_f32(new_delay));
 
                 break;

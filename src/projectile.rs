@@ -57,7 +57,7 @@ fn shoot_projectile(
             *last_sound_time = time.elapsed_secs();
         }
 
-        if damage_player.damage < 50.0 {
+        if damage_player.damage < 75.0 {
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_xyz(
@@ -67,7 +67,7 @@ fn shoot_projectile(
                 ),
                 Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
             ));
-        } else if damage_player.damage < 100.0 {
+        } else if damage_player.damage < 150.0 {
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
@@ -85,7 +85,7 @@ fn shoot_projectile(
                 Transform::from_xyz(base_x, base_y, z),
                 Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
             ));
-        } else if damage_player.damage < 150.0 {
+        } else if damage_player.damage < 250.0 {
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),

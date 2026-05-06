@@ -241,6 +241,11 @@ pub struct GameAssets {
 #[derive(Component)]
 pub struct MusicPlayed;
 
+#[derive(Resource, Default)]
+pub struct AudioSettings {
+    pub is_muted: bool,
+}
+
 impl Default for Health {
     fn default() -> Self {
         Self {
