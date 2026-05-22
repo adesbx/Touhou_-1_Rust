@@ -186,7 +186,7 @@ fn change_color_on_hit(
     mut player_query: Single<(&mut Player, &mut Sprite), With<Player>>,
 ) {
     let (player, sprite) = &mut *player_query; // possiblement sale voir pour faire autrement
-    if time.elapsed_secs() - player.last_hit < INVINCIBILITY_TIME  {
+    if time.elapsed_secs() - player.last_hit < INVINCIBILITY_TIME && player.last_hit != 0.0 {
         sprite.color = Color::srgba(0.9, 0.0, 0.0, 0.9);
     } else {
         sprite.color = Color::WHITE;
