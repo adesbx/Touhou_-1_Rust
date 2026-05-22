@@ -9,8 +9,16 @@ Affrontez des vagues d'Anges et de Cherubs aux patterns de déplacement uniques,
 Ce jeu a été développé dans un but d'**apprentissage pour découvrir le langage Rust** et la logique ECS (Entity Component System) du moteur Bevy.
 
 * **Assets graphiques :** 100% fait maison ! Tous les sprites, les feuilles d'animations (spritesheets), le décor de fond ont été dessinés et intégrés par mes soins.
-* **Audio :** Les musiques sont égalements faites maisons, les seuls éléments externes non réalisés à la main sont les bruitages de type **SFX** (sons de tirs, impacts, explosions).
+* **Audio :** Les musiques sont égalements faites maisons, les seuls éléments externes non réalisés à la main sont les bj'ruitages de type **SFX** (sons de tirs, impacts, explosions).
 
+### 🎵 Crédits Audio (SFX)
+Afin de donner vie aux affrontements, le projet intègre les bruitages externes suivants :
+* **Bruit de tir (Joueur) :** [Laser Shoot - wolferCZ (Freesound)](https://freesound.org/people/wolferCZ/sounds/464553/)
+* **Bruit de tir Boule de Feu (Joueur) :** [Fire Magic - Pixabay](https://pixabay.com/fr/sound-effects/films-et-effets-sp%c3%a9ciaux-fire-magic-5-378639/)
+* **Bruit de tir Électrique (Boss) :** [Elemental Spell Impact Electric - Pixabay](https://pixabay.com/fr/sound-effects/la-technologie-elemental-spell-impact-electric-448567/)
+* **Bruit de tir Arme Vortex (Espace) :** [Vortex Shoot - D4XX (Freesound)](https://freesound.org/people/D4XX/sounds/617043/)
+* **Bruit de tir Ennemi classique :** [Robotic Shoot - Pixabay](https://pixabay.com/fr/sound-effects/films-et-effets-sp%c3%a9ciaux-robotic-shoot-138432/)
+* **Bruit d'explosion (Bombe) :** [Bomb Explosion - Anomaex (Freesound)](https://freesound.org/people/Anomaex/sounds/490266/)
 
 ## 🚀 Comment lancer le jeu
 
@@ -42,7 +50,7 @@ Le jeu utilise une configuration classique de type clavier "ZQSD + Action".
 | **Z** / **S** | **Haut / Bas** | Déplacer le joueur verticalement |
 | **Q** / **D** | **Gauche / Droite** | Déplacer le joueur horizontalement |
 | **K** | **Tirer** | Lance des projectiles en ligne droite |
-| **L** | **Bombe** | Utilise une bombe pour tuer les ennemies proches |
+| **L** | **Bombe** | Utilise une bombe pour tuer les ennemis proches |
 | **T** | **Mute Musique** | Coupe / Active la musique de fond à tout moment |
 
 ---
