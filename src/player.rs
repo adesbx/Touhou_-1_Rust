@@ -8,7 +8,16 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (move_player, confine_player_movement, move_power_up, check_collison_power_up, use_bombs, update_player_sprites, update_explosion_sprite));
+        app.add_systems(Update, (
+            move_player, 
+            confine_player_movement, 
+            move_power_up, 
+            check_collison_power_up, 
+            use_bombs,
+            change_color_on_hit, 
+            update_player_sprites, 
+            update_explosion_sprite
+        ));
     }
 }
 
@@ -170,6 +179,18 @@ fn use_bombs(
         player.nbr_bombs -= 1;
     }
 
+}
+
+fn change_color_on_hit(
+    time:  Res<Time>,
+    mut player_query: Single<(&mut Player, &mut Sprite), With<Player>>,
+) {
+    let (player, sprite) = &mut *player_query; // possiblement sale voir pour faire autrement
+    if time.elapsed_secs() - player.last_hit < INVINCIBILITY_TIME  {
+        sprite.color = Color::srgba(0.9, 0.0, 0.0, 0.9);
+    } else {
+        sprite.color = Color::WHITE;
+    }
 }
 
 fn update_player_sprites(
