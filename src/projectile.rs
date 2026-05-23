@@ -38,10 +38,6 @@ fn shoot_projectile(
     player.shoot_timer_fire.tick(time.delta());
 
     if keyboard.pressed(KeyCode::KeyK) && player.shoot_timer.is_finished(){
-        let texture = asset_serv.load("projectiles/projectile.png");
-        let fire_texture = asset_serv.load("projectiles/fire_ball.png");
-
-
         let base_x = transform.translation.x;
         let base_y = transform.translation.y + 10.0;
         let z = transform.translation.z;
@@ -59,134 +55,154 @@ fn shoot_projectile(
         }
 
         if damage_player.damage < 75.0 {
-            commands.spawn((
-                Sprite::from_image(texture),
-                Transform::from_xyz(
-                    base_x,
-                    base_y,
-                    z
-                ),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
+            first_power_shooting(&clock, &mut commands, &asset_serv, base_x, base_y, z);
         } else if damage_player.damage < 150.0 {
-            commands.spawn((
-                Sprite::from_image(texture.clone()),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs(),},
-            ));
-
-            commands.spawn((
-                Sprite::from_image(texture.clone()),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
-
-            commands.spawn((
-                Sprite::from_image(texture),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
+            second_power_shooting(&clock, &mut commands, &asset_serv, base_x, base_y, z);
         } else if damage_player.damage < 250.0 {
-            commands.spawn((
-                Sprite::from_image(texture.clone()),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
-
-            commands.spawn((
-                Sprite::from_image(texture.clone()),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
-
-            commands.spawn((
-                Sprite::from_image(texture),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
-            
-            if  player.shoot_timer_fire.is_finished() {
-                commands.spawn((
-                    AudioPlayer::new(assets.shoot_fire_sound.clone()),
-                    PlaybackSettings {
-                        mode: bevy::audio::PlaybackMode::Despawn,
-                        volume: Volume::Decibels(-8.0),
-                        ..default()
-                    },
-                ));
-                if player.shoot_from_left {
-                commands.spawn((
-                        Sprite {
-                            image: fire_texture,
-                            custom_size: Some(Vec2::new(64.0, 64.0)),
-                            ..default()
-                        },
-                        Transform::from_xyz(base_x-10.0, base_y, z),
-                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: clock.watch.elapsed_secs()},
-                    ));
-                } else {
-                    commands.spawn((
-                        Sprite {
-                            image: fire_texture,
-                            custom_size: Some(Vec2::new(64.0, 64.0)),
-                            ..default()
-                        },
-                        Transform::from_xyz(base_x+10.0, base_y, z),
-                        Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: clock.watch.elapsed_secs()},
-                    ));
-                }
-                player.shoot_from_left = !player.shoot_from_left
-            }
+            third_power_shooting(&clock, &mut commands, &asset_serv, &assets, player, base_x, base_y, z);
         } else {
-            commands.spawn((
-                Sprite::from_image(texture.clone()),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
-
-            commands.spawn((
-                Sprite::from_image(texture.clone()),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
-
-            commands.spawn((
-                Sprite::from_image(texture),
-                Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
-            ));
-            
-            if  player.shoot_timer_fire.is_finished() {
-                commands.spawn((
-                    AudioPlayer::new(assets.shoot_fire_sound.clone()),
-                    PlaybackSettings {
-                        mode: bevy::audio::PlaybackMode::Despawn,
-                        volume: Volume::Decibels(-8.0),
-                        ..default()
-                    },
-                ));
-                //tire des deux cotés mtn
-                commands.spawn((
-                        Sprite {
-                            image: fire_texture.clone(),
-                            custom_size: Some(Vec2::new(64.0, 64.0)),
-                            ..default()
-                        },
-                        Transform::from_xyz(base_x-10.0, base_y, z),
-                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: clock.watch.elapsed_secs()},
-                    ));
-                commands.spawn((
-                    Sprite {
-                        image: fire_texture.clone(),
-                        custom_size: Some(Vec2::new(64.0, 64.0)),
-                        ..default()
-                    },
-                    Transform::from_xyz(base_x+10.0, base_y, z),
-                    Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: clock.watch.elapsed_secs()},
-                ));
+            fourth_power_shooting(&clock, &mut commands, &asset_serv, &assets, player, base_x, base_y, z);
         }
     }
 }
+
+fn first_power_shooting(
+    clock: &GameClock,
+    commands: &mut Commands,
+    asset_serv: &AssetServer,
+    base_x: f32,
+    base_y: f32,
+    base_z: f32
+) {
+    commands.spawn((
+        Sprite::from_image(asset_serv.load("projectiles/projectile.png")),
+        Transform::from_xyz(
+            base_x,
+            base_y,
+            base_z
+        ),
+        Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
+    ));
+}
+
+fn second_power_shooting(
+    clock: &GameClock,
+    commands: &mut Commands,
+    asset_serv: &AssetServer,
+    base_x: f32,
+    base_y: f32,
+    base_z: f32
+) {
+    let texture = asset_serv.load("projectiles/projectile.png");
+    commands.spawn((
+        Sprite::from_image(texture.clone()),
+        Transform::from_xyz(base_x, base_y, base_z),
+        Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs(),},
+    ));
+
+    commands.spawn((
+        Sprite::from_image(texture.clone()),
+        Transform::from_xyz(base_x, base_y, base_z),
+        Projectile { direction: Vec2::new(-0.25, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
+    ));
+
+    commands.spawn((
+        Sprite::from_image(texture),
+        Transform::from_xyz(base_x, base_y, base_z),
+        Projectile { direction: Vec2::new(0.25, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
+    ));
+}
+
+fn third_power_shooting(
+    clock: &GameClock,
+    commands: &mut Commands,
+    asset_serv: &AssetServer,
+    assets: &GameAssets,
+    player: &mut Mut<Player>,
+    base_x: f32,
+    base_y: f32,
+    base_z: f32
+) {
+    let fire_texture = asset_serv.load("projectiles/fire_ball.png");
+    second_power_shooting(clock, commands, asset_serv, base_x, base_y, base_z);
+    
+    if  player.shoot_timer_fire.is_finished() {
+        commands.spawn((
+            AudioPlayer::new(assets.shoot_fire_sound.clone()),
+            PlaybackSettings {
+                mode: bevy::audio::PlaybackMode::Despawn,
+                volume: Volume::Decibels(-8.0),
+                ..default()
+            },
+        ));
+        if player.shoot_from_left {
+        commands.spawn((
+                Sprite {
+                    image: fire_texture,
+                    custom_size: Some(Vec2::new(64.0, 64.0)),
+                    ..default()
+                },
+                Transform::from_xyz(base_x-10.0, base_y, base_z),
+                Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: clock.watch.elapsed_secs()},
+            ));
+        } else {
+            commands.spawn((
+                Sprite {
+                    image: fire_texture,
+                    custom_size: Some(Vec2::new(64.0, 64.0)),
+                    ..default()
+                },
+                Transform::from_xyz(base_x+10.0, base_y, base_z),
+                Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: clock.watch.elapsed_secs()},
+            ));
+        }
+        player.shoot_from_left = !player.shoot_from_left
+    }
+}
+
+
+fn fourth_power_shooting(
+    clock: &GameClock,
+    commands: &mut Commands,
+    asset_serv: &AssetServer,
+    assets: &GameAssets,
+    player: &mut Mut<Player>,
+    base_x: f32,
+    base_y: f32,
+    base_z: f32
+) {
+    let fire_texture = asset_serv.load("projectiles/fire_ball.png");
+    second_power_shooting(clock, commands, asset_serv, base_x, base_y, base_z);
+    
+    if  player.shoot_timer_fire.is_finished() {
+        commands.spawn((
+            AudioPlayer::new(assets.shoot_fire_sound.clone()),
+            PlaybackSettings {
+                mode: bevy::audio::PlaybackMode::Despawn,
+                volume: Volume::Decibels(-8.0),
+                ..default()
+            },
+        ));
+        //tire des deux cotés mtn
+        commands.spawn((
+                Sprite {
+                    image: fire_texture.clone(),
+                    custom_size: Some(Vec2::new(64.0, 64.0)),
+                    ..default()
+                },
+                Transform::from_xyz(base_x-10.0, base_y, base_z),
+                Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: clock.watch.elapsed_secs()},
+            ));
+        commands.spawn((
+            Sprite {
+                image: fire_texture.clone(),
+                custom_size: Some(Vec2::new(64.0, 64.0)),
+                ..default()
+            },
+            Transform::from_xyz(base_x+10.0, base_y, base_z),
+            Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: clock.watch.elapsed_secs()},
+        ));
+    }
 }
 
 fn move_projectile(
