@@ -290,6 +290,7 @@ pub fn shoot_boss_rain(
 //phase 2
 
 pub fn shoot_boss_diagonal_attack(
+    clock: ResMut<GameClock>,
     mut commands: Commands,
     mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
     time: Res<Time>,
@@ -304,7 +305,7 @@ pub fn shoot_boss_diagonal_attack(
             let end_x: f32 = GAME_WIDTH / 2.0;
             let start_y = (GAME_HEIGHT / 2.0) - 50.0;
             let thickness = 50; 
-            let now = time.elapsed_secs();
+            let now = clock.watch.elapsed_secs();
             let safe_limit_x = start_x + (GAME_WIDTH * 0.1);
             let num_cols = ((end_x - start_x) / spacing).floor() as i32;
 
@@ -333,6 +334,7 @@ pub fn shoot_boss_diagonal_attack(
 pub fn shoot_boomerang_attack(
     mut commands: Commands,
     time: Res<Time>,
+    clock: ResMut<GameClock>,
     asset_serv: Res<AssetServer>,
     mut current_angle: Local<f32>,
     mut boss_query: Single<(&Transform, &mut Boss), With<Boss>>,
@@ -347,7 +349,7 @@ pub fn shoot_boomerang_attack(
             let num_projectiles = 16; 
             let num_waves = 5;
             let step = (std::f32::consts::PI * 2.0) / num_projectiles as f32;
-            let now = time.elapsed_secs();
+            let now = clock.watch.elapsed_secs();
 
             for w in 0..num_waves{
                 let wave_distance = 300.0 - (w as f32 * 50.0);

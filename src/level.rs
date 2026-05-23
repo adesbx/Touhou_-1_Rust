@@ -8,7 +8,13 @@ pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (spawn_from_level_data, spawn_bombs, move_bombs, check_collison_bombs, spawn_power_up, handle_despawn_timers));
+        app.add_systems(Update, (
+            spawn_from_level_data, 
+            spawn_bombs, move_bombs, 
+            check_collison_bombs, 
+            spawn_power_up, 
+            handle_despawn_timers
+        ).run_if(in_state(GameState::Running)));
     }
 }
 

@@ -1,7 +1,6 @@
 use bevy::app::App;
 use bevy::prelude::*;
 use bevy::audio::{AudioSink, Volume};
-use bevy::state::commands;
 
 mod components;
 mod constants;
@@ -42,7 +41,9 @@ fn main() {
         .add_plugins(background::BackgroundPlugin)
         .add_plugins(pause::PausePlugin)
         .add_systems(Startup, (setup, setup_assets))// pour le premier démarage
-        .add_systems(Update, (play_music_theme, toggle_mute))
+        .add_systems(Update, 
+            (play_music_theme, toggle_mute, tick_game_clock).run_if(in_state(GameState::Running).or(in_state(GameState::Paused)))
+        )
         .add_systems(OnEnter(GameState::Reset), cleanup_and_restart)
         .add_systems(OnExit(GameState::Reset), simple_restart)
         .run();
@@ -170,7 +171,7 @@ fn setup(
 }
 
 fn simple_restart(
-    time: Res<Time>,
+    mut clock: ResMut<GameClock>,
     mut commands: Commands, 
     asset_serv: Res<AssetServer>,
     mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
@@ -179,6 +180,7 @@ fn simple_restart(
     manager.phase_timer = 0.0;
     manager.next_index = 0;
     manager.current_phase = GamePhase::PreBoss;
+    clock.watch.reset();
     
     commands.spawn((
         Camera2d, 
@@ -386,3 +388,6 @@ fn cleanup_and_restart(
     next_state.set(GameState::Running);
 }
 
+fn tick_game_clock(time: Res<Time>, mut clock: ResMut<GameClock>) {
+    clock.watch.tick(time.delta());
+}

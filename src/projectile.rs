@@ -24,6 +24,7 @@ impl Plugin for ProjectilePlugin {
 
 fn shoot_projectile(
     time:  Res<Time>,
+    clock: ResMut<GameClock>,
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
     assets: Res<GameAssets>,
@@ -45,7 +46,7 @@ fn shoot_projectile(
         let base_y = transform.translation.y + 10.0;
         let z = transform.translation.z;
 
-        if time.elapsed_secs() - *last_sound_time > 0.1 {
+        if clock.watch.elapsed_secs() - *last_sound_time > 0.1 {
             commands.spawn((
                 AudioPlayer::new(assets.shoot_sound.clone()),
                 PlaybackSettings {
@@ -54,7 +55,7 @@ fn shoot_projectile(
                     ..default()
                 },
             ));
-            *last_sound_time = time.elapsed_secs();
+            *last_sound_time = clock.watch.elapsed_secs();
         }
 
         if damage_player.damage < 75.0 {
@@ -65,43 +66,43 @@ fn shoot_projectile(
                     base_y,
                     z
                 ),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
         } else if damage_player.damage < 150.0 {
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs(),},
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs(),},
             ));
 
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
 
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
         } else if damage_player.damage < 250.0 {
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
 
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
 
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
             
             if  player.shoot_timer_fire.is_finished() {
@@ -121,7 +122,7 @@ fn shoot_projectile(
                             ..default()
                         },
                         Transform::from_xyz(base_x-10.0, base_y, z),
-                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
+                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: clock.watch.elapsed_secs()},
                     ));
                 } else {
                     commands.spawn((
@@ -131,7 +132,7 @@ fn shoot_projectile(
                             ..default()
                         },
                         Transform::from_xyz(base_x+10.0, base_y, z),
-                        Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: time.elapsed_secs()},
+                        Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: clock.watch.elapsed_secs()},
                     ));
                 }
                 player.shoot_from_left = !player.shoot_from_left
@@ -140,19 +141,19 @@ fn shoot_projectile(
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
 
             commands.spawn((
                 Sprite::from_image(texture.clone()),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(-0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
 
             commands.spawn((
                 Sprite::from_image(texture),
                 Transform::from_xyz(base_x, base_y, z),
-                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: time.elapsed_secs()},
+                Projectile { direction: Vec2::new(0.5, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
             ));
             
             if  player.shoot_timer_fire.is_finished() {
@@ -172,7 +173,7 @@ fn shoot_projectile(
                             ..default()
                         },
                         Transform::from_xyz(base_x-10.0, base_y, z),
-                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: time.elapsed_secs()},
+                        Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: clock.watch.elapsed_secs()},
                     ));
                 commands.spawn((
                     Sprite {
@@ -181,7 +182,7 @@ fn shoot_projectile(
                         ..default()
                     },
                     Transform::from_xyz(base_x+10.0, base_y, z),
-                    Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: time.elapsed_secs()},
+                    Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: clock.watch.elapsed_secs()},
                 ));
         }
     }
@@ -190,10 +191,11 @@ fn shoot_projectile(
 
 fn move_projectile(
     time:  Res<Time>,
+    clock: ResMut<GameClock>,
     mut projectile_query: Query<(&mut Transform, &Projectile), Without<Enemy>>,
     enemy_query: Query<(&Transform, &Enemy), (With<Enemy>, Without<Boss>)>,
 ) {
-    let elapsed = time.elapsed_secs();
+    let elapsed = clock.watch.elapsed_secs();
     let dt = time.delta_secs();
 
     for (mut transform, projectile) in &mut projectile_query {
@@ -234,13 +236,13 @@ fn move_projectile(
 
 pub fn move_diagonal_projectiles(
     mut commands: Commands,
-    time: Res<Time>,
+    clock: ResMut<GameClock>,
     mut spawner_query: Query<(Entity, &DiagonalMovementSpawner)>,
     mut despawner_query: Query<(Entity, &DiagonalMovementDespawner)>,
     asset_serv: Res<AssetServer>,
     mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let now = time.elapsed_secs();
+    let now = clock.watch.elapsed_secs();
     let lifetime = 2.0; 
 
     for (entity, movement) in &mut spawner_query {
@@ -324,14 +326,14 @@ fn confine_projectile_movement(
 
 
 fn check_collison_projectile_player(
-    time: Res<Time>,
+    clock: ResMut<GameClock>,
     mut commands: Commands,
     enemy_projectile_query: Query<(Entity, &Transform), With<EnemyProjectile>>,
     enemy_query: Query<(Entity, &Transform, &Enemy), With<Enemy>>,
     mut player_query: Single<(&Transform, &mut Health, &mut Player), With<Player>>,
 ) {
     let (transform, health, player) = &mut *player_query; // possiblement sale voir pour faire autrement
-    if time.elapsed_secs() - player.last_hit > INVINCIBILITY_TIME  {
+    if clock.watch.elapsed_secs() - player.last_hit > INVINCIBILITY_TIME  {
         for (projectile_entity, projectile_transform) in &enemy_projectile_query {
             let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
@@ -339,7 +341,7 @@ fn check_collison_projectile_player(
             if distance < (CROSS_PROJECTILE_SIZE + PLAYER_SIZE) / 2.0 {                
                 commands.entity(projectile_entity).despawn();
                 health.hp -= 1.0;
-                player.last_hit = time.elapsed_secs();
+                player.last_hit = clock.watch.elapsed_secs();
                 break;
             }
         }
@@ -361,11 +363,11 @@ fn check_collison_projectile_player(
             if distance < (size + PLAYER_SIZE) / 2.0 && enemy.variety != 'b' {                
                 commands.entity(enemy_entity).despawn();
                 health.hp -= 1.0;
-                player.last_hit = time.elapsed_secs();
+                player.last_hit = clock.watch.elapsed_secs();
                 break;
             } else if distance < (size + PLAYER_SIZE) / 2.0 && enemy.variety == 'b'{
                 health.hp -= 1.0;
-                player.last_hit = time.elapsed_secs();
+                player.last_hit = clock.watch.elapsed_secs();
                 break;
             }
         }
@@ -492,10 +494,10 @@ pub fn update_vortex(
 
 pub fn move_boomerang_projectiles(
     mut commands: Commands,
-    time: Res<Time>,
+    clock: ResMut<GameClock>,
     mut query: Query<(Entity, &mut Transform, &BoomerangProjectile)>,
 ) {
-    let now = time.elapsed_secs();
+    let now = clock.watch.elapsed_secs();
     let speed_factor = 0.8; 
 
     for (entity, mut transform, proj) in &mut query {

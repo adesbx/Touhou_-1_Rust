@@ -14,17 +14,18 @@ impl Plugin for EnemyPlugin {
             check_health, 
             update_player_sprites,
             update_disappearance_sprites
-        ));
+        ).run_if(in_state(GameState::Running)));
     }
 }
 
 fn move_enemies(
     time: Res<Time>,
+    clock: ResMut<GameClock>,
     mut query: Query<(&mut Transform, &EnemyMovement, &Enemy), (With<Enemy>, Without<Player>, Without<Boss>)>,
     player_query: Single<&Transform, (With<Player>, Without<Enemy>)>,
 ) {
     let dt = time.delta_secs();
-    let elapsed = time.elapsed_secs();
+    let elapsed = clock.watch.elapsed_secs();
     let p1 = player_query.translation.truncate();
     
     let attraction_speed = 150.0;
