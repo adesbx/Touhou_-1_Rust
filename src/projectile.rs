@@ -188,7 +188,6 @@ fn shoot_projectile(
 }
 }
 
-
 fn move_projectile(
     time:  Res<Time>,
     mut projectile_query: Query<(&mut Transform, &Projectile), Without<Enemy>>,

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use serde::Deserialize;
+use bevy::time::Stopwatch;
 
 #[derive(Component, Debug, Deserialize, Clone)]
 #[serde(default)]
@@ -176,6 +177,7 @@ pub enum GameState {
     #[default]
     Running,
     Paused,
+    Reset
 }
 
 #[derive(Deserialize, Asset, TypePath, Debug, PartialEq)]
@@ -228,6 +230,11 @@ pub struct LevelDataLoader;
 
 #[derive(Component)]
 pub struct Background;
+
+#[derive(Resource, Default)]
+pub struct GameClock {
+    pub watch: Stopwatch,
+}
 
 #[derive(Resource)]
 pub struct GameAssets {

@@ -1,6 +1,7 @@
 use bevy::app::App;
 use bevy::prelude::*;
 use bevy::audio::{AudioSink, Volume};
+use bevy::state::commands;
 
 mod components;
 mod constants;
@@ -29,6 +30,7 @@ fn main() {
             power_up_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
         })
         .init_resource::<AudioSettings>()
+        .init_resource::<GameClock>()
         .register_asset_loader(LevelDataLoader)
         .register_asset_loader(DialogueLoader)
         .add_plugins(player::PlayerPlugin)
@@ -39,8 +41,10 @@ fn main() {
         .add_plugins(ui::UiPlugin)
         .add_plugins(background::BackgroundPlugin)
         .add_plugins(pause::PausePlugin)
-        .add_systems(Startup, (setup, setup_assets))
+        .add_systems(Startup, (setup, setup_assets))// pour le premier démarage
         .add_systems(Update, (play_music_theme, toggle_mute))
+        .add_systems(OnEnter(GameState::Reset), cleanup_and_restart)
+        .add_systems(OnExit(GameState::Reset), simple_restart)
         .run();
 }
 
@@ -51,7 +55,7 @@ fn setup(
 ) {   
     let handle = asset_serv.load("enemies.ron");
     commands.insert_resource(LevelHandle(handle));
-    let handle = asset_serv.load("dialogue.ron");
+    let handle: Handle<Dialogue> = asset_serv.load("dialogue.ron");
     commands.insert_resource(DialogueHandle(handle));
     commands.insert_resource(BombSpawner {
         spawn_timer: Timer::from_seconds(3.0, TimerMode::Repeating),
@@ -165,6 +169,124 @@ fn setup(
     ));
 }
 
+fn simple_restart(
+    time: Res<Time>,
+    mut commands: Commands, 
+    asset_serv: Res<AssetServer>,
+    mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
+    mut manager: ResMut<LevelManager>, 
+) {
+    manager.phase_timer = 0.0;
+    manager.next_index = 0;
+    manager.current_phase = GamePhase::PreBoss;
+    
+    commands.spawn((
+        Camera2d, 
+        Projection::Orthographic(OrthographicProjection { 
+            scaling_mode: bevy::camera::ScalingMode::AutoMin { 
+                min_width: GAME_WIDTH, 
+                min_height: GAME_HEIGHT
+            },
+            
+            ..OrthographicProjection::default_2d()
+        }),
+    ));
+
+    commands.spawn((
+            Sprite {
+                image: asset_serv.load("hud/hud_bg.png"),
+                custom_size: Some(Vec2::new(900.0, 448.0)),
+                ..default()
+            },
+            Transform::from_xyz(0.0, 0.0, -100.0),
+    ));
+
+    let texture = asset_serv.load("characters/character.png");
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 3, None, None);
+    let texture_atlas_layout = texture_atlas_layout.add(layout);
+
+    commands.spawn((
+        Sprite::from_atlas_image(texture, TextureAtlas { layout: texture_atlas_layout, index: 0}),
+        Transform::from_xyz(0., 0., 0.),
+        Player { 
+            last_hit: 0.0, 
+            shoot_timer: Timer::from_seconds(0.1, TimerMode::Repeating), 
+            shoot_from_left: false,
+            shoot_timer_fire: Timer::from_seconds(0.5, TimerMode::Repeating), 
+            nbr_bombs: 0,
+            animation_timer: Timer::from_seconds(0.2, TimerMode::Repeating), 
+        },
+        Health { hp: PLAYER_HP, ..default()},
+        Damage { damage: PLAYER_DAMAGE}
+    ));
+
+    commands.spawn((
+        Text::new(format!("HP:{:.0}", PLAYER_HP)), 
+        TextFont {
+            font_size: 32.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 750.0),
+            ..default()
+        },
+        PlayerHealthText, 
+    ));
+
+    commands.spawn((
+        Text::new("Power:10"), 
+        TextFont {
+            font_size: 32.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0 + 30.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 750.0),
+            ..default()
+        },
+        PlayerDamageText, 
+    ));
+
+    commands.spawn((
+        Text::new("Bombs:0"), 
+        TextFont {
+            font_size: 32.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0 + 60.0),
+            left: Val::Px(GAME_HEIGHT/2.0 + 750.0),
+            ..default()
+        },
+        PlayerBombsText, 
+    ));
+
+    commands.spawn((
+        Text::new("Touhou-1"), 
+        TextFont {
+            font_size: 40.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0 + 30.0),
+            left: Val::Px(0.0),
+            ..default()
+        },
+    ));
+}
 
 fn play_music_theme(
     asset_serv: Res<AssetServer>, 
@@ -252,3 +374,15 @@ fn setup_assets(mut commands: Commands, asset_serv: Res<AssetServer>) {
         shoot_fire_sound: asset_serv.load("sounds/fire_projectile.ogg"),
     });
 }
+
+fn cleanup_and_restart(
+    mut commands: Commands,
+    entities_query: Query<Entity, Without<Window>>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    for entity in &entities_query {
+        commands.entity(entity).despawn();
+    }
+    next_state.set(GameState::Running);
+}
+

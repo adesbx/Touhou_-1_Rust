@@ -7,6 +7,7 @@ pub struct BackgroundPlugin;
 impl Plugin for BackgroundPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_background)
+           .add_systems(OnExit(GameState::Reset), setup_background)
            .add_systems(Update, scroll_background);
     }
 }

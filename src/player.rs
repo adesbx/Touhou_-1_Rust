@@ -16,8 +16,9 @@ impl Plugin for PlayerPlugin {
             use_bombs,
             change_color_on_hit, 
             update_player_sprites, 
-            update_explosion_sprite
-        ));
+            update_explosion_sprite,
+            check_if_dead
+        ).run_if(in_state(GameState::Running).or(in_state(GameState::Paused))));
     }
 }
 
@@ -240,5 +241,14 @@ fn update_explosion_sprite(
                 atlas.index += 1;
             }
         }
+    }
+}
+
+fn check_if_dead(
+    mut next_state: ResMut<NextState<GameState>>,
+    player_query: Query<Entity, With<Player>>,
+) {
+    if player_query.is_empty() {
+        next_state.set(GameState::Reset);
     }
 }
