@@ -117,7 +117,7 @@ fn check_collison_power_up(
                 commands.entity(power_entity).despawn();
                 
                 // ICI pour changer la vitesse de tir du joueur
-                let new_delay = (0.1 - (damage_player.damage - 10.0) * 0.0005).max(0.01);
+                let new_delay = (0.1 - (damage_player.damage - 10.0) * 0.0001).max(0.03);
                 player.shoot_timer.set_duration(Duration::from_secs_f32(new_delay));
 
                 break;
