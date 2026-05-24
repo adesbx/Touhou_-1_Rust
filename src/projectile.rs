@@ -473,6 +473,7 @@ pub fn update_vortex(
                 let start_angle = (i as f32) * (std::f32::consts::TAU / num_fragments as f32);
                 
                 commands.spawn((
+                    //TODO : Faire grossir légérement cette image
                     Sprite::from_image(asset_server.load("projectiles/projectile_vortex_fragment.png")),
                     Transform::from_translation(transform.translation),
                     VortexFragment {
@@ -484,7 +485,7 @@ pub fn update_vortex(
                     },
                     EnemyProjectile {
                         direction: Vec2::new(0.0, -1.0),
-                        speed: BOSS_VORTEX_SPEED
+                        speed: BOSS_VORTEX_FRAGMENT_SPEED
                     },
                 ));
             }

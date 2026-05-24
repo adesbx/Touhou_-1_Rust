@@ -194,7 +194,11 @@ fn basic_shoot_projectiles(
             let mut rng = rand::thread_rng();
 
             commands.spawn((
-                Sprite::from_image(asset_serv.load("projectiles/projectile_vortex.png")),
+                Sprite {
+                    image: asset_serv.load("projectiles/projectile_vortex.png"),
+                    color: Color::srgb(0.2, 0.6, 0.9),
+                    ..default()
+                },
                 Transform::from_translation(transform.translation), 
                 EnemyProjectile {
                     direction: Vec2::new(0.0, -1.0),
