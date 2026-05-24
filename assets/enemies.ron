@@ -1,20 +1,20 @@
 (
     pre_boss: [
         // Direction = 1.0 (oscillation douce)
-        (spawn_time: 1.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 1.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 2.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 2.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 3.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 3.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 1.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 1.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 2.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 2.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 3.0, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 3.5, pos: (-130.0, 240.0), direction: 1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
 
         // Direction = -1.0 pour une oscillation en miroir.
-        (spawn_time: 5.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 6.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 6.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 7.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 7.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
-        (spawn_time: 8.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 100.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 5.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 6.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 6.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 7.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 7.5, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
+        (spawn_time: 8.0, pos: (130.0, 240.0), direction: -1.0, hp: ( hp: 50.0 ), variety: 'c', pattern: SineWave),
 
         // Ils partent de la gauche et glissent vers la droite (direction: 1.0)
         (spawn_time: 12.0, pos: (-100.0, 240.0), direction: 1.0, hp: ( hp: 150.0 ), variety: 'a', pattern: Arc(60.0)),
@@ -57,26 +57,26 @@
 
         // CROIX
         // --- PARTIE 1 : LE POTEAU VERTICAL (Ligne centrale) ---
-        (spawn_time: 40.0, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.15, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.30, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.45, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight), 
+        (spawn_time: 40.0, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.15, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.30, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight), 
 
         // 2. La barre horizontale (Spawn simultané à 40.45s)
-        (spawn_time: 40.45, pos: (-30.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.45, pos: (-20.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.45, pos: (-10.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.45, pos: (10.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.45, pos: (20.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.45, pos: (30.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (-30.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (-20.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (-10.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (10.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (20.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.45, pos: (30.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
 
         // 3. Haut du poteau (On rajoute 3 chérubins APRÈS la barre pour fermer la croix en haut)
-        (spawn_time: 40.60, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.75, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 40.90, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 41.05, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 41.20, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
-        (spawn_time: 41.35, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 100.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.60, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.75, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 40.90, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 41.05, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 41.20, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
+        (spawn_time: 41.35, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 70.0), variety: 'c', pattern: Straight),
     ],
     boss: (spawn_time: 15.00, pos: (0.0, 240.0), direction: 1.0, hp: (hp: 2000.0), variety: 'b', pattern: Straight),
     post_boss: [

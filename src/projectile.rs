@@ -54,11 +54,11 @@ fn shoot_projectile(
             *last_sound_time = clock.watch.elapsed_secs();
         }
 
-        if damage_player.damage < 75.0 {
+        if damage_player.damage < 150.0 {
             first_power_shooting(&clock, &mut commands, &asset_serv, base_x, base_y, z);
-        } else if damage_player.damage < 150.0 {
+        } else if damage_player.damage < 300.0 {
             second_power_shooting(&clock, &mut commands, &asset_serv, base_x, base_y, z);
-        } else if damage_player.damage < 250.0 {
+        } else if damage_player.damage < 450.0 {
             third_power_shooting(&clock, &mut commands, &asset_serv, &assets, player, base_x, base_y, z);
         } else {
             fourth_power_shooting(&clock, &mut commands, &asset_serv, &assets, player, base_x, base_y, z);
