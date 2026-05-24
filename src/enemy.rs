@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use rand::Rng;
 use crate::components::*;
 use crate::constants::*;
+use bevy::audio::{AudioSink, Volume};
 
 pub struct EnemyPlugin;
 
@@ -134,6 +135,7 @@ fn check_collison_enemies(
 fn check_health(
     mut commands: Commands,
     asset_serv: Res<AssetServer>,
+    assets: Res<GameAssets>,
     mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
     mut health_query: Query<(Entity, &mut Health, &Transform), With<Health>>,
 ) {
@@ -153,6 +155,15 @@ fn check_health(
             ));
 
             commands.entity(entity).despawn();
+
+            commands.spawn((
+                AudioPlayer::new(assets.enemy_dying.clone()),
+                PlaybackSettings {
+                    mode: bevy::audio::PlaybackMode::Despawn,
+                    volume: Volume::Decibels(-4.0),
+                    ..default()
+                },
+            ));
         }
     }
 }

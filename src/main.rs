@@ -371,6 +371,7 @@ fn setup_assets(mut commands: Commands, asset_serv: Res<AssetServer>) {
     commands.insert_resource(GameAssets {
         shoot_sound: asset_serv.load("sounds/player_shooting.ogg"),
         explosion_sound: asset_serv.load("sounds/explosion.ogg"),
+        enemy_dying: asset_serv.load("sounds/enemy_dying.ogg"),
         cross_electricity: asset_serv.load("sounds/cross_electricity.ogg"),
         vortex_explosion: asset_serv.load("sounds/vortex_explosion.ogg"),
         shoot_fire_sound: asset_serv.load("sounds/fire_projectile.ogg"),

@@ -243,6 +243,7 @@ pub struct HitBox;
 pub struct GameAssets {
     pub shoot_sound: Handle<AudioSource>,
     pub explosion_sound: Handle<AudioSource>,
+    pub enemy_dying: Handle<AudioSource>,
     pub cross_electricity: Handle<AudioSource>,
     pub vortex_explosion: Handle<AudioSource>,
     pub shoot_fire_sound: Handle<AudioSource>,
