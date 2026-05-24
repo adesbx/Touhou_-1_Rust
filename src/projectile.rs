@@ -94,6 +94,7 @@ fn second_power_shooting(
     base_z: f32
 ) {
     let texture = asset_serv.load("projectiles/projectile.png");
+    let angle = 0.05;
     commands.spawn((
         Sprite::from_image(texture.clone()),
         Transform::from_xyz(base_x, base_y, base_z),
@@ -103,13 +104,13 @@ fn second_power_shooting(
     commands.spawn((
         Sprite::from_image(texture.clone()),
         Transform::from_xyz(base_x, base_y, base_z),
-        Projectile { direction: Vec2::new(-0.25, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
+        Projectile { direction: Vec2::new(-angle, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
     ));
 
     commands.spawn((
         Sprite::from_image(texture),
         Transform::from_xyz(base_x, base_y, base_z),
-        Projectile { direction: Vec2::new(0.25, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
+        Projectile { direction: Vec2::new(angle, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
     ));
 }
 
