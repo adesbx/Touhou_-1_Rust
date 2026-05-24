@@ -19,6 +19,7 @@ Afin de donner vie aux affrontements, le projet intègre les bruitages externes 
 * **Bruit de tir Arme Vortex (Espace) :** [Vortex Shoot - D4XX (Freesound)](https://freesound.org/people/D4XX/sounds/617043/)
 * **Bruit de tir Ennemi classique :** [Robotic Shoot - Pixabay](https://pixabay.com/fr/sound-effects/films-et-effets-sp%c3%a9ciaux-robotic-shoot-138432/)
 * **Bruit d'explosion (Bombe) :** [Bomb Explosion - Anomaex (Freesound)](https://freesound.org/people/Anomaex/sounds/490266/)
+* **Bruit quand un ennemi meurs:** [8Bit Explosion - Duskbreaker](https://freesound.org/people/Duskbreaker/sounds/641486/)
 
 ## 🚀 Comment lancer le jeu
 
