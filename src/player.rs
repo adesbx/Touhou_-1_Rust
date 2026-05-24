@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::sprite_render::Material2d;
 use std::time::Duration;
 use crate::components::*;
 use crate::constants::*;
@@ -17,7 +18,8 @@ impl Plugin for PlayerPlugin {
             change_color_on_hit, 
             update_player_sprites, 
             update_explosion_sprite,
-            check_if_dead
+            check_if_dead,
+            draw_hitbox
         ).run_if(in_state(GameState::Running).or(in_state(GameState::Paused))));
     }
 }
@@ -110,7 +112,7 @@ fn check_collison_power_up(
             let p1 = power_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
             let distance: f32 = p1.distance(p2);
-            if distance < (POWER_UP_SIZE + PLAYER_SIZE) / 2.0 {                
+            if distance < (POWER_UP_SIZE + PLAYER_HIT_BOX) / 2.0 {                
                 damage_player.damage += PLAYER_DAMAGE;
                 commands.entity(power_entity).despawn();
                 
@@ -250,5 +252,36 @@ fn check_if_dead(
 ) {
     if player_query.is_empty() {
         next_state.set(GameState::Reset);
+    }
+}
+
+fn draw_hitbox(
+    mut commands: Commands,
+    entity: Single<Entity, With<Player>>,
+    hitbox_query: Query<Entity, With<HitBox>>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+
+    if keyboard.just_pressed(KeyCode::KeyY) {
+        if hitbox_query.is_empty(){
+            commands.entity(entity.entity()).with_children(|parent| {
+
+                parent.spawn((
+                    Mesh2d(
+                        meshes.add(Rectangle::new(PLAYER_HIT_BOX, PLAYER_HIT_BOX))
+                    ),
+                    MeshMaterial2d(
+                        materials.add(ColorMaterial::from_color(Color::WHITE))
+                    ),
+                    HitBox
+                ));
+            });
+        } else {
+            for hitbox_entity in hitbox_query {
+                commands.entity(hitbox_entity).despawn();
+            }
+        }
     }
 }

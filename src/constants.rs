@@ -1,8 +1,9 @@
 // joueur
-pub const PLAYER_DAMAGE: f32 = 50.0;
+pub const PLAYER_DAMAGE: f32 = 10.0;
 pub const PLAYER_HP: f32 = 3.0;
 pub const PLAYER_SPEED: f32 = 200.0;
 pub const PLAYER_SIZE: f32 = 32.0; // taille du sprite du joueur
+pub const PLAYER_HIT_BOX: f32 = 22.0; // taille du sprite du joueur
 pub const PROJECTILE_SPEED: f32 = 400.0;
 pub const PROJECTILE_SIZE: f32 = 16.0; // taille du sprite projectile
 pub const FIRE_PROJECTILE_SIZE: f32 = 20.0; // taille du sprite projectile

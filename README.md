@@ -52,6 +52,7 @@ Le jeu utilise une configuration classique de type clavier "ZQSD + Action".
 | **K** | **Tirer** | Lance des projectiles en ligne droite |
 | **L** | **Bombe** | Utilise une bombe pour tuer les ennemis proches |
 | **T** | **Mute Musique** | Coupe / Active la musique de fond à tout moment |
+| **Y** | **Voir la Hitbox** | Active ou Désactive le carré symbolisant la hitbox du joueur |
 
 ---
 

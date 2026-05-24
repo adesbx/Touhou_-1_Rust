@@ -354,7 +354,7 @@ fn check_collison_projectile_player(
             let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
             let distance = p1.distance(p2);
-            if distance < (CROSS_PROJECTILE_SIZE + PLAYER_SIZE) / 2.0 {                
+            if distance < (CROSS_PROJECTILE_SIZE + PLAYER_HIT_BOX) / 2.0 {                
                 commands.entity(projectile_entity).despawn();
                 health.hp -= 1.0;
                 player.last_hit = clock.watch.elapsed_secs();
@@ -376,12 +376,12 @@ fn check_collison_projectile_player(
                 size = BOSS_SIZE;
             }
 
-            if distance < (size + PLAYER_SIZE) / 2.0 && enemy.variety != 'b' {                
+            if distance < (size + PLAYER_HIT_BOX) / 2.0 && enemy.variety != 'b' {                
                 commands.entity(enemy_entity).despawn();
                 health.hp -= 1.0;
                 player.last_hit = clock.watch.elapsed_secs();
                 break;
-            } else if distance < (size + PLAYER_SIZE) / 2.0 && enemy.variety == 'b'{
+            } else if distance < (size + PLAYER_HIT_BOX) / 2.0 && enemy.variety == 'b'{
                 health.hp -= 1.0;
                 player.last_hit = clock.watch.elapsed_secs();
                 break;

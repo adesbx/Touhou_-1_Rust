@@ -236,6 +236,9 @@ pub struct GameClock {
     pub watch: Stopwatch,
 }
 
+#[derive(Component)]
+pub struct HitBox;
+
 #[derive(Resource)]
 pub struct GameAssets {
     pub shoot_sound: Handle<AudioSource>,
