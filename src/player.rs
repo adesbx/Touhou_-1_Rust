@@ -126,6 +126,7 @@ fn check_collison_power_up(
 
 fn use_bombs(
     mut commands: Commands,
+    time:  Res<Time>,
     asset_serv: Res<AssetServer>,
     assets: Res<GameAssets>,
     mut player_query: Single<(&Transform, &mut Player), With<Player>>,
@@ -133,54 +134,54 @@ fn use_bombs(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-
     let (transform, player) = &mut *player_query; // possiblement sale voir pour faire autrement
-
-    if keyboard.just_pressed(KeyCode::KeyL) && player.nbr_bombs > 0 {
-        let player_pos = transform.translation.truncate();
-        let bomb_radius = 180.0;
-        let bomb_damage = 200.0;
-        for (enemy_transform, mut enemy_health) in &mut enemy_query {
-            let enemy_pos = enemy_transform.translation.truncate();
-            if player_pos.distance(enemy_pos) < bomb_radius {
-                enemy_health.hp -= bomb_damage;
-            
+    player.bomb_timer.tick(time.delta());
+    if player.bomb_timer.is_finished() {
+        if keyboard.just_pressed(KeyCode::KeyL) && player.nbr_bombs > 0 {
+            let player_pos = transform.translation.truncate();
+            let bomb_radius = 180.0;
+            let bomb_damage = 200.0;
+            for (enemy_transform, mut enemy_health) in &mut enemy_query {
+                let enemy_pos = enemy_transform.translation.truncate();
+                if player_pos.distance(enemy_pos) < bomb_radius {
+                    enemy_health.hp -= bomb_damage;
+                
+                }
             }
+
+            let texture: Handle<_> = asset_serv.load("projectiles/explosion_ring.png");
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 2, 3, None, None);
+            let texture_atlas_layout = texture_atlas_layout.add(layout);
+            
+            commands.spawn((
+                Sprite {
+                    image: texture,
+                    texture_atlas: Some(TextureAtlas {
+                        layout: texture_atlas_layout,
+                        index: 0,
+                    }),
+                    custom_size: Some(Vec2::new(128.0, 128.0)),
+                    ..default()
+                },
+                Transform::from_translation(transform.translation),
+                DespawnTimer {
+                    timer: Timer::from_seconds(0.5, TimerMode::Once),
+                    animation_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+                },
+            ));
+
+            commands.spawn((
+                AudioPlayer::new(assets.explosion_sound.clone()),
+                PlaybackSettings {
+                    mode: bevy::audio::PlaybackMode::Despawn,
+                    volume: Volume::Decibels(-5.0),
+                    ..default()
+                },
+            ));
+            player.nbr_bombs -= 1;
+            player.bomb_timer.reset();
         }
-
-        let texture: Handle<_> = asset_serv.load("projectiles/explosion_ring.png");
-        let layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 2, 3, None, None);
-        let texture_atlas_layout = texture_atlas_layout.add(layout);
-        
-        commands.spawn((
-            Sprite {
-                image: texture,
-                texture_atlas: Some(TextureAtlas {
-                    layout: texture_atlas_layout,
-                    index: 0,
-                }),
-                custom_size: Some(Vec2::new(128.0, 128.0)),
-                ..default()
-            },
-            Transform::from_translation(transform.translation),
-            DespawnTimer {
-                timer: Timer::from_seconds(0.5, TimerMode::Once),
-                animation_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
-            },
-        ));
-
-        commands.spawn((
-            AudioPlayer::new(assets.explosion_sound.clone()),
-            PlaybackSettings {
-                mode: bevy::audio::PlaybackMode::Despawn,
-                volume: Volume::Decibels(-5.0),
-                ..default()
-            },
-        ));
-
-        player.nbr_bombs -= 1;
     }
-
 }
 
 fn change_color_on_hit(

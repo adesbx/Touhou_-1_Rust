@@ -40,6 +40,7 @@ pub struct Player {
     pub shoot_timer: Timer,
     pub shoot_timer_fire: Timer,
     pub shoot_from_left: bool,
+    pub bomb_timer: Timer,
     pub nbr_bombs: i32,
     pub animation_timer: Timer,
 }
