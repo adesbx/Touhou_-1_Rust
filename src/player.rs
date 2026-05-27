@@ -139,13 +139,10 @@ fn use_bombs(
     if player.bomb_timer.is_finished() {
         if keyboard.just_pressed(KeyCode::KeyL) && player.nbr_bombs > 0 {
             let player_pos = transform.translation.truncate();
-            let bomb_radius = 180.0;
-            let bomb_damage = 200.0;
             for (enemy_transform, mut enemy_health) in &mut enemy_query {
                 let enemy_pos = enemy_transform.translation.truncate();
-                if player_pos.distance(enemy_pos) < bomb_radius {
-                    enemy_health.hp -= bomb_damage;
-                
+                if player_pos.distance(enemy_pos) < BOMB_RANGE {
+                    enemy_health.hp -= BOMB_DAMAGE;
                 }
             }
 

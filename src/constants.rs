@@ -25,6 +25,8 @@ pub const BOSS_VORTEX_FRAGMENT_SPEED: f32 = 75.0;
 // item
 pub const POWER_UP_SIZE: f32 = 20.0; // taille du sprite power up
 pub const BOMB_SIZE: f32 = 24.0; // taille du sprite bombe
+pub const BOMB_RANGE: f32 = 100.0;
+pub const BOMB_DAMAGE: f32 = 100.0;
 
 // jeu
 pub const GAME_WIDTH: f32 = 384.0;
