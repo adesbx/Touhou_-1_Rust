@@ -127,6 +127,7 @@ fn check_collison_power_up(
 fn use_bombs(
     mut commands: Commands,
     time:  Res<Time>,
+    clock: ResMut<GameClock>,
     asset_serv: Res<AssetServer>,
     assets: Res<GameAssets>,
     mut player_query: Single<(&Transform, &mut Player), With<Player>>,
@@ -160,7 +161,11 @@ fn use_bombs(
                     custom_size: Some(Vec2::new(128.0, 128.0)),
                     ..default()
                 },
-                Transform::from_translation(transform.translation),
+                Transform {
+                    translation: transform.translation,
+                    rotation: Quat::from_rotation_z(clock.watch.elapsed_secs()),
+                    ..default()
+                },
                 DespawnTimer {
                     timer: Timer::from_seconds(0.5, TimerMode::Once),
                     animation_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
