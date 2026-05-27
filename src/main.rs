@@ -218,7 +218,7 @@ fn simple_restart(
             shoot_timer_fire: Timer::from_seconds(0.5, TimerMode::Repeating), 
             nbr_bombs: 0,
             animation_timer: Timer::from_seconds(0.2, TimerMode::Repeating), 
-            bomb_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
+            bomb_timer: Timer::from_seconds(4.0, TimerMode::Once), 
         },
         Health { hp: PLAYER_HP, ..default()},
         Damage { damage: PLAYER_DAMAGE}

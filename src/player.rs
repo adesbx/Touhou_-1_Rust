@@ -147,7 +147,7 @@ fn use_bombs(
             }
 
             let texture: Handle<_> = asset_serv.load("projectiles/explosion_ring.png");
-            let layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 2, 3, None, None);
+            let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 3, None, None);
             let texture_atlas_layout = texture_atlas_layout.add(layout);
             
             commands.spawn((
