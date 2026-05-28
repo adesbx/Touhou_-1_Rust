@@ -9,8 +9,10 @@ impl Plugin for PausedPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (
             switch_pause,
-            display_pause_menu
         ));
+
+        app.add_systems(OnEnter(GameState::Paused), display_pause_menu);
+        app.add_systems(OnExit(GameState::Paused), remove_pause_menu);
     }
 }
 
@@ -30,20 +32,23 @@ fn switch_pause(
 
 fn display_pause_menu(
     mut commands: Commands,
-    state: Res<State<GameState>>,
-    pause_menu: Single<Entity, With<PauseMenu>>,
 ) {
-    if state.get() == &GameState::Running {
-        commands.spawn((
+    commands.spawn((
         PauseMenu,
         Sprite {
-            color: Color::srgb(0.2, 0.2, 0.2),
-            custom_size: Some(Vec2::new(400.0, 250.0)),
+            color: Color::srgb(0.2, 0.2, 0.8),
+            custom_size: Some(Vec2::new(400.0, 400.0)),
             ..default()
         },
-        Transform::from_xyz(0.0, 0.0, 10000000000000.0),
-        ));
-    } else {
-        commands.entity(pause_menu.entity()).despawn();
+        Transform::from_xyz(0.0 ,0.0, 900.0),
+    ));
+}
+
+fn remove_pause_menu(
+    mut commands: Commands, 
+    pause_menu: Query<Entity, With<PauseMenu>>,
+) {
+    for entity in pause_menu{
+        commands.entity(entity).despawn();
     }
 }
