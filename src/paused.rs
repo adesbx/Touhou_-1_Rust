@@ -1,4 +1,3 @@
-use bevy::ecs::relationship::RelationshipSourceCollection;
 use bevy::prelude::*;
 use crate::components::*;
 use crate::constants::*;
@@ -35,13 +34,25 @@ fn display_pause_menu(
 ) {
     commands.spawn((
         PauseMenu,
-        Sprite {
-            color: Color::srgb(0.2, 0.2, 0.8),
-            custom_size: Some(Vec2::new(400.0, 400.0)),
+        Node {
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            width: percent(100),
+            height: percent(100),
             ..default()
         },
         Transform::from_xyz(0.0 ,0.0, 900.0),
-    ));
+            BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.0)),
+    )).with_children(|parent|{
+        parent.spawn((
+            Node {
+                width: percent(40),
+                height: percent(60),
+                ..default()
+            },
+            BackgroundColor(Color::srgb(0.2, 0.4, 0.8)),
+        ));
+    });
 }
 
 fn remove_pause_menu(
