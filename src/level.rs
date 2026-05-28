@@ -119,7 +119,7 @@ pub fn spawn_from_level_data(
         }
 
         if manager.current_phase == GamePhase::PostBoss && manager.next_index >= current_waves.len() && enemy_query.iter().count() == 0 {
-            commands.set_state(GameState::Paused);
+            commands.set_state(GameState::Discussion);
             manager.current_phase = GamePhase::Dialogue;
 
             for entity in projectile_query{

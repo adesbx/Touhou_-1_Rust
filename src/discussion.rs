@@ -4,19 +4,19 @@ use crate::components::*;
 use crate::constants::*;
 use bevy::asset::{io::Reader, AssetLoader, LoadContext};
 
-pub struct PausePlugin;
+pub struct DiscussionPlugin;
 
-impl Plugin for PausePlugin {
+impl Plugin for DiscussionPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (
             spawn_dialog_box,
-            start_discution,
+            start_discussion,
             spawn_heroes,
-        ).run_if(in_state(GameState::Paused)));
+        ).run_if(in_state(GameState::Discussion)));
     }
 }
 
-pub fn start_discution(
+pub fn start_discussion(
     mut commands: Commands,
     dialogue_handle: Res<DialogueHandle>, 
     dialogue_assets: Res<Assets<Dialogue>>,

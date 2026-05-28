@@ -19,7 +19,7 @@ impl Plugin for PlayerPlugin {
             update_explosion_sprite,
             check_if_dead,
             draw_hitbox
-        ).run_if(in_state(GameState::Running).or(in_state(GameState::Paused))));
+        ).run_if(in_state(GameState::Running).or(in_state(GameState::Discussion))));
     }
 }
 

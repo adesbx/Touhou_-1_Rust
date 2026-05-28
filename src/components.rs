@@ -179,6 +179,7 @@ pub struct LevelManager {
 pub enum GameState {
     #[default]
     Running,
+    Discussion,
     Paused,
     Reset
 }
@@ -254,6 +255,9 @@ pub struct GameAssets {
 
 #[derive(Component)]
 pub struct MusicPlayed;
+
+#[derive(Component)]
+pub struct PauseMenu;
 
 #[derive(Resource, Default)]
 pub struct AudioSettings {

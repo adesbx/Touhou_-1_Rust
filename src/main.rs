@@ -11,7 +11,8 @@ mod projectile;
 mod level;
 mod ui;
 mod background;
-mod pause;
+mod discussion;
+mod paused;
 
 use crate::components::*;
 use crate::constants::*;
@@ -39,10 +40,11 @@ fn main() {
         .add_plugins(level::LevelPlugin)
         .add_plugins(ui::UiPlugin)
         .add_plugins(background::BackgroundPlugin)
-        .add_plugins(pause::PausePlugin)
+        .add_plugins(discussion::DiscussionPlugin)
+        .add_plugins(paused::PausedPlugin)
         .add_systems(Startup, (setup, setup_assets))// pour le premier démarage
         .add_systems(Update, 
-            (play_music_theme, toggle_mute, tick_game_clock).run_if(in_state(GameState::Running).or(in_state(GameState::Paused)))
+            (play_music_theme, toggle_mute, tick_game_clock).run_if(in_state(GameState::Running).or(in_state(GameState::Discussion)))
         )
         .add_systems(OnEnter(GameState::Reset), cleanup_and_restart)
         .add_systems(OnExit(GameState::Reset), simple_restart)
