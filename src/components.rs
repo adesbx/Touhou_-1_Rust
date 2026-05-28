@@ -60,6 +60,7 @@ pub struct Projectile {
     pub speed: f32,
     pub variety: char,
     pub spawn_time: f32,
+    pub size: f32
 }
 
 #[derive(Component)]

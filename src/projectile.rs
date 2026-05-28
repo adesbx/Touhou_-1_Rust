@@ -81,7 +81,13 @@ fn first_power_shooting(
             base_y,
             base_z
         ),
-        Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
+        Projectile { 
+            direction: Vec2::new(0.0, 1.0), 
+            speed: PROJECTILE_SPEED, 
+            variety: 'b', 
+            spawn_time: clock.watch.elapsed_secs(),
+            size: PROJECTILE_SIZE
+        },
     ));
 }
 
@@ -98,19 +104,37 @@ fn second_power_shooting(
     commands.spawn((
         Sprite::from_image(texture.clone()),
         Transform::from_xyz(base_x, base_y, base_z),
-        Projectile { direction: Vec2::new(0.0, 1.0), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs(),},
+        Projectile { 
+            direction: Vec2::new(0.0, 1.0), 
+            speed: PROJECTILE_SPEED, 
+            variety: 'b', 
+            spawn_time: clock.watch.elapsed_secs(),
+            size: PROJECTILE_SIZE
+        },
     ));
 
     commands.spawn((
         Sprite::from_image(texture.clone()),
         Transform::from_xyz(base_x, base_y, base_z),
-        Projectile { direction: Vec2::new(-angle, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
+        Projectile { 
+            direction: Vec2::new(-angle, 1.0).normalize(), 
+            speed: PROJECTILE_SPEED, 
+            variety: 'b', 
+            spawn_time: clock.watch.elapsed_secs(),
+            size: PROJECTILE_SIZE
+        },
     ));
 
     commands.spawn((
         Sprite::from_image(texture),
         Transform::from_xyz(base_x, base_y, base_z),
-        Projectile { direction: Vec2::new(angle, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'b', spawn_time: clock.watch.elapsed_secs()},
+        Projectile { 
+            direction: Vec2::new(angle, 1.0).normalize(), 
+            speed: PROJECTILE_SPEED, 
+            variety: 'b', 
+            spawn_time: clock.watch.elapsed_secs(),
+            size: PROJECTILE_SIZE
+        },
     ));
 }
 
@@ -144,7 +168,13 @@ fn third_power_shooting(
                     ..default()
                 },
                 Transform::from_xyz(base_x-10.0, base_y, base_z),
-                Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: clock.watch.elapsed_secs()},
+                Projectile { 
+                    direction: Vec2::new(1.0, 1.0).normalize(), 
+                    speed: PROJECTILE_SPEED, 
+                    variety: 'f', 
+                    spawn_time: clock.watch.elapsed_secs(),
+                    size: FIRE_PROJECTILE_SIZE
+                },
             ));
         } else {
             commands.spawn((
@@ -154,7 +184,13 @@ fn third_power_shooting(
                     ..default()
                 },
                 Transform::from_xyz(base_x+10.0, base_y, base_z),
-                Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 'f', spawn_time: clock.watch.elapsed_secs()},
+                Projectile { 
+                    direction: Vec2::new(-1.0, 1.0).normalize(), 
+                    speed: PROJECTILE_SPEED, 
+                    variety: 'f', 
+                    spawn_time: clock.watch.elapsed_secs(),
+                    size: FIRE_PROJECTILE_SIZE
+                },
             ));
         }
         player.shoot_from_left = !player.shoot_from_left
@@ -192,7 +228,13 @@ fn fourth_power_shooting(
                     ..default()
                 },
                 Transform::from_xyz(base_x-10.0, base_y, base_z),
-                Projectile { direction: Vec2::new(1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: clock.watch.elapsed_secs()},
+                Projectile { 
+                    direction: Vec2::new(1.0, 1.0).normalize(), 
+                    speed: PROJECTILE_SPEED, 
+                    variety: 't', 
+                    spawn_time: clock.watch.elapsed_secs(),
+                    size: FIRE_PROJECTILE_SIZE,
+                }
             ));
         commands.spawn((
             Sprite {
@@ -201,7 +243,13 @@ fn fourth_power_shooting(
                 ..default()
             },
             Transform::from_xyz(base_x+10.0, base_y, base_z),
-            Projectile { direction: Vec2::new(-1.0, 1.0).normalize(), speed: PROJECTILE_SPEED, variety: 't', spawn_time: clock.watch.elapsed_secs()},
+            Projectile { 
+                direction: Vec2::new(-1.0, 1.0).normalize(), 
+                speed: PROJECTILE_SPEED, 
+                variety: 't', 
+                spawn_time: clock.watch.elapsed_secs(),
+                size: FIRE_PROJECTILE_SIZE,
+            },
         ));
     }
 }
@@ -218,7 +266,7 @@ fn move_projectile(
     for (mut transform, projectile) in &mut projectile_query {
 
         if projectile.variety == 'b' {// projectile basique fonce dans sa direction
-            let movement = projectile.direction.normalize() * projectile.speed * dt;
+            let movement: Vec2 = projectile.direction.normalize() * projectile.speed * dt;
             transform.translation += movement.extend(0.0);
         } else if projectile.variety == 'f' { // feu basique
             let local_time: f32 = elapsed - projectile.spawn_time;
