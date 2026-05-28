@@ -279,6 +279,7 @@ pub fn move_diagonal_projectiles(
                 EnemyProjectile {
                     speed: 0.0,
                     direction: Vec2::ZERO,
+                    size: BOSS_PROJECTILE_DIAG
                 },
                 DiagonalMovementDespawner {
                     spawn_time: now,
@@ -345,17 +346,17 @@ fn confine_projectile_movement(
 fn check_collison_projectile_player(
     clock: ResMut<GameClock>,
     mut commands: Commands,
-    enemy_projectile_query: Query<(Entity, &Transform), With<EnemyProjectile>>,
+    enemy_projectile_query: Query<(Entity, &Transform, &EnemyProjectile), With<EnemyProjectile>>,
     enemy_query: Query<(Entity, &Transform, &Enemy), With<Enemy>>,
     mut player_query: Single<(&Transform, &mut Health, &mut Player), With<Player>>,
 ) {
     let (transform, health, player) = &mut *player_query; // possiblement sale voir pour faire autrement
     if clock.watch.elapsed_secs() - player.last_hit > INVINCIBILITY_TIME  {
-        for (projectile_entity, projectile_transform) in &enemy_projectile_query {
+        for (projectile_entity, projectile_transform, projectile) in &enemy_projectile_query {
             let p1 = projectile_transform.translation.truncate(); // Vec3 -> Vec2
             let p2 = transform.translation.truncate();
             let distance = p1.distance(p2);
-            if distance < (CROSS_PROJECTILE_SIZE + PLAYER_HIT_BOX) / 2.0 {                
+            if distance < (projectile.size + PLAYER_HIT_BOX) / 2.0 {                
                 commands.entity(projectile_entity).despawn();
                 health.hp -= 1.0;
                 player.last_hit = clock.watch.elapsed_secs();
@@ -423,7 +424,8 @@ fn enemies_shoot_projectiles(
                 Transform::from_translation(transform.translation),
                 EnemyProjectile{
                     direction: direction,
-                    speed: CROSS_PROJECTILE_SPEED
+                    speed: CROSS_PROJECTILE_SPEED,
+                    size: CROSS_PROJECTILE_SIZE
                 },
             ));
           }
@@ -485,7 +487,8 @@ pub fn update_vortex(
                     },
                     EnemyProjectile {
                         direction: Vec2::new(0.0, -1.0),
-                        speed: BOSS_VORTEX_FRAGMENT_SPEED
+                        speed: BOSS_VORTEX_FRAGMENT_SPEED,
+                        size: BOSS_VORTEX_FRAGMENT_SIZE
                     },
                 ));
             }

@@ -21,6 +21,10 @@ pub const BOSS_HP: f32 = 4000.0;
 pub const BOSS_SPEED: f32 = 300.0;
 pub const BOSS_VORTEX_SPEED: f32 = 200.0;
 pub const BOSS_VORTEX_FRAGMENT_SPEED: f32 = 75.0;
+pub const BOSS_VORTEX_SIZE: f32 = 16.0;
+pub const BOSS_VORTEX_FRAGMENT_SIZE: f32 = 14.0;
+pub const BOSS_CROSS_ELECTRISED: f32 = 16.0;
+pub const BOSS_PROJECTILE_DIAG: f32 = 16.0;
 
 // item
 pub const POWER_UP_SIZE: f32 = 20.0; // taille du sprite power up

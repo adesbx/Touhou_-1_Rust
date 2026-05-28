@@ -89,6 +89,7 @@ pub struct BoomerangProjectile {
 pub struct EnemyProjectile {
     pub direction: Vec2,
     pub speed: f32,
+    pub size: f32,
 }
 
 #[derive(Component)]

@@ -203,6 +203,7 @@ fn basic_shoot_projectiles(
                 EnemyProjectile {
                     direction: Vec2::new(0.0, -1.0),
                     speed: BOSS_VORTEX_SPEED,
+                    size: BOSS_VORTEX_SIZE
                 },
                 BasicProjectileBoss {
                     start_pos: transform.translation.truncate(),
@@ -218,6 +219,7 @@ fn basic_shoot_projectiles(
                     EnemyProjectile {
                         direction : Vec2::new(0.19*i as f32 , -1.0),
                         speed: BOSS_VORTEX_SPEED,
+                        size: BOSS_VORTEX_SIZE
                     },
                 ));
             }
@@ -230,6 +232,7 @@ fn basic_shoot_projectiles(
                     EnemyProjectile {
                         direction : Vec2::new(-0.19*i as f32 , -1.0),
                         speed: BOSS_VORTEX_SPEED,
+                        size: BOSS_VORTEX_SIZE
                     },
                 ));
             }
@@ -284,6 +287,7 @@ pub fn shoot_boss_rain(
                     EnemyProjectile {
                         direction: Vec2::new(0.0, -1.0), 
                         speed: speed,
+                        size: BOSS_CROSS_ELECTRISED
                     },
                 ));
             }
@@ -371,7 +375,11 @@ pub fn shoot_boomerang_attack(
                             start_time: now,
                             custom_distance: wave_distance
                         },
-                        EnemyProjectile { speed: 0.0, direction: Vec2::ZERO },
+                        EnemyProjectile { 
+                            speed: 0.0, 
+                            direction: Vec2::ZERO,
+                            size: BOSS_VORTEX_FRAGMENT_SIZE 
+                        },
                     ));
                 }
             }

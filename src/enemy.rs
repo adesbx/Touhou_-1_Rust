@@ -154,7 +154,9 @@ fn check_health(
                 health.clone(),
             ));
 
-            commands.entity(entity).despawn();
+            if commands.get_entity(entity).is_ok() {
+                commands.entity(entity).despawn();
+            }
 
             commands.spawn((
                 AudioPlayer::new(assets.enemy_dying.clone()),
