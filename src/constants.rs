@@ -39,7 +39,9 @@ pub const GAME_WIDTH: f32 = 384.0;
 pub const GAME_HEIGHT: f32 = 448.0;
 
 //menu
-pub const NORMAL_BUTTON: Color = Color::srgb(0.2, 0.4, 0.6);
+pub const NORMAL_BUTTON: Color = Color::srgb(0.07, 0.07, 0.5);
 pub const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 pub const HOVERED_PRESSED_BUTTON: Color = Color::srgb(0.25, 0.65, 0.25);
 pub const PRESSED_BUTTON: Color = Color::srgb(0.35, 0.75, 0.35);
+
+

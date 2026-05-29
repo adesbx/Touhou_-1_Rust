@@ -33,6 +33,7 @@ fn switch_pause(
 
 fn display_pause_menu(
     mut commands: Commands,
+    asset_serv: Res<AssetServer>,
 ) {
     commands.spawn((
         PauseMenu,
@@ -51,12 +52,13 @@ fn display_pause_menu(
                 flex_direction: FlexDirection::Column,
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
+                border: UiRect::all(px(4)),
                 width: percent(40),
                 height: percent(60),
                 ..default()
             },
-            BackgroundColor(Color::srgb(0.2, 0.4, 0.8)),
-            BorderColor{top: Color::WHITE, right: Color::WHITE, left: Color::WHITE, bottom: Color::WHITE},
+            BackgroundColor(Color::srgb(0.07, 0.07, 0.3)),
+            BorderColor::all(Color::WHITE),
             BorderRadius::new(Val::Px(25.0), Val::Px(25.0), Val::Px(25.0), Val::Px(25.0)),
         )).with_children(|menu| {
             let button_node = Node {
@@ -74,7 +76,13 @@ fn display_pause_menu(
                 MenuButtonAction::Reset,
                 BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
             )).with_children(|button|{
-                button.spawn(Text::new("Reset"));
+                button.spawn((
+                    Text::new("Reset"),
+                    TextFont {
+                        font: asset_serv.load("PressStart2P-Regular.ttf"),
+                        ..default()
+                    },
+                ));
             });
 
             menu.spawn((
@@ -83,7 +91,13 @@ fn display_pause_menu(
                 MenuButtonAction::SettingsSound,
                 BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
             )).with_children(|button|{
-                button.spawn(Text::new("Sound"));
+                button.spawn((
+                    Text::new("Sound"),
+                    TextFont {
+                        font: asset_serv.load("PressStart2P-Regular.ttf"),
+                        ..default()
+                    },
+                ));
             });
 
             menu.spawn((
@@ -92,7 +106,13 @@ fn display_pause_menu(
                 MenuButtonAction::Resume,
                 BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
             )).with_children(|button: &mut bevy::ecs::relationship::RelatedSpawnerCommands<'_, ChildOf>|{
-                button.spawn(Text::new("Resume"));
+                button.spawn((
+                    Text::new("Resume"),
+                    TextFont {
+                        font: asset_serv.load("PressStart2P-Regular.ttf"),
+                        ..default()
+                    },
+                ));
             });
         });
     });
