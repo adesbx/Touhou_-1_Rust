@@ -259,6 +259,16 @@ pub struct MusicPlayed;
 #[derive(Component)]
 pub struct PauseMenu;
 
+#[derive(Component)]
+pub struct SelectedOption;
+
+#[derive(Component)]
+pub enum MenuButtonAction {
+    Reset,
+    SettingsSound,
+    Resume,
+}
+
 #[derive(Resource, Default)]
 pub struct AudioSettings {
     pub is_muted: bool,

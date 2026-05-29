@@ -1,3 +1,5 @@
+use bevy::prelude::*;
+
 // joueur
 pub const PLAYER_DAMAGE: f32 = 20.0;
 pub const PLAYER_HP: f32 = 3.0;
@@ -35,3 +37,9 @@ pub const BOMB_DAMAGE: f32 = 150.0;
 // jeu
 pub const GAME_WIDTH: f32 = 384.0;
 pub const GAME_HEIGHT: f32 = 448.0;
+
+//menu
+pub const NORMAL_BUTTON: Color = Color::srgb(0.2, 0.4, 0.6);
+pub const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
+pub const HOVERED_PRESSED_BUTTON: Color = Color::srgb(0.25, 0.65, 0.25);
+pub const PRESSED_BUTTON: Color = Color::srgb(0.35, 0.75, 0.35);
