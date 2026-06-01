@@ -1,6 +1,6 @@
 use bevy::app::App;
 use bevy::prelude::*;
-use bevy::audio::{AudioSink, CpalSample, Volume};
+use bevy::audio::{AudioSink, Volume};
 
 mod components;
 mod constants;
@@ -344,7 +344,7 @@ fn play_music_theme(
             AudioPlayer::new(asset_serv.load( "sounds/main_theme.ogg")),
             PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Loop,
-                volume: Volume::Decibels(-7.0),
+                volume: Volume::Linear(0.5),
                 ..default()
             },
             MusicPlayed
@@ -377,9 +377,16 @@ fn change_volume(
     mut music_query: Query<&mut AudioSink, With<MusicPlayed>>,
 ) {
     for mut sink in &mut music_query {
-        sink.set_volume(Volume::Decibels(-5.0+(settings.volume).to_float_sample())); 
+        if settings.volume != 0 {
+            let v = settings.volume as f32;
+            let linear = (v / 9.0).clamp(0.0, 1.0);
+
+            sink.set_volume(Volume::Linear(linear));
+
+            println!("Current volume is : {}", sink.volume().to_decibels());
+            println!("Current settings volume is : {}", settings.volume);
+        }
     }
-    println!("Current volume is : {}", settings.volume);
 }
 
 fn setup_assets(mut commands: Commands, asset_serv: Res<AssetServer>) {
