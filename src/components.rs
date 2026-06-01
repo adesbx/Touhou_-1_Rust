@@ -259,6 +259,16 @@ pub struct MusicPlayed;
 #[derive(Component)]
 pub struct PauseMenu;
 
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum MenuState {
+    #[default]
+    Main,
+    SettingsSound,
+}
+
+#[derive(Resource, Component, Clone, Copy, PartialEq, Eq)]
+pub struct VolumeButton(pub u32);
+
 #[derive(Component)]
 pub struct SelectedOption;
 
@@ -267,11 +277,13 @@ pub enum MenuButtonAction {
     Reset,
     SettingsSound,
     Resume,
+    Main
 }
 
 #[derive(Resource, Default)]
 pub struct AudioSettings {
     pub is_muted: bool,
+    pub volume: u32
 }
 
 impl Default for Health {

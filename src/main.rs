@@ -1,6 +1,6 @@
 use bevy::app::App;
 use bevy::prelude::*;
-use bevy::audio::{AudioSink, Volume};
+use bevy::audio::{AudioSink, CpalSample, Volume};
 
 mod components;
 mod constants;
@@ -12,7 +12,7 @@ mod level;
 mod ui;
 mod background;
 mod discussion;
-mod paused;
+mod pause;
 
 use crate::components::*;
 use crate::constants::*;
@@ -21,6 +21,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .init_state::<GameState>()
+        .init_state::<MenuState>()
         .init_asset::<LevelData>()
         .init_asset::<Dialogue>()
         .insert_resource(LevelManager {
@@ -29,6 +30,7 @@ fn main() {
             next_index: 0,
             power_up_timer: Timer::from_seconds(2.0, TimerMode::Repeating), 
         })
+        .insert_resource(VolumeButton(5))
         .init_resource::<AudioSettings>()
         .init_resource::<GameClock>()
         .register_asset_loader(LevelDataLoader)
@@ -41,10 +43,10 @@ fn main() {
         .add_plugins(ui::UiPlugin)
         .add_plugins(background::BackgroundPlugin)
         .add_plugins(discussion::DiscussionPlugin)
-        .add_plugins(paused::PausedPlugin)
+        .add_plugins(pause::PausePlugin)
         .add_systems(Startup, (setup, setup_assets))// pour le premier démarage
         .add_systems(Update, 
-            (play_music_theme, toggle_mute, tick_game_clock).run_if(in_state(GameState::Running).or(in_state(GameState::Discussion)))
+            (play_music_theme, toggle_mute, tick_game_clock, change_volume).run_if(in_state(GameState::Running).or(in_state(GameState::Discussion)))
         )
         .add_systems(OnEnter(GameState::Reset), cleanup_and_restart)
         .add_systems(OnExit(GameState::Reset), simple_restart)
@@ -301,7 +303,6 @@ fn play_music_theme(
     music_query: Query<Entity, With<MusicPlayed>>,
     mut current_music: Local<String>,
 ) {
-
     if !music_query.is_empty() {
         if manager.current_phase != GamePhase::BossFight && manager.current_phase != GamePhase::PreBoss {
             return;
@@ -369,6 +370,16 @@ fn toggle_mute(
             }
         }
     }
+}
+
+fn change_volume(
+    settings: ResMut<AudioSettings>,
+    mut music_query: Query<&mut AudioSink, With<MusicPlayed>>,
+) {
+    for mut sink in &mut music_query {
+        sink.set_volume(Volume::Decibels(-5.0+(settings.volume).to_float_sample())); 
+    }
+    println!("Current volume is : {}", settings.volume);
 }
 
 fn setup_assets(mut commands: Commands, asset_serv: Res<AssetServer>) {
