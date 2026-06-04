@@ -10,7 +10,8 @@ impl Plugin for PausePlugin {
             switch_pause,
             button_system,
             button_system_action,
-            sound_settigns_system
+            sound_settigns_system,
+            reset_unselected_buttons
         ));
 
         app.add_systems(OnEnter(GameState::Paused), display_pause_menu);
@@ -141,10 +142,10 @@ fn button_system(
 ) {
     for (interaction, mut background_color, selected) in &mut interaction_query {
         *background_color = match (*interaction, selected) {
-            (Interaction::Pressed, _) | (Interaction::None, Some(_)) => PRESSED_BUTTON.into(),
             (Interaction::Hovered, Some(_)) => HOVERED_PRESSED_BUTTON.into(),
             (Interaction::Hovered, None) => HOVERED_BUTTON.into(),
             (Interaction::None, None) => NORMAL_BUTTON.into(),
+            (Interaction::Pressed, _) | (Interaction::None, Some(_)) => PRESSED_BUTTON.into(),
         }
     }
 }
@@ -245,10 +246,6 @@ fn sound_settings_menu_setup(
                                                 BackgroundColor(NORMAL_BUTTON),
                                                 VolumeButton(volume_setting),
                                             ));
-
-                                            if volume == VolumeButton(volume_setting) {
-                                                entity.insert(SelectedOption);
-                                            }
                                         }
                                     }),
                                 )),
@@ -272,15 +269,33 @@ fn sound_settings_menu_setup(
 }
 
 fn sound_settigns_system(
+    mut commands: Commands, 
     interaction_query: Query<
-        (&Interaction, &VolumeButton),
+        (Entity, &Interaction, &VolumeButton),
         (Changed<Interaction>, With<Button>),
     >,
+    selected: Query<Entity, With<SelectedOption>>,
     mut settings: ResMut<AudioSettings>,
 ) {
-    for (interaction, action) in & interaction_query {
+    for (entity, interaction, action) in & interaction_query {
         if *interaction == Interaction::Pressed {
-            settings.volume = action.0;
+            settings.volume = action.0; 
+
+            for old in &selected {
+                commands.entity(old).remove::<SelectedOption>();
+            }
+
+            commands.entity(entity).insert(SelectedOption);
+        }
+    }
+}
+
+fn reset_unselected_buttons(
+    mut query: Query<(&Interaction, &mut BackgroundColor, Option<&SelectedOption>), With<Button>>,
+) {
+    for (interaction, mut color, selected) in &mut query {
+        if selected.is_none() && *interaction == Interaction::None {
+            *color = NORMAL_BUTTON.into();
         }
     }
 }
