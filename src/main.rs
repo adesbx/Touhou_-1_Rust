@@ -383,8 +383,8 @@ fn change_volume(
 
             sink.set_volume(Volume::Linear(linear));
 
-            println!("Current volume is : {}", sink.volume().to_decibels());
-            println!("Current settings volume is : {}", settings.volume);
+            // println!("Current volume is : {}", sink.volume().to_decibels());
+            // println!("Current settings volume is : {}", settings.volume);
         }
     }
 }

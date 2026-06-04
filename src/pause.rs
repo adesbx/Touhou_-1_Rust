@@ -50,6 +50,7 @@ fn display_pause_menu(
         BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.0)),
     )).with_children(|parent|{
         parent.spawn((
+            PauseMenuChildren,
             Node {
                 flex_direction: FlexDirection::Column,
                 justify_content: JustifyContent::Center,
@@ -176,18 +177,24 @@ fn button_system_action(
     }
 }
 
-fn sound_settings_menu_setup(mut commands: Commands, volume: Res<VolumeButton>, pause_menu: Single<Entity, With<PauseMenu>>) {
+fn sound_settings_menu_setup(
+    mut commands: Commands, 
+    volume: Res<VolumeButton>, 
+    pause_menu: Single<Entity, With<PauseMenuChildren>>,
+    asset_serv: Res<AssetServer>,
+) {
     let button_node = Node {
-        width: px(200),
-        height: px(65),
-        margin: UiRect::all(px(20)),
+        width: px(100),
+        height: px(45),
+        margin: UiRect::all(px(5)),
         justify_content: JustifyContent::Center,
         align_items: AlignItems::Center,
         ..default()
     };
     let button_text_style = (
         TextFont {
-            font_size: 33.0,
+            font_size: 23.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
             ..default()
         },
         TextColor(Color::WHITE),
@@ -207,28 +214,45 @@ fn sound_settings_menu_setup(mut commands: Commands, volume: Res<VolumeButton>, 
             children![
                 (
                     Node {
+                        flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
+                        row_gap: px(10),
                         ..default()
                     },
                     Children::spawn((
-                        Spawn((Text::new("Volume"), button_text_style.clone())),
+                        Spawn((
+                            Text::new("Volume"),
+                            button_text_style.clone(),
+                        )),
                         SpawnWith(move |parent: &mut ChildSpawner| {
-                            for volume_setting in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
-                                let mut entity = parent.spawn((
-                                    Button,
-                                    Node {
-                                        width: px(30),
-                                        height: px(65),
-                                        ..button_node_clone.clone()
-                                    },
-                                    BackgroundColor(NORMAL_BUTTON),
-                                    VolumeButton(volume_setting),
-                                ));
+                            parent.spawn((
+                                Node {
+                                    flex_direction: FlexDirection::Row,
+                                    justify_content: JustifyContent::Center,
+                                    align_items: AlignItems::Center,
+                                    ..default()
+                                },
+                                Children::spawn((
+                                    SpawnWith(move |parent: &mut ChildSpawner| {
+                                        for volume_setting in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
+                                            let mut entity = parent.spawn((
+                                                Button,
+                                                Node {
+                                                    width: px(30),
+                                                    height: px(65),
+                                                    ..button_node_clone.clone()
+                                                },
+                                                BackgroundColor(NORMAL_BUTTON),
+                                                VolumeButton(volume_setting),
+                                            ));
 
-                                if volume == VolumeButton(volume_setting) {
-                                    entity.insert(SelectedOption);
-                                }
-                            }
+                                            if volume == VolumeButton(volume_setting) {
+                                                entity.insert(SelectedOption);
+                                            }
+                                        }
+                                    }),
+                                )),
+                            ));
                         }),
                     )),
                 ),

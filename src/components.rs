@@ -259,6 +259,9 @@ pub struct MusicPlayed;
 #[derive(Component)]
 pub struct PauseMenu;
 
+#[derive(Component)]
+pub struct PauseMenuChildren;
+
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum MenuState {
     #[default]
