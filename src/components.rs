@@ -265,6 +265,7 @@ pub struct PauseMenuChildren;
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum MenuState {
     #[default]
+    Nothing,
     Main,
     SettingsSound,
 }

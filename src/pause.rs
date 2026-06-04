@@ -17,6 +17,7 @@ impl Plugin for PausePlugin {
         app.add_systems(OnEnter(GameState::Paused), display_pause_menu);
         app.add_systems(OnExit(GameState::Paused), remove_pause_menu);
         app.add_systems(OnEnter(MenuState::SettingsSound), sound_settings_menu_setup);
+        app.add_systems(OnEnter(MenuState::Main), main_menu_setup);
     }
 }
 
@@ -24,11 +25,13 @@ fn switch_pause(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     state: Res<State<GameState>>,
+    mut menu_state: ResMut<NextState<MenuState>>,
 ) {
     if keyboard.just_pressed(KeyCode::Escape) {
         if state.get() != &GameState::Paused {
             commands.set_state(GameState::Paused);
         } else {
+            menu_state.set(MenuState::Nothing);
             commands.set_state(GameState::Running);
         }
     }
@@ -36,7 +39,7 @@ fn switch_pause(
 
 fn display_pause_menu(
     mut commands: Commands,
-    asset_serv: Res<AssetServer>,
+    mut menu_state: ResMut<NextState<MenuState>>,
 ) {
     commands.spawn((
         PauseMenu,
@@ -64,65 +67,9 @@ fn display_pause_menu(
             BackgroundColor(Color::srgb(0.07, 0.07, 0.3)),
             BorderColor::all(Color::WHITE),
             BorderRadius::new(Val::Px(25.0), Val::Px(25.0), Val::Px(25.0), Val::Px(25.0)),
-        )).with_children(|menu| {
-            let button_node = Node {
-                width: px(300),
-                height: px(65),
-                margin: UiRect::all(px(20)),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                ..default()
-            };
-
-            menu.spawn((
-                DespawnOnExit(MenuState::Main),
-                Button,
-                button_node.clone(),
-                MenuButtonAction::Reset,
-                BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
-            )).with_children(|button|{
-                button.spawn((
-                    Text::new("Reset"),
-                    TextFont {
-                        font: asset_serv.load("PressStart2P-Regular.ttf"),
-                        ..default()
-                    },
-                ));
-            });
-
-            menu.spawn((
-                DespawnOnExit(MenuState::Main),
-                Button,
-                button_node.clone(),
-                MenuButtonAction::SettingsSound,
-                BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
-            )).with_children(|button|{
-                button.spawn((
-                    Text::new("Sound"),
-                    TextFont {
-                        font: asset_serv.load("PressStart2P-Regular.ttf"),
-                        ..default()
-                    },
-                ));
-            });
-
-            menu.spawn((
-                DespawnOnExit(MenuState::Main),
-                Button,
-                button_node.clone(),
-                MenuButtonAction::Resume,
-                BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
-            )).with_children(|button: &mut bevy::ecs::relationship::RelatedSpawnerCommands<'_, ChildOf>|{
-                button.spawn((
-                    Text::new("Resume"),
-                    TextFont {
-                        font: asset_serv.load("PressStart2P-Regular.ttf"),
-                        ..default()
-                    },
-                ));
-            });
-        });
+        ));
     });
+    menu_state.set(MenuState::Main);
 }
 
 fn remove_pause_menu(
@@ -169,6 +116,7 @@ fn button_system_action(
                 },
                 MenuButtonAction::Resume => {
                     next_state.set(GameState::Running);
+                    menu_state.set(MenuState::Nothing);
                 },
                 MenuButtonAction::Main => {
                     menu_state.set(MenuState::Main);
@@ -178,9 +126,81 @@ fn button_system_action(
     }
 }
 
+fn main_menu_setup(
+    mut commands: Commands,
+    pause_menu: Single<Entity, With<PauseMenuChildren>>,
+    asset_serv: Res<AssetServer>,
+) {
+    let button_node = Node {
+        width: px(300),
+        height: px(65),
+        margin: UiRect::all(px(20)),
+        justify_content: JustifyContent::Center,
+        align_items: AlignItems::Center,
+        ..default()
+    };
+
+    let font = asset_serv.load("PressStart2P-Regular.ttf");
+
+    commands
+        .entity(pause_menu.entity())
+        .with_children(|menu| {
+
+            menu.spawn((
+                DespawnOnExit(MenuState::Main),
+                Button,
+                button_node.clone(),
+                MenuButtonAction::Reset,
+                BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
+            ))
+            .with_children(|button| {
+                button.spawn((
+                    Text::new("Reset"),
+                    TextFont {
+                        font: font.clone(),
+                        ..default()
+                    },
+                ));
+            });
+
+            menu.spawn((
+                DespawnOnExit(MenuState::Main),
+                Button,
+                button_node.clone(),
+                MenuButtonAction::SettingsSound,
+                BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
+            ))
+            .with_children(|button| {
+                button.spawn((
+                    Text::new("Sound"),
+                    TextFont {
+                        font: font.clone(),
+                        ..default()
+                    },
+                ));
+            });
+
+            menu.spawn((
+                DespawnOnExit(MenuState::Main),
+                Button,
+                button_node.clone(),
+                MenuButtonAction::Resume,
+                BackgroundColor(Color::srgb(0.2, 0.4, 0.6)),
+            ))
+            .with_children(|button| {
+                button.spawn((
+                    Text::new("Resume"),
+                    TextFont {
+                        font: font.clone(),
+                        ..default()
+                    },
+                ));
+            });
+        });
+}
+
 fn sound_settings_menu_setup(
     mut commands: Commands, 
-    volume: Res<VolumeButton>, 
     pause_menu: Single<Entity, With<PauseMenuChildren>>,
     asset_serv: Res<AssetServer>,
 ) {
@@ -201,7 +221,6 @@ fn sound_settings_menu_setup(
         TextColor(Color::WHITE),
     );
 
-    let volume = *volume;
     let button_node_clone = button_node.clone();
 
     commands.entity(pause_menu.entity()).with_children(|parent| {
@@ -236,7 +255,7 @@ fn sound_settings_menu_setup(
                                 Children::spawn((
                                     SpawnWith(move |parent: &mut ChildSpawner| {
                                         for volume_setting in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
-                                            let mut entity = parent.spawn((
+                                            parent.spawn((
                                                 Button,
                                                 Node {
                                                     width: px(30),
