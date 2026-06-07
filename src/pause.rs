@@ -203,6 +203,7 @@ fn sound_settings_menu_setup(
     mut commands: Commands, 
     pause_menu: Single<Entity, With<PauseMenuChildren>>,
     asset_serv: Res<AssetServer>,
+    settings: ResMut<AudioSettings>,
 ) {
     let button_node = Node {
         width: px(100),
@@ -222,6 +223,7 @@ fn sound_settings_menu_setup(
     );
 
     let button_node_clone = button_node.clone();
+    let current_volume = settings.volume;
 
     commands.entity(pause_menu.entity()).with_children(|parent| {
         parent.spawn((
@@ -254,17 +256,28 @@ fn sound_settings_menu_setup(
                                 },
                                 Children::spawn((
                                     SpawnWith(move |parent: &mut ChildSpawner| {
-                                        for volume_setting in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
-                                            parent.spawn((
+                                        for volume_setting in [0, 1, 2, 3, 4, 5, 6] {
+                                            
+                                            let color = if volume_setting == current_volume {
+                                                PRESSED_BUTTON
+                                            } else {
+                                                NORMAL_BUTTON
+                                            };
+
+                                            let mut button = parent.spawn((
                                                 Button,
                                                 Node {
                                                     width: px(30),
                                                     height: px(65),
                                                     ..button_node_clone.clone()
                                                 },
-                                                BackgroundColor(NORMAL_BUTTON),
+                                                BackgroundColor(color),
                                                 VolumeButton(volume_setting),
                                             ));
+
+                                            if volume_setting == current_volume {
+                                                button.insert(SelectedOption);
+                                            }
                                         }
                                     }),
                                 )),
@@ -299,6 +312,7 @@ fn sound_settigns_system(
     for (entity, interaction, action) in & interaction_query {
         if *interaction == Interaction::Pressed {
             settings.volume = action.0; 
+            println!("new volume {}", settings.volume);
 
             for old in &selected {
                 commands.entity(old).remove::<SelectedOption>();

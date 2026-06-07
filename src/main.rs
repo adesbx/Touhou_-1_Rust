@@ -314,12 +314,6 @@ fn play_music_theme(
             "sounds/main_theme.ogg"
         };
 
-        let volume = if manager.current_phase == GamePhase::BossFight {
-            Volume::Decibels(-3.0)
-        } else {
-            Volume::Decibels(-7.0)
-        };
-
         if *current_music == sound_path {
             return;
         }
@@ -328,12 +322,11 @@ fn play_music_theme(
             commands.entity(entity).despawn();
         }
 
-
         commands.spawn((
             AudioPlayer::new(asset_serv.load(sound_path)),
             PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Loop,
-                volume: volume,
+                volume: Volume::Linear(0.5),
                 ..default()
             },
             MusicPlayed
@@ -357,16 +350,14 @@ fn toggle_mute(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut settings: ResMut<AudioSettings>,
     mut music_query: Query<&mut AudioSink, With<MusicPlayed>>,
-    mut last_decibel: Local<Volume>,
 ) {
     if keyboard.just_pressed(KeyCode::KeyT) {
         settings.is_muted = !settings.is_muted;
         for mut sink in &mut music_query {
             if settings.is_muted {
-                *last_decibel = sink.volume();
-                sink.set_volume(Volume::Decibels(-1000.0));
+                sink.mute();
             } else {
-                sink.set_volume(*last_decibel); 
+                sink.unmute(); 
             }
         }
     }
@@ -377,15 +368,14 @@ fn change_volume(
     mut music_query: Query<&mut AudioSink, With<MusicPlayed>>,
 ) {
     for mut sink in &mut music_query {
-        if settings.volume != 0 {
-            let v = settings.volume as f32;
-            let linear = (v / 9.0).clamp(0.0, 1.0);
+        let v = settings.volume as f32;
+        let linear = (v / 6.0).clamp(0.1, 1.0);
 
-            sink.set_volume(Volume::Linear(linear));
+        sink.set_volume(Volume::Linear(linear));
 
-            // println!("Current volume is : {}", sink.volume().to_decibels());
-            // println!("Current settings volume is : {}", settings.volume);
-        }
+        // println!("Current volume is : {}", sink.volume().to_decibels());
+        // println!("Current settings volume is : {}", settings.volume);
+    
     }
 }
 
