@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::Rng;
 use crate::components::*;
 use crate::constants::*;
-use bevy::audio::{AudioSink, Volume};
+use bevy::audio::Volume;
 
 pub struct EnemyPlugin;
 

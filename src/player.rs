@@ -132,6 +132,7 @@ fn use_bombs(
     assets: Res<GameAssets>,
     mut player_query: Single<(&Transform, &mut Player), With<Player>>,
     mut enemy_query: Query<(&Transform, &mut Health), With<Enemy>>, 
+    mut projectile_query: Query<(&Transform, Entity), With<EnemyProjectile>>, 
     keyboard: Res<ButtonInput<KeyCode>>,
     mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
 ) {
@@ -144,6 +145,13 @@ fn use_bombs(
                 let enemy_pos = enemy_transform.translation.truncate();
                 if player_pos.distance(enemy_pos) < BOMB_RANGE {
                     enemy_health.hp -= BOMB_DAMAGE;
+                }
+            }
+
+            for (transform, entity) in &mut projectile_query {
+                let pos = transform.translation.truncate();
+                if player_pos.distance(pos) < BOMB_RANGE {
+                    commands.entity(entity).despawn();
                 }
             }
 
