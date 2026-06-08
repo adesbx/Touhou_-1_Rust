@@ -137,12 +137,19 @@ fn check_health(
     asset_serv: Res<AssetServer>,
     assets: Res<GameAssets>,
     mut texture_atlas_layout: ResMut<Assets<TextureAtlasLayout>>,
-    mut health_query: Query<(Entity, &mut Health, &Transform), With<Health>>,
+    mut health_query: Query<(Entity, &mut Health, &Transform, Option<&Boss>), With<Health>>,
+    mut manager: ResMut<NextState<GameState>>, 
 ) {
 
-    for (entity, mut health, transform) in &mut health_query {
+    for (entity, mut health, transform, boss) in &mut health_query {
         if health.hp <= 0.0  && !health.is_dying{
             health.is_dying = true;
+
+            if let Some(boss) = boss {
+                if !boss.first_spawn {
+                    manager.set(GameState::EndGame);
+                }
+            }
 
             let texture: Handle<_> = asset_serv.load("projectiles/smoke.png");
             let layout = TextureAtlasLayout::from_grid(UVec2::splat(24), 2, 3, None, None);

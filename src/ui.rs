@@ -1,11 +1,13 @@
 use bevy::prelude::*;
 use crate::components::*;
+use crate::constants::*;
 
 pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (update_health_ui, update_damage_ui, update_bombs_ui));
+        app.add_systems(OnEnter(GameState::EndGame), show_win_message);
     }
 }
 
@@ -28,4 +30,26 @@ fn update_bombs_ui(
     mut text_query: Single<&mut Text, With<PlayerBombsText>>,
 ) {
     text_query.0 = format!("Bombs:{:.0}", player_query.nbr_bombs);
+}
+
+fn show_win_message(
+    mut commands: Commands, 
+    asset_serv: Res<AssetServer>,
+) {
+    commands.spawn((
+        Text::new("You win !"), 
+        TextFont {
+            font_size: 50.0,
+            font: asset_serv.load("PressStart2P-Regular.ttf"),
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(GAME_HEIGHT/2.0),
+            left: Val::Percent(35.0),
+            ..default()
+        },
+        ZIndex(999)
+    ));
 }

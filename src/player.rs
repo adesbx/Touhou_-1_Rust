@@ -20,6 +20,8 @@ impl Plugin for PlayerPlugin {
             check_if_dead,
             draw_hitbox
         ).run_if(in_state(GameState::Running).or(in_state(GameState::Discussion))));
+
+        app.add_systems(Update, move_player_to_top.run_if(in_state(GameState::EndGame)));
     }
 }
 
@@ -294,4 +296,18 @@ fn draw_hitbox(
             }
         }
     }
+}
+
+fn move_player_to_top(
+    time:  Res<Time>,
+    mut player_transform: Single<&mut Transform, With<Player>>, ) {
+    let mut direction = Vec2::ZERO;
+
+    direction.y += 1.;
+
+    if direction != Vec2::ZERO {
+        direction = direction.normalize_or_zero();
+    }
+
+    player_transform.translation.y += direction.y * time.delta_secs() * (PLAYER_SPEED / 2.0);
 }

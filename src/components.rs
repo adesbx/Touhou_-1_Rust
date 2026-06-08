@@ -181,7 +181,8 @@ pub enum GameState {
     Running,
     Discussion,
     Paused,
-    Reset
+    Reset,
+    EndGame
 }
 
 #[derive(Deserialize, Asset, TypePath, Debug, PartialEq)]
