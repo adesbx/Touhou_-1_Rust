@@ -50,6 +50,7 @@ fn main() {
         )
         .add_systems(OnEnter(GameState::Reset), cleanup_and_restart)
         .add_systems(OnExit(GameState::Reset), simple_restart)
+        .add_systems(OnExit(GameState::EndGame), play_end_theme)
         .run();
 }
 
@@ -345,6 +346,22 @@ fn play_music_theme(
         *current_music = "sounds/main_theme.ogg".to_string();
     }
 }
+
+fn play_end_theme(
+    asset_serv: Res<AssetServer>, 
+    mut commands: Commands,
+) {
+    commands.spawn((
+        AudioPlayer::new(asset_serv.load( "sounds/end_theme.ogg")),
+        PlaybackSettings {
+            mode: bevy::audio::PlaybackMode::Once,
+            volume: Volume::Linear(0.5),
+            ..default()
+        },
+        MusicPlayed
+    ));
+}
+
 
 fn toggle_mute(
     keyboard: Res<ButtonInput<KeyCode>>,
