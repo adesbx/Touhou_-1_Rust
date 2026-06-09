@@ -50,7 +50,7 @@ fn main() {
         )
         .add_systems(OnEnter(GameState::Reset), cleanup_and_restart)
         .add_systems(OnExit(GameState::Reset), simple_restart)
-        .add_systems(OnExit(GameState::EndGame), play_end_theme)
+        .add_systems(OnEnter(GameState::EndGame), play_end_theme)
         .run();
 }
 
@@ -350,7 +350,17 @@ fn play_music_theme(
 fn play_end_theme(
     asset_serv: Res<AssetServer>, 
     mut commands: Commands,
+    music_query: Query<Entity, With<MusicPlayed>>,
+    projectile_query: Query<Entity, Or<(With<Projectile>, With<EnemyProjectile>)>>,
 ) {
+    for entity in music_query {
+        commands.entity(entity).despawn();
+    }
+
+    for entity in projectile_query {
+        commands.entity(entity).despawn();
+    }
+
     commands.spawn((
         AudioPlayer::new(asset_serv.load( "sounds/end_theme.ogg")),
         PlaybackSettings {
