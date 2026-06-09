@@ -31,7 +31,7 @@ jobs:
         cp README.md dist/
 
     - name: Create ZIP Archive
-      shell: bash
+      shell: pwsh
       run: |
         compress-archive -Path dist/* -DestinationPath touhou_game.zip
 
