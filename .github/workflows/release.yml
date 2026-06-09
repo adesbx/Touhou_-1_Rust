@@ -1,0 +1,43 @@
+name: Deploy Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Rust Toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2
+
+    - name: Build Game in Release Mode
+      run: cargo build --release
+
+    - name: Prepare Release Folder
+      shell: bash
+      run: |
+        mkdir dist
+        cp target/release/touhou_-1_rust.exe dist/
+        cp -r assets dist/assets
+        cp README.md dist/
+
+    - name: Create ZIP Archive
+      shell: bash
+      run: |
+        compress-archive -Path dist/* -DestinationPath touhou_game.zip
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: touhou_game.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
