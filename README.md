@@ -9,7 +9,7 @@ Affrontez des vagues d'Anges et de Cherubs aux patterns de déplacement uniques,
 Ce jeu a été développé dans un but d'**apprentissage pour découvrir le langage Rust** et la logique ECS (Entity Component System) du moteur Bevy.
 
 * **Assets graphiques :** 100% fait maison ! Tous les sprites, les feuilles d'animations (spritesheets), le décor de fond ont été dessinés et intégrés par mes soins.
-* **Audio :** Les musiques sont égalements faites maisons, les seuls éléments externes non réalisés à la main sont les bj'ruitages de type **SFX** (sons de tirs, impacts, explosions).
+* **Audio :** Les musiques sont égalements faites maisons, les seuls éléments externes non réalisés à la main sont les bruitages de type **SFX** (sons de tirs, impacts, explosions).
 
 ### Crédits Audio (SFX)
 Afin de donner vie aux affrontements, le projet intègre les bruitages externes suivants :
@@ -60,7 +60,6 @@ Le jeu utilise une configuration classique de type clavier "ZQSD + Action".
 ## Mécaniques de jeu & Contenu
 
 * **Système de Vagues :** Progression rythmée à travers plusieurs vagues d'ennemis juste avant le Boss.
-* **Graphismes Pixel-Art :** Rendu net ("crispy") assuré via `ImagePlugin::default_nearest()` et la désactivation du MSAA (`Msaa::Off`) directement sur la caméra pour éviter le flou sur les sprites et la police *PressStart2P*.
 * **Power-Ups :** Les ennemis ont une chance sur trois (1/3) de faire apparaître un item de puissance à leur mort. Ces mêmes items peuvent spawn de manière  aléatoire durant la partie. Ramasser ces items débloque différents niveaux de tir améliorés. De plus, la cadence de tir (vitesse) augmente dynamiquement en scalant directement sur votre niveau de Power-Up actuel.
 
 
