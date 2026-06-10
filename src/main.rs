@@ -1,3 +1,4 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use bevy::app::App;
 use bevy::prelude::*;
 use bevy::audio::{AudioSink, Volume};
